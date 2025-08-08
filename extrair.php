@@ -74,7 +74,7 @@ if ($_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
     $modelo_path = __DIR__ . '/modelo_planilha_importacao.xlsx';
     $modelo_nome = 'ahreas';
 
-    $comando = "python extractor_pdf.py"
+    $comando = "python3 extractor_pdf.py"
         . " --pdf " . escapeshellarg($pdf_path)
         . " --modelo " . escapeshellarg($modelo_path)
         . " --saida " . escapeshellarg($output_dir)

@@ -7,6 +7,66 @@ from typing import List, Tuple, Optional
 import argparse
 import sys
 import json
+import os
+import shutil
+import sys
+from typing import Optional
+
+def _resolver_pdftotext(caminho_forcado: Optional[str] = None) -> str:
+    """
+    Retorna o executável `pdftotext` a usar.
+    Ordem de resolução:
+    1) argumento explícito (caminho_forcado), se existir
+    2) variável de ambiente POPPLER_PDFTOTEXT
+    3) `pdftotext` no PATH (shutil.which)
+    4) locais comuns no Windows
+    5) locais comuns em Linux/Mac
+    Lança FileNotFoundError se não encontrar.
+    """
+    candidatos = []
+
+    # 1) parâmetro explícito
+    if caminho_forcado:
+        candidatos.append(caminho_forcado)
+
+    # 2) env var
+    env = os.environ.get("POPPLER_PDFTOTEXT")
+    if env:
+        candidatos.append(env)
+
+    # 3) no PATH
+    which = shutil.which("pdftotext")
+    if which:
+        candidatos.append(which)
+
+    # 4) caminhos comuns (Windows)
+    if sys.platform.startswith("win"):
+        comuns_win = [
+            r"C:\Program Files\poppler\bin\pdftotext.exe",
+            r"C:\Program Files\poppler-24.02.0\Library\bin\pdftotext.exe",
+            r"C:\Program Files\poppler-23.11.0\Library\bin\pdftotext.exe",
+            r"C:\poppler\Library\bin\pdftotext.exe",
+        ]
+        candidatos.extend(comuns_win)
+    else:
+        # 5) caminhos comuns (Linux/Mac)
+        comuns_unix = [
+            "/usr/bin/pdftotext",
+            "/usr/local/bin/pdftotext",
+            "/opt/homebrew/bin/pdftotext",  # macOS (Apple Silicon / Homebrew)
+            "/usr/local/opt/poppler/bin/pdftotext",  # macOS (Intel / Homebrew)
+        ]
+        candidatos.extend(comuns_unix)
+
+    for c in candidatos:
+        if c and os.path.isfile(c):
+            return c
+
+    raise FileNotFoundError(
+        "Não encontrei o executável 'pdftotext'. "
+        "Defina POPPLER_PDFTOTEXT com o caminho completo ou instale o Poppler e "
+        "garanta que 'pdftotext' esteja no PATH."
+    )
 
 class ExtractorPDF:
     def __init__(self, config_path: str = "config.json"):
@@ -317,8 +377,12 @@ class ExtractorPDF:
 
 
         return list(unidades_dict.values())
-
-    def processar_pdf(self, caminho_pdf: str, pdftotext_path: str = r'C:/poppler/Library/bin/pdftotext.exe') -> Optional[pd.DataFrame]:
+    
+    def processar_pdf(self, caminho_pdf: str, pdftotext_path: Optional[str] = None) -> Optional[pd.DataFrame]:
+        exe = _resolver_pdftotext(pdftotext_path)
+        # ... use `exe` no subprocesso, ex:
+        # subprocess.run([exe, "-layout", caminho_pdf, "-"], check=True, stdout=PIPE, stderr=PIPE)
+        ...
         if not os.path.exists(caminho_pdf):
             raise FileNotFoundError(f"PDF não encontrado: {caminho_pdf}")
         # Nome do .txt igual ao PDF, mas na pasta de output
@@ -371,6 +435,7 @@ if __name__ == "__main__":
     parser.add_argument('--modelo', required=True, help='Caminho do modelo XLSX (estrutura da planilha de destino)')
     parser.add_argument('--saida', required=True, help='Pasta de saída para o arquivo XLSX gerado')
     parser.add_argument('--modelo_nome', required=True, help='Nome do modelo de extração (ex: ahreas)')
+    parser.add_argument("--pdftotext", help="Caminho do executável pdftotext (opcional).")
 
     args = parser.parse_args()
 

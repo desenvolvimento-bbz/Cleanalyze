@@ -1,42 +1,32 @@
-# Base mínima com PHP + Python + Poppler
-FROM debian:bookworm-slim
+# ==== base PHP com Composer ====
+FROM php:8.2-cli
 
-ENV DEBIAN_FRONTEND=noninteractive \
-    APP_ENV=production \
-    PORT=8080
-
-# Dependências do sistema
+# Instala dependências do sistema (python3, poppler, zip, git) e extensões úteis
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates curl unzip git \
-    php-cli php-mbstring php-xml php-zip php-gd php-curl \
-    python3 python3-pip \
+    python3 python3-venv python3-pip \
     poppler-utils \
+    git unzip \
  && rm -rf /var/lib/apt/lists/*
 
-# Composer
-RUN curl -fsSL https://getcomposer.org/installer -o /tmp/composer-setup.php \
- && php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer \
- && rm /tmp/composer-setup.php
+# Instala Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# Cria diretório da app
 WORKDIR /app
 
-# Instala dependências PHP no container
-COPY composer.json composer.lock /app/
-RUN composer install --no-dev --prefer-dist --no-interaction
+# Copia composer.* e instala deps PHP (Dompdf, PhpSpreadsheet etc.)
+COPY composer.json composer.lock* /app/
+RUN composer install --no-dev --prefer-dist --no-interaction || composer install --no-dev --prefer-dist --no-interaction
 
-# Copia o restante do app
+# Copia código
 COPY . /app
 
-# PHP ini custom (uploads maiores + sessão em pasta do app)
-COPY docker/php.ini /etc/php/8.2/cli/conf.d/app.ini
+# Pastas graváveis em runtime
+RUN mkdir -p /app/logs /app/uploads /app/output \
+ && chown -R www-data:www-data /app
 
-# Prepara diretórios de escrita
-RUN mkdir -p /app/uploads /app/output /app/logs /app/.sessions \
- && chmod -R 777 /app/uploads /app/output /app/logs /app/.sessions
+# Porta será injetada pelo Railway (ENV PORT)
+ENV PORT=8080
 
-# Entry-point que cria dirs (com volume) e sobe o servidor
-COPY docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-EXPOSE 8080
-CMD ["/entrypoint.sh"]
+# Comando: PHP embutido servindo a raiz do app
+CMD ["sh", "-c", "php -d variables_order=EGPCS -S 0.0.0.0:${PORT} -t /app"]

@@ -1,7 +1,10 @@
 .git
 .gitignore
 node_modules
-vendor  # (opcional: se quiser que o build sempre rode composer install)
+vendor/*/
+tests
+*.md
 *.log
-uploads
-output
+logs/*.log
+uploads/*
+output/*
