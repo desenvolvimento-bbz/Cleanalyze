@@ -1,0 +1,7 @@
+.git
+.gitignore
+node_modules
+vendor  # (opcional: se quiser que o build sempre rode composer install)
+*.log
+uploads
+output
