@@ -1,32 +1,35 @@
-# ==== base PHP com Composer ====
-FROM php:8.2-cli
+# Imagem mínima com PHP 8.2 (Alpine) + extensões necessárias + Python + Poppler
+FROM alpine:3.20
 
-# Instala dependências do sistema (python3, poppler, zip, git) e extensões úteis
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-venv python3-pip \
+# Instala PHP (CLI) e extensões usadas pelo PhpSpreadsheet + dependências úteis
+RUN apk add --no-cache \
+    php82 php82-cli php82-session php82-mbstring php82-zip php82-xml php82-dom php82-simplexml \
+    php82-gd php82-curl php82-opcache php82-iconv \
+    python3 py3-pip \
     poppler-utils \
-    git unzip \
- && rm -rf /var/lib/apt/lists/*
+    curl unzip git
 
-# Instala Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Composer (oficial) – funciona bem no Alpine
+RUN curl -fsSL https://getcomposer.org/installer -o composer-setup.php \
+ && php82 composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+ && rm composer-setup.php
 
-# Cria diretório da app
+# Define o PHP 8.2 como padrão para o cli
+RUN ln -sf /usr/bin/php82 /usr/bin/php
+
 WORKDIR /app
-
-# Copia composer.* e instala deps PHP (Dompdf, PhpSpreadsheet etc.)
-COPY composer.json composer.lock* /app/
-RUN composer install --no-dev --prefer-dist --no-interaction || composer install --no-dev --prefer-dist --no-interaction
-
-# Copia código
 COPY . /app
 
-# Pastas graváveis em runtime
-RUN mkdir -p /app/logs /app/uploads /app/output \
- && chown -R www-data:www-data /app
+# Instala dependências PHP
+ENV COMPOSER_ALLOW_SUPERUSER=1
+RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
 
-# Porta será injetada pelo Railway (ENV PORT)
-ENV PORT=8080
+# Instala dependências Python (se tiver requirements.txt)
+RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.txt; fi
 
-# Comando: PHP embutido servindo a raiz do app
-CMD ["sh", "-c", "php -d variables_order=EGPCS -S 0.0.0.0:${PORT} -t /app"]
+# Cria diretórios de upload/output e dá permissão
+RUN mkdir -p /app/uploads /app/output && chmod -R 777 /app/uploads /app/output
+
+# A Railway injeta $PORT. O servidor embutido do PHP vai ouvir nele.
+EXPOSE 8080
+CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t /app"]
