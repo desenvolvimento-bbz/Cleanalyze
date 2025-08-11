@@ -2,5 +2,9 @@
   "ti@bbz.com.br": {
     "hash": "$2y$10$qGMB0euxnT8Mv8RfD.Hqqe88b6tW4LB8XbYLVv8m4wijLExvAmtk6",
     "role": "admin"
+  },
+    "integracao@bbz.com.br": {
+    "hash": "$2y$10$8HeeEOCp2boHQ9fA.a2Zee.v5ajhy6qsM0ahZwsSylrGT2YqetYyG",
+    "role": "user"
   }
 }

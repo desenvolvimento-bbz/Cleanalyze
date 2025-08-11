@@ -279,6 +279,32 @@ class ExtractorPDF:
             elif len(digitos) == 10 and digitos[2] == "9":
                 celulares.append(digitos)
         return list(set(celulares))
+    
+    def extrair_cpf_cnpj(self, bloco: str) -> str:
+        """
+        Captura prioritariamente CNPJ quando 'Tipo de pessoa: Jurídica' estiver presente.
+        Caso contrário, procura CNPJ/CPF no bloco inteiro, sempre evitando pegar o CNPJ
+        do condomínio (que está fora do bloco).
+        """
+        # 1) Caso clássico: linha com "Tipo de pessoa: Jurídica ... CNPJ: ..."
+        m = re.search(
+            r'Tipo\s+de\s+pessoa\s*:\s*Jur[ií]dica.*?CNPJ\s*:\s*([\d./-]{14,18})',
+            bloco, re.IGNORECASE | re.DOTALL
+        )
+        if m:
+            return m.group(1).strip()
+
+        # 2) Procura CNPJ em qualquer lugar do bloco (preferência a CNPJ)
+        m = re.search(r'CNPJ\s*:\s*([\d./-]{14,18})', bloco, re.IGNORECASE)
+        if m:
+            return m.group(1).strip()
+
+        # 3) Como fallback, procura CPF
+        m = re.search(r'CPF\s*:\s*([\d.-]{11,14})', bloco, re.IGNORECASE)
+        if m:
+            return m.group(1).strip()
+
+        return ""
 
     def merge_dados(self, orig: dict, novo: dict) -> dict:
         for k, v in novo.items():
@@ -315,8 +341,7 @@ class ExtractorPDF:
                 campos["Código do Cliente"] = cod_cliente
 
             # CPF/CNPJ (primeiro do bloco)
-            cpf_cnpj_matches = re.findall(r'CPF:\s*([\d./-]+)', bloco)
-            campos["CPF/CNPJ"] = cpf_cnpj_matches[0] if cpf_cnpj_matches else ""
+            campos["CPF/CNPJ"] = self.extrair_cpf_cnpj(bloco)
 
             # E-mails e Telefones (busca tudo, elimina repetidos)
             campos["E-mails"] = ", ".join(sorted(set(self.extrair_emails(bloco))))
@@ -389,7 +414,7 @@ class ExtractorPDF:
         nome_txt = os.path.splitext(os.path.basename(caminho_pdf))[0] + ".txt"
         caminho_txt = os.path.join(self.pasta_saida, nome_txt)
         try:
-            subprocess.run([pdftotext_path, '-layout', caminho_pdf, caminho_txt], check=True)
+            subprocess.run([exe, '-layout', caminho_pdf, caminho_txt], check=True)
             with open(caminho_txt, "r", encoding="utf-8") as f:
                 texto = f.read()
             # NÃO apague o TXT!
