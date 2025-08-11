@@ -74,6 +74,59 @@ if ($_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
     $modelo_path = __DIR__ . '/modelo_planilha_importacao.xlsx';
     $modelo_nome = 'ahreas';
 
+    // ===== Execução robusta do Python =====
+    $base       = __DIR__;
+    $py         = (stripos(PHP_OS, 'WIN') === 0) ? 'python' : 'python3';
+    $script     = $base . '/extractor_pdf.py';                      // ajuste o nome se necessário
+    $modelo_path= $base . '/modelo_planilha_importacao.xlsx';       // já existente no seu código
+    $output_dir = $output_dir;                                      // já definido acima (absoluto)
+    $xlsx_gerado= $output_dir . 'relatorio_unidades_extraido.xlsx'; // onde esperamos o XLSX
+
+    // sanity checks ajudam quando o repo é clonado numa máquina nova
+    $preFlightError = null;
+    if (!file_exists($script))        $preFlightError = "Backend Python não encontrado: $script";
+    elseif (!file_exists($modelo_path)) $preFlightError = "Modelo XLSX não encontrado: $modelo_path";
+    elseif (!is_dir($output_dir))       $preFlightError = "Pasta de saída não existe: $output_dir";
+
+    $stdout = ''; $stderr = ''; $code = 1;
+
+    if ($preFlightError) {
+        $stderr = $preFlightError;
+    } else {
+        // monta argumentos com escapes
+        $args = [
+            escapeshellarg($script),
+            '--pdf',         escapeshellarg($pdf_path),
+            '--modelo',      escapeshellarg($modelo_path),
+            '--saida',       escapeshellarg($output_dir),
+            '--modelo_nome', escapeshellarg($modelo_nome)
+        ];
+
+        // Se a env POPPLER_PDFTOTEXT estiver definida, passamos explicitamente
+        $pdftotext = getenv('POPPLER_PDFTOTEXT') ?: ($_ENV['POPPLER_PDFTOTEXT'] ?? null);
+        if (!empty($pdftotext)) {
+            $args[] = '--pdftotext';
+            $args[] = escapeshellarg($pdftotext);
+        }
+
+        $cmd = escapeshellcmd($py) . ' ' . implode(' ', $args);
+
+        // captura stdout/stderr
+        $descriptors = [
+            1 => ['pipe','w'], // stdout
+            2 => ['pipe','w'], // stderr
+        ];
+        $proc = proc_open($cmd, $descriptors, $pipes, $base);
+        if (is_resource($proc)) {
+            $stdout = stream_get_contents($pipes[1]); fclose($pipes[1]);
+            $stderr = stream_get_contents($pipes[2]); fclose($pipes[2]);
+            $code   = proc_close($proc);
+        } else {
+            $stderr = 'Falha ao iniciar processo Python.';
+            $code = 1;
+        }
+    }
+
     $comando = "python3 extractor_pdf.py"
         . " --pdf " . escapeshellarg($pdf_path)
         . " --modelo " . escapeshellarg($modelo_path)
@@ -120,11 +173,22 @@ if ($_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
             <a href="output/relatorio_unidades_extraido.xlsx" class="btn btn-primary mb-3" download>📥 Baixar Planilha XLSX</a><br>
             <a href="index.php" class="btn btn-outline-secondary">🔁 Voltar ao Início</a>
             <?php
-            if (file_exists($xlsx_gerado)) {
+            if (file_exists($xlsx_gerado) && $code === 0) {
                 exibirPlanilhaComoTabelaHTML($xlsx_gerado);
             } else {
-                echo "<div class='alert alert-danger'>Erro: Arquivo XLSX não encontrado.</div>";
-                echo "<pre>" . htmlspecialchars($saida) . "</pre>";
+                echo "<div class='alert alert-danger'>Falha na extração.</div>";
+                if ($code !== 0) {
+                    echo "<p class='text-muted'>O processo Python retornou código $code.</p>";
+                }
+                // mostra stderr (ou stdout) para diagnosticar (ex.: pdftotext não encontrado)
+                $log = trim($stderr) ?: trim($stdout);
+                if ($log) {
+                    echo "<pre style='white-space:pre-wrap;'>".htmlspecialchars($log)."</pre>";
+                } else {
+                    echo "<pre style='white-space:pre-wrap;'>Sem logs do processo.</pre>";
+                }
+                // dica rápida
+                echo "<div class='alert alert-secondary mt-2'>Dica: rode <code>diag.php</code> para checar se o <code>pdftotext</code> está instalado/visível.</div>";
             }
             ?>
             <hr>

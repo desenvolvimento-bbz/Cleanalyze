@@ -283,3 +283,7 @@
 {"ts":"2025-08-11T17:11:42+02:00","ip":"::1","ua":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36","event":"page.view","data":{"page":"index.php"}}
 {"ts":"2025-08-11T17:12:05+02:00","ip":"::1","ua":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36","event":"session.logout","data":{"email":null}}
 {"ts":"2025-08-11T17:12:05+02:00","ip":"::1","ua":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36","event":"session.logout","data":{"email":"ti@bbz.com.br"}}
+{"ts":"2025-08-11T17:33:00+02:00","ip":"::1","ua":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36","event":"session.login","data":{"email":"ti@bbz.com.br"}}
+{"ts":"2025-08-11T17:33:00+02:00","ip":"::1","ua":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36","event":"page.view","data":{"page":"index.php"}}
+{"ts":"2025-08-11T17:33:10+02:00","ip":"::1","ua":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36","event":"page.view","data":{"page":"extrair.php"}}
+{"ts":"2025-08-11T18:10:15+02:00","ip":"::1","ua":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36","event":"session.timeout","data":{"email":"ti@bbz.com.br"}}
