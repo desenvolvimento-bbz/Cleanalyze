@@ -40,6 +40,6 @@ RUN mkdir -p uploads output logs \
 EXPOSE 80
 CMD ["apache2-foreground"]
 
-# Faz o Apache ouvir na porta $PORT (padrão 8080 no Koyeb) e inicia
-CMD ["sh","-c","sed -ri 's/Listen 80/Listen ${PORT:-8080}/' /etc/apache2/ports.conf && apache2-foreground"]
+# Faz o Apache ouvir na porta $PORT (Koyeb) ou 8080 (fallback) e inicia
+CMD ["sh","-c","sed -ri \"s/Listen 80/Listen ${PORT:-8080}/\" /etc/apache2/ports.conf && apache2-foreground"]
 
