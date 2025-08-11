@@ -3,23 +3,23 @@ FROM composer:2 AS vendor
 WORKDIR /app
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-progress --no-interaction \
-    --ignore-platform-req=ext-gd
+  --ignore-platform-req=ext-gd --ignore-platform-req=ext-zip
 
 # Etapa 2: PHP + Apache (Debian)
 FROM php:8.2-apache
 
-# Dependências do sistema (poppler, python, pandas, openpyxl, etc) + libs pro GD + fontes
+# Pacotes do sistema (adicione libzip-dev e zlib1g-dev)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     poppler-utils \
     python3 python3-pip python3-pandas python3-openpyxl \
     git unzip \
     libfreetype6-dev libjpeg62-turbo-dev libpng-dev \
-    fonts-dejavu \
- && rm -rf /var/lib/apt/lists/*
+    libzip-dev zlib1g-dev \
+  && rm -rf /var/lib/apt/lists/*
 
-# Habilita GD no PHP 8.2 (necessário para PhpSpreadsheet)
+# Extensões do PHP: gd + zip
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
- && docker-php-ext-install -j"$(nproc)" gd
+ && docker-php-ext-install -j"$(nproc)" gd zip
 
 # (Opcional) Mudar DocumentRoot – já é /var/www/html por padrão
 ENV APACHE_DOCUMENT_ROOT=/var/www/html
