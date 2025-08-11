@@ -163,7 +163,7 @@ body{ background:var(--cinzaClaro); color:var(--azul); font-family:'Manrope',san
 </div>
 
 <footer class="text-center text-muted my-4">
-  2025 © BBZ Administração de Condomínio Ltda. | Todos os direitos reservados.
+  2025 © Desenvolvimento BBZ.
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
