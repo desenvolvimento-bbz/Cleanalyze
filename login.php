@@ -104,7 +104,7 @@ body{ background:var(--cinzaClaro); color:var(--azul); }
 </div>
 
 <footer class="text-center text-muted my-4">
-  2025 © BBZ Administração de Condomínio Ltda. | Todos os direitos reservados.
+  2025 © Desenvolvimento BBZ.
 </footer>
 </body>
 </html>

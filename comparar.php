@@ -352,6 +352,18 @@ HTML;
           </a>
         </li>
         <?php endif; ?>
+          <li class="nav-item">
+            <span class="nav-link disabled" style="opacity:.85; cursor:default;">
+              <?= htmlspecialchars($_SESSION['user_email'] ?? '') ?>
+            </span>
+          </li>
+
+          <!-- Sair -->
+          <li class="nav-item">
+            <a class="nav-link<?= basename($_SERVER['PHP_SELF']) === 'logout.php' ? ' active' : '' ?>" href="auth/logout.php">
+              Sair
+            </a>
+          </li>
       </ul>
     </div>
   </div>

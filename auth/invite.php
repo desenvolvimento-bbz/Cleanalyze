@@ -67,7 +67,19 @@ body{ background:var(--cinzaClaro); color:var(--azul); font-family:'Manrope',san
       <ul class="navbar-nav ms-auto">
         <li class="nav-item"><a class="nav-link" href="<?= htmlspecialchars($siteBase) ?>/index.php">Extrair</a></li>
         <li class="nav-item"><a class="nav-link" href="<?= htmlspecialchars($siteBase) ?>/comparar.php">Comparar</a></li>
-        <li class="nav-item"><a class="nav-link active" href="<?= htmlspecialchars($siteBase) ?>/auth/invite.php">Convites</a></li>
+        <li class="nav-item"><a class="nav-link active" href="<?= htmlspecialchars($siteBase) ?>/auth/invite.php">Gerencias Convites</a></li>
+        <li class="nav-item">
+          <span class="nav-link disabled" style="opacity:.85; cursor:default;">
+          <?= htmlspecialchars($_SESSION['user_email'] ?? '') ?>
+          </span>
+        </li>
+
+        <!-- Sair -->
+        <li class="nav-item">
+          <a class="nav-link<?= basename($_SERVER['PHP_SELF']) === 'logout.php' ? ' active' : '' ?>" href="logout.php">
+          Sair
+          </a>
+        </li>
       </ul>
     </div>
   </div>

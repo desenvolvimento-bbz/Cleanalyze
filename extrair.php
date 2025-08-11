@@ -144,7 +144,7 @@ if ($_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
             });
         </script>
         <footer class="text-center text-muted my-4">
-        2025 © BBZ Administração de Condomínio Ltda. | Todos os direitos reservados.
+        2025 © Desenvolvimento BBZ.
         </footer>
     </body>
     </html>

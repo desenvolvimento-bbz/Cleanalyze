@@ -48,6 +48,18 @@ app_log('page.view', ['page'=>basename(__FILE__)]);
           </a>
         </li>
         <?php endif; ?>
+          <li class="nav-item">
+            <span class="nav-link disabled" style="opacity:.85; cursor:default;">
+              <?= htmlspecialchars($_SESSION['user_email'] ?? '') ?>
+            </span>
+          </li>
+
+          <!-- Sair -->
+          <li class="nav-item">
+            <a class="nav-link<?= basename($_SERVER['PHP_SELF']) === 'logout.php' ? ' active' : '' ?>" href="auth/logout.php">
+              Sair
+            </a>
+          </li>
       </ul>
     </div>
   </div>
@@ -135,7 +147,7 @@ app_log('page.view', ['page'=>basename(__FILE__)]);
 </script>
 
   <footer class="text-center text-muted my-4">
-  2025 © BBZ Administração de Condomínio Ltda. | Todos os direitos reservados.
+  2025 © Desenvolvimento BBZ.
 </footer>
 </body>
 
