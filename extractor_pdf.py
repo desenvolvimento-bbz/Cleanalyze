@@ -7,56 +7,47 @@ from typing import List, Tuple, Optional
 import argparse
 import sys
 import json
-import os
 import shutil
-import sys
-from typing import Optional
+
+# Caso queira alterar o texto que vai para a coluna "Cód. Tipo Unidade" nas vagas:
+DEFAULT_TIPO_VAGA = "VAGA"
 
 def _resolver_pdftotext(caminho_forcado: Optional[str] = None) -> str:
     """
-    Retorna o executável `pdftotext` a usar.
-    Ordem de resolução:
-    1) argumento explícito (caminho_forcado), se existir
-    2) variável de ambiente POPPLER_PDFTOTEXT
-    3) `pdftotext` no PATH (shutil.which)
-    4) locais comuns no Windows
-    5) locais comuns em Linux/Mac
-    Lança FileNotFoundError se não encontrar.
+    Resolve o executável `pdftotext`.
+    Ordem:
+      1) caminho_forcado (arg)
+      2) env POPPLER_PDFTOTEXT
+      3) PATH (shutil.which)
+      4) caminhos comuns Win
+      5) caminhos comuns Unix/Mac
     """
     candidatos = []
-
-    # 1) parâmetro explícito
     if caminho_forcado:
         candidatos.append(caminho_forcado)
 
-    # 2) env var
     env = os.environ.get("POPPLER_PDFTOTEXT")
     if env:
         candidatos.append(env)
 
-    # 3) no PATH
     which = shutil.which("pdftotext")
     if which:
         candidatos.append(which)
 
-    # 4) caminhos comuns (Windows)
     if sys.platform.startswith("win"):
-        comuns_win = [
+        candidatos.extend([
             r"C:\Program Files\poppler\bin\pdftotext.exe",
             r"C:\Program Files\poppler-24.02.0\Library\bin\pdftotext.exe",
             r"C:\Program Files\poppler-23.11.0\Library\bin\pdftotext.exe",
             r"C:\poppler\Library\bin\pdftotext.exe",
-        ]
-        candidatos.extend(comuns_win)
+        ])
     else:
-        # 5) caminhos comuns (Linux/Mac)
-        comuns_unix = [
+        candidatos.extend([
             "/usr/bin/pdftotext",
             "/usr/local/bin/pdftotext",
-            "/opt/homebrew/bin/pdftotext",  # macOS (Apple Silicon / Homebrew)
-            "/usr/local/opt/poppler/bin/pdftotext",  # macOS (Intel / Homebrew)
-        ]
-        candidatos.extend(comuns_unix)
+            "/opt/homebrew/bin/pdftotext",              # macOS ARM
+            "/usr/local/opt/poppler/bin/pdftotext",     # macOS Intel
+        ])
 
     for c in candidatos:
         if c and os.path.isfile(c):
@@ -68,13 +59,13 @@ def _resolver_pdftotext(caminho_forcado: Optional[str] = None) -> str:
         "garanta que 'pdftotext' esteja no PATH."
     )
 
+
 class ExtractorPDF:
     def __init__(self, config_path: str = "config.json"):
         self.modelo_path = None
         self.pasta_saida = None
-        self.colunas_modelo = []
+        self.colunas_modelo: List[str] = []
 
-        # Carrega config.json
         with open(config_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
 
@@ -88,9 +79,10 @@ class ExtractorPDF:
         self.colunas_modelo = pd.read_excel(modelo_path).columns.tolist()
 
     def configurar_pasta_saida(self, pasta_saida: str):
-        if not os.path.exists(pasta_saida):
-            os.makedirs(pasta_saida, exist_ok=True)
+        os.makedirs(pasta_saida, exist_ok=True)
         self.pasta_saida = pasta_saida
+
+    # ----------------- utilidades -----------------
 
     def limpar_texto(self, texto: str, maiusculo: bool = True, remover_pontuacao: bool = True) -> str:
         if not texto:
@@ -110,10 +102,11 @@ class ExtractorPDF:
         match = re.search(padrao, texto)
         if match:
             valor = match.group(1).strip()
-            if not valor or valor == ':' or valor == '-':
+            if not valor or valor in (':', '-'):
                 return ""
             if split_first_word:
-                return valor.split()[0] if valor.split() else ""
+                partes = valor.split()
+                return partes[0] if partes else ""
             if split_chars:
                 for sep in split_chars:
                     if sep in valor:
@@ -122,99 +115,43 @@ class ExtractorPDF:
         return ""
 
     def extrair_texto_entre_campos(self, texto: str, campo_inicio: str, campo_fim: str) -> str:
-        """Extrai texto entre dois campos específicos"""
         padrao = rf'{re.escape(campo_inicio)}\s*:\s*(.*?)(?={re.escape(campo_fim)}\s*:|$)'
-        match = re.search(padrao, texto, re.DOTALL)
+        match = re.search(padrao, texto, re.DOTALL | re.IGNORECASE)
         if match:
-            valor = match.group(1).strip()
-            # Remove quebras de linha e espaços extras
-            valor = re.sub(r'\s+', ' ', valor)
-            if not valor or valor == ':' or valor == '-':
+            valor = re.sub(r'\s+', ' ', match.group(1)).strip()
+            if not valor or valor in (':', '-'):
                 return ""
             return valor
         return ""
 
     def extrair_ac_refinado(self, texto: str) -> str:
-        """
-        Extrai A/C com critérios rigorosos:
-        - Deve estar presente no texto
-        - Deve vir antes de "Unidade alugada" (se existir)
-        - Deve conter nome e sobrenome (pelo menos duas palavras)
-        - Para precisamente no final do valor A/C, sem capturar outros campos
-        """
         try:
-            # Primeiro, verifica se "A/C:" está presente
             if "A/C:" not in texto:
                 return ""
-            
-            # Encontra as posições de "A/C:" e "Unidade alugada"
             posicao_ac = texto.find("A/C:")
             posicao_unidade_alugada = texto.find("Unidade alugada")
-            
-            # Se "Unidade alugada" existe e "A/C:" vem depois, retorna vazio
             if posicao_unidade_alugada != -1 and posicao_ac > posicao_unidade_alugada:
                 return ""
-            
-            # Se "Unidade alugada" existe, considera apenas o texto antes dela
-            if posicao_unidade_alugada != -1:
-                texto_filtrado = texto[:posicao_unidade_alugada]
-            else:
-                texto_filtrado = texto
-            
-            # Regex mais específica para capturar apenas o valor de A/C
-            # Para em qualquer campo comum que possa aparecer após A/C
+            texto_filtrado = texto if posicao_unidade_alugada == -1 else texto[:posicao_unidade_alugada]
             ac_match = re.search(
-                r'A/C\s*:\s*([^:\n]+?)(?=\s*(?:Tipo\s+de|Forma\s+de\s+envio|Locatário|Unidade\s+alugada|Endereço|Telefone|E-mail|CPF|CNPJ|Classificação|Fração|\s{2,}|\n\s*\w+\s*:|\n\n|$))', 
-                texto_filtrado, 
-                re.DOTALL | re.IGNORECASE
+                r'A/C\s*:\s*([^:\n]+?)(?=\s*(?:Tipo\s+de|Forma\s+de\s+envio|Locatário|Unidade\s+alugada|Endereço|Telefone|E-mail|CPF|CNPJ|Classificação|Fração|\s{2,}|\n\s*\w+\s*:|\n\n|$))',
+                texto_filtrado, re.DOTALL | re.IGNORECASE
             )
-            
-            if ac_match:
-                valor = ac_match.group(1).strip()
-                
-                # Remove quebras de linha e normaliza espaços
-                valor = re.sub(r'\s+', ' ', valor)
-                
-                # Remove possíveis caracteres residuais no final
-                valor = re.sub(r'[:\-\s]+$', '', valor)
-                
-                # Ignora casos inválidos básicos
-                if not valor or valor in [':', '-', '']:
-                    return ""
-                
-                # Ignora se contém apenas números (quebra de página)
-                if valor.isdigit():
-                    return ""
-                
-                # Ignora caracteres suspeitos de quebra de página
-                if any(char in valor for char in ['Page', 'Página', '\f', '\x0c']):
-                    return ""
-                
-                # Remove palavras que claramente não são nomes (como "Tipo", "de", etc.)
-                palavras_filtradas = []
-                palavras = valor.split()
-                
-                for palavra in palavras:
-                    palavra_limpa = re.sub(r'[^\w]', '', palavra)
-                    # Ignora palavras comuns de campos ou muito curtas
-                    if (palavra_limpa and 
-                        not palavra_limpa.isdigit() and 
-                        len(palavra_limpa) > 1 and
-                        palavra_limpa.lower() not in ['tipo', 'de', 'da', 'do', 'para', 'com', 'por', 'em']):
-                        palavras_filtradas.append(palavra)
-                
-                # CRITÉRIO PRINCIPAL: Deve conter pelo menos duas palavras válidas (nome e sobrenome)
-                if len(palavras_filtradas) < 2:
-                    return ""
-                
-                # Retorna apenas as duas primeiras palavras válidas (nome e sobrenome)
-                return f"{palavras_filtradas[0]} {palavras_filtradas[1]}"
-            
-            return ""
-            
-        except Exception as e:
-            # Proteção contra erros - retorna vazio em caso de exceção
-            print(f"Erro ao extrair A/C: {e}")
+            if not ac_match:
+                return ""
+            valor = re.sub(r'\s+', ' ', ac_match.group(1)).strip()
+            valor = re.sub(r'[:\-\s]+$', '', valor)
+            if not valor or valor.isdigit() or any(c in valor for c in ['Page', 'Página', '\f', '\x0c']):
+                return ""
+            palavras = []
+            for p in valor.split():
+                pl = re.sub(r'[^\w]', '', p)
+                if pl and not pl.isdigit() and len(pl) > 1 and pl.lower() not in ['tipo','de','da','do','para','com','por','em']:
+                    palavras.append(p)
+            if len(palavras) < 2:
+                return ""
+            return f"{palavras[0]} {palavras[1]}"
+        except Exception:
             return ""
 
     def extrair_endereco_refinado(self, logradouro_completo: str) -> Tuple[str, str, str, str]:
@@ -255,20 +192,17 @@ class ExtractorPDF:
     def extrair_emails(self, texto: str) -> List[str]:
         if not texto:
             return []
-        linhas = texto.split('\n')
         emails_ordenados = []
-        for linha in linhas:
-            padrao_email = r'\b[\w\.-]+@[\w\.-]+\.\w+\b'
-            encontrados_linha = re.finditer(padrao_email, linha, flags=re.IGNORECASE)
-            for match in encontrados_linha:
-                email_limpo = match.group().lower().strip()
-                if email_limpo not in emails_ordenados:
-                    emails_ordenados.append(email_limpo)
+        for linha in texto.split('\n'):
+            for m in re.finditer(r'\b[\w\.-]+@[\w\.-]+\.\w+\b', linha, flags=re.IGNORECASE):
+                e = m.group().lower().strip()
+                if e not in emails_ordenados:
+                    emails_ordenados.append(e)
         return emails_ordenados
 
     def extrair_celulares(self, texto: str) -> List[str]:
-        padrao_telefone = r'[\(]?\d{2}[\)]?\s*9\s*\d{4}[-\s]?\d{4}|\b9\d{4}[-]?\d{4}\b|\b\d{11}\b|\b\d{2}\s*9\d{4}[-]?\d{4}'
-        encontrados = re.findall(padrao_telefone, texto)
+        padrao = r'[\(]?\d{2}[\)]?\s*9\s*\d{4}[-\s]?\d{4}|\b9\d{4}[-]?\d{4}\b|\b\d{11}\b|\b\d{2}\s*9\d{4}[-]?\d{4}'
+        encontrados = re.findall(padrao, texto)
         celulares = []
         for numero in encontrados:
             digitos = re.sub(r'\D', '', numero)
@@ -279,32 +213,28 @@ class ExtractorPDF:
             elif len(digitos) == 10 and digitos[2] == "9":
                 celulares.append(digitos)
         return list(set(celulares))
-    
+
     def extrair_cpf_cnpj(self, bloco: str) -> str:
-        """
-        Captura prioritariamente CNPJ quando 'Tipo de pessoa: Jurídica' estiver presente.
-        Caso contrário, procura CNPJ/CPF no bloco inteiro, sempre evitando pegar o CNPJ
-        do condomínio (que está fora do bloco).
-        """
-        # 1) Caso clássico: linha com "Tipo de pessoa: Jurídica ... CNPJ: ..."
-        m = re.search(
-            r'Tipo\s+de\s+pessoa\s*:\s*Jur[ií]dica.*?CNPJ\s*:\s*([\d./-]{14,18})',
-            bloco, re.IGNORECASE | re.DOTALL
-        )
-        if m:
-            return m.group(1).strip()
+        """Prioriza CPF/CNPJ do morador/pagador e evita o CNPJ do condomínio do cabeçalho."""
+        def pega_primeiro(chunk: str) -> Optional[str]:
+            m = re.search(r'(?:CPF|CNPJ)\s*:\s*([\d./-]+)', chunk)
+            return m.group(1).strip() if m else None
 
-        # 2) Procura CNPJ em qualquer lugar do bloco (preferência a CNPJ)
-        m = re.search(r'CNPJ\s*:\s*([\d./-]{14,18})', bloco, re.IGNORECASE)
+        limites = r'(?:Telefone/e-mail do cliente|Dados gerais|Observações|Rateio/frações|Endereço de cobrança)'
+        m = re.search(r'Dados pessoais(.*?){limites}'.format(limites=limites), bloco, re.DOTALL|re.IGNORECASE)
         if m:
-            return m.group(1).strip()
+            v = pega_primeiro(m.group(1))
+            if v:
+                return v
 
-        # 3) Como fallback, procura CPF
-        m = re.search(r'CPF\s*:\s*([\d.-]{11,14})', bloco, re.IGNORECASE)
+        m = re.search(r'Dados do pagador(.*?){limites}'.format(limites=limites), bloco, re.DOTALL|re.IGNORECASE)
         if m:
-            return m.group(1).strip()
+            v = pega_primeiro(m.group(1))
+            if v:
+                return v
 
-        return ""
+        v = pega_primeiro(bloco)
+        return v or ""
 
     def merge_dados(self, orig: dict, novo: dict) -> dict:
         for k, v in novo.items():
@@ -312,38 +242,52 @@ class ExtractorPDF:
                 orig[k] = v
         return orig
 
+    # ----------------- núcleo -----------------
+
     def extrair_dados(self, texto: str) -> List[dict]:
         if not self.colunas_modelo:
             raise ValueError("Modelo não configurado. Use configurar_modelo() primeiro.")
 
-        # Regex para pegar todas as ocorrências de unidade, até o início da próxima
-        unidade_regex = r'(Bloco:\s*\w+\s+Unidade:\s*\d+\s*[-–].+?Código do cliente:\s*\d+)'  # pega cabeçalho até "Código do cliente"
-        indices = [m.start() for m in re.finditer(unidade_regex, texto, flags=re.DOTALL)]
-        indices.append(len(texto))  # último bloco vai até o final
+        # [AJUSTE] aceitar unidade alfa-numérica (ex.: VG0196), e não apenas dígitos
+        unidade_regex = r'(Bloco:\s*\w+\s+Unidade:\s*\S+\s*[-–].+?Código do cliente:\s*\d+)'
+        indices = [m.start() for m in re.finditer(unidade_regex, texto, flags=re.DOTALL | re.IGNORECASE)]
+        indices.append(len(texto))
 
         unidades_dict = {}
-        for i in range(len(indices)-1):
-            bloco = texto[indices[i]:indices[i+1]]
-            bloco = bloco.replace('\x0c', '').replace('\f', '')  # remove quebras de página
+        for i in range(len(indices) - 1):
+            bloco = texto[indices[i]:indices[i + 1]]
+            bloco = bloco.replace('\x0c', '').replace('\f', '')
 
-            cabecalho = re.search(r'Bloco:\s*(\w+)\s+Unidade:\s*(\d+)\s*[-–]\s*(.+?)\s+Código do cliente:\s*(\d+)', bloco, re.DOTALL)
-            if not cabecalho: 
+            # [AJUSTE] unidade alfa-numérica
+            cabecalho = re.search(
+                r'Bloco:\s*(\w+)\s+Unidade:\s*(\S+)\s*[-–]\s*(.+?)\s+Código do cliente:\s*(\d+)',
+                bloco, re.DOTALL | re.IGNORECASE
+            )
+            if not cabecalho:
                 continue
-            bloco_id, unidade_id, nome, cod_cliente = cabecalho.groups()
-            chave_unidade = f"{bloco_id}_{unidade_id.zfill(4)}"
+
+            bloco_id, unidade_raw, nome, cod_cliente = cabecalho.groups()
+            unidade_raw = unidade_raw.strip()
+            # Zero-pad só se for número puro
+            if unidade_raw.isdigit():
+                unidade_fmt = unidade_raw.zfill(4)
+            else:
+                unidade_fmt = unidade_raw.upper()
+
+            chave_unidade = f"{bloco_id}_{unidade_fmt}"
 
             campos = {col: "" for col in self.colunas_modelo}
             campos["Cód. Condomínio"] = "000000"
             campos["Cód. Bloco"] = bloco_id
-            campos["Cód. Unidade"] = unidade_id.zfill(4)
+            campos["Cód. Unidade"] = unidade_fmt
             campos["Nome"] = self.limpar_texto(nome)
             if "Código do Cliente" in campos:
                 campos["Código do Cliente"] = cod_cliente
 
-            # CPF/CNPJ (primeiro do bloco)
+            # CPF/CNPJ
             campos["CPF/CNPJ"] = self.extrair_cpf_cnpj(bloco)
 
-            # E-mails e Telefones (busca tudo, elimina repetidos)
+            # Emails / Telefones
             campos["E-mails"] = ", ".join(sorted(set(self.extrair_emails(bloco))))
             campos["Telefones Celular"] = ", ".join(sorted(set(self.extrair_celulares(bloco))))
             for tipo in ["residencial", "comercial"]:
@@ -354,89 +298,86 @@ class ExtractorPDF:
                 else:
                     campos["Telefones Comercial"] = ", ".join(sorted(set(encontrados)))
 
-            # CAMPOS PADRÃO
+            # Campos padrão
+            tipo_unidade = self.extrair_texto_entre_campos(bloco, "Tipo de unidade", "Dias de prazo")
+            tipo_unidade = tipo_unidade.strip() if tipo_unidade else ""
+            # sem fallback para "VAGA": se vier vazio, fica vazio mesmo
+            campos["Cód. Tipo Unidade"] = tipo_unidade
+
+
             campos["Tipo Corresp. Cobrança"] = self.extrair_valor_simples(bloco, "Tipo de correspondência", split_first_word=True)
             campos["Cód. Classificação Unidade"] = self.extrair_valor_simples(bloco, "Classificação", split_chars=["-"])
-            campos["Cód. Tipo Unidade"] = self.extrair_valor_simples(bloco, "Tipo de unidade", split_first_word=True)
             campos["Aos Cuidados"] = self.extrair_ac_refinado(bloco)
 
-            # Endereço: pegue sempre o último do bloco
+            # Endereço (último do bloco)
             enderecos = re.findall(r'Endereço:\s*([^\n\r\f]+)', bloco)
             if enderecos:
                 raw = enderecos[-1].strip()
-                tipo_logradouro, nome_rua, numero, bairro, cidade, estado, cep, complemento = self.extrair_campos_endereco(raw)
-                campos["Logradouro Cobrança"] = tipo_logradouro
+                tipo_log, nome_rua, numero, bairro, cidade, estado, cep, compl = self.extrair_campos_endereco(raw)
+                campos["Logradouro Cobrança"] = tipo_log
                 campos["Endereço Cobrança"] = nome_rua
                 campos["Número Cobrança"] = numero
                 campos["Bairro Cobrança"] = bairro
                 campos["Cidade Cobrança"] = cidade
                 campos["Estado Cobrança"] = estado
                 campos["CEP Cobrança"] = cep
-                campos["Complemento Cobrança"] = complemento
+                campos["Complemento Cobrança"] = compl
 
-            # Fração unidade: último valor do bloco
-            fracao_matches = re.findall(r'Fração unidade:\s*([\d,.]+)', bloco)
-            campos["Fração Unidade"] = self.converter_ponto_para_virgula(fracao_matches[-1]) if fracao_matches else ""
-            metragem_matches = re.findall(r'Metragem total:\s*([\d,.]+)', bloco)
-            campos["Metragem"] = self.converter_ponto_para_virgula(metragem_matches[-1]) if metragem_matches else ""
-            area_construida_matches = re.findall(r'Área construída:\s*([\d,.]+)', bloco)
-            campos["Área Construída"] = self.converter_ponto_para_virgula(area_construida_matches[-1]) if area_construida_matches else ""
+            # Frações/áreas
+            fx = re.findall(r'Fração unidade:\s*([\d,.]+)', bloco)
+            campos["Fração Unidade"] = self.converter_ponto_para_virgula(fx[-1]) if fx else ""
+            mt = re.findall(r'Metragem total:\s*([\d,.]+)', bloco)
+            campos["Metragem"] = self.converter_ponto_para_virgula(mt[-1]) if mt else ""
+            ac = re.findall(r'Área construída:\s*([\d,.]+)', bloco)
+            campos["Área Construída"] = self.converter_ponto_para_virgula(ac[-1]) if ac else ""
 
             # Frações extras
-            for j in range(1, 11):
+            for j in range(1, 10 + 1):
                 campo_nome = f'Fração Extra {j}'
-                matches = re.findall(rf'Fração extra {j}:\s*([\d,.]+)', bloco)
+                matches = re.findall(rf'Fração extra {j}:\s*([\d,.]+)', bloco, flags=re.IGNORECASE)
                 if campo_nome in campos:
                     campos[campo_nome] = self.converter_ponto_para_virgula(matches[-1]) if matches else ""
 
             if "Fração Garagem" in self.colunas_modelo:
-                fracao_garagem_matches = re.findall(r'Fração garagem:\s*([\d,.]+)', bloco)
-                campos["Fração Garagem"] = self.converter_ponto_para_virgula(fracao_garagem_matches[-1]) if fracao_garagem_matches else ""
+                fg = re.findall(r'Fração garagem:\s*([\d,.]+)', bloco, flags=re.IGNORECASE)
+                campos["Fração Garagem"] = self.converter_ponto_para_virgula(fg[-1]) if fg else ""
 
-            # MERGE inteligente para consolidar todos os blocos da mesma unidade (chave = bloco+unidade)
+            # Mapeamento p/ modelo final
             campos_modelo = {
                 col: campos.get(self.MAPEAMENTO.get(col, col), "") if self.MAPEAMENTO.get(col, col) else ""
                 for col in self.colunas_modelo
             }
             unidades_dict[chave_unidade] = self.merge_dados(unidades_dict.get(chave_unidade, {}), campos_modelo)
 
-
         return list(unidades_dict.values())
-    
+
     def processar_pdf(self, caminho_pdf: str, pdftotext_path: Optional[str] = None) -> Optional[pd.DataFrame]:
-        exe = _resolver_pdftotext(pdftotext_path)
-        # ... use `exe` no subprocesso, ex:
-        # subprocess.run([exe, "-layout", caminho_pdf, "-"], check=True, stdout=PIPE, stderr=PIPE)
-        ...
         if not os.path.exists(caminho_pdf):
             raise FileNotFoundError(f"PDF não encontrado: {caminho_pdf}")
-        # Nome do .txt igual ao PDF, mas na pasta de output
+
+        exe = _resolver_pdftotext(pdftotext_path)
+
         nome_txt = os.path.splitext(os.path.basename(caminho_pdf))[0] + ".txt"
         caminho_txt = os.path.join(self.pasta_saida, nome_txt)
+
         try:
+            # usa o executável resolvido
             subprocess.run([exe, '-layout', caminho_pdf, caminho_txt], check=True)
             with open(caminho_txt, "r", encoding="utf-8") as f:
                 texto = f.read()
-            # NÃO apague o TXT!
+
             dados = self.extrair_dados(texto)
             if not dados:
                 return None
 
-            # --- DIAGNÓSTICO (remova se não quiser prints) ---
-            print("Colunas do modelo:", self.colunas_modelo)
-            print("Chaves do dict extraído:", list(dados[0].keys()) if dados else [])
-
-            # Cria DataFrame a partir dos dados extraídos
             df = pd.DataFrame(dados)
 
-            # Garante que todas as colunas do modelo existam no DataFrame, mesmo se vazias
+            # Garante todas as colunas do modelo
             for col in self.colunas_modelo:
                 if col not in df.columns:
                     df[col] = ""
 
-            # Reordena as colunas exatamente na ordem do modelo
             df = df[self.colunas_modelo]
-
             return df
 
         except subprocess.CalledProcessError as e:
@@ -454,6 +395,7 @@ class ExtractorPDF:
         except Exception as e:
             raise RuntimeError(f"Erro ao salvar Excel: {e}")
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Extrai dados de PDF e exporta para XLSX.')
     parser.add_argument('--pdf', required=True, help='Caminho do PDF de entrada')
@@ -465,13 +407,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     try:
-        # Define caminho do config com base no modelo_nome
         config_path = os.path.join("config", f"{args.modelo_nome}.json")
         extrator = ExtractorPDF(config_path=config_path)
         extrator.configurar_modelo(args.modelo)
         extrator.configurar_pasta_saida(args.saida)
 
-        df_resultado = extrator.processar_pdf(args.pdf)
+        df_resultado = extrator.processar_pdf(args.pdf, pdftotext_path=args.pdftotext)
         if df_resultado is not None:
             caminho_excel = extrator.salvar_excel(df_resultado, "relatorio_unidades_extraido.xlsx")
             print(f"OK: Dados extraídos e salvos em: {caminho_excel}")
