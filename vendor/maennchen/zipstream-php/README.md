@@ -155,3 +155,42 @@ See: https://www.php.net/supported-versions.php
 - Jesse G. Donat <donatj@gmail.com> - https://donatstudios.com
 - Nicolas CARPi <nico-git@deltablot.email> - https://www.deltablot.com
 - Nik Barham <nik@brokencube.co.uk> - https://www.brokencube.co.uk
+
+## 📦 Notas de Atualização (Beta)
+
+### 🚀 Novidades
+- **Extração PDF → XLSX (Poppler + Python)** com pré-visualização e download do XLSX.
+- **Comparação de planilhas (A × B)** com destaque de diferenças, contagem e exportação em **PDF**.
+- **Menu lateral vertical com colapso** (mais espaço útil para as tabelas).
+
+### 🧠 Melhorias na Extração
+- **CPF/CNPJ** agora vem de **Dados pessoais / Dados do pagador** (evita CNPJ do condomínio em quebras de página).
+- **Unidades alfa-numéricas** (ex.: `VG0196`) suportadas.
+- **Tipo de unidade (VG/vagas)**: captura **exatamente** o texto entre “Tipo de unidade:” e “Dias de prazo”.
+- Endereço e campo **A/C** com regex refinada.
+
+### 🔒 Acesso & Segurança
+- Login com validações, **sessão expira em 15 min**, link “Gerenciar Convites” só para **admin**, **logout** no navbar e **e-mail do usuário** visível.
+- **Logs de uso** (login/logout, páginas, extrações/comparações).
+
+### 🧰 Diagnóstico & Suporte
+- **diag.php** mostra PHP/Python/pdftotext (Poppler).
+- Tratamento de erros mais claro.
+
+### 🛠️ Infra/Deploy
+- **Docker** (PHP 8.2 + Apache, zip, gd, mbstring, xml, curl, Poppler, Python com pandas/openpyxl).
+- **Koyeb** em produção (porta 8080).
+- `vendor/` gerado no build (Composer).
+
+### 🧭 UI
+- Navbar Manrope + rodapé padrão:  
+  *“2025 © BBZ Administração de Condomínio Ltda. | Todos os direitos reservados.”*
+
+### ✅ Dicas de uso
+- Comparação: gere ambas planilhas pelo **mesmo modelo**.
+- Extração: PDFs padronizados (Ahreas). Envie exemplos de novos layouts.
+
+### 📌 Próximos passos
+- Novos modelos além de Ahreas.
+- Filtro “mostrar apenas linhas diferentes” na comparação.
+- UI para convites (sem JSON).
