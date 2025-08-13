@@ -1,14 +1,14 @@
-# Etapa 1: Composer (baixa dependências do PHP)
+# ===== Etapa 1: Composer (baixa dependências do PHP) =====
 FROM composer:2 AS vendor
 WORKDIR /app
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-progress --no-interaction \
   --ignore-platform-req=ext-gd --ignore-platform-req=ext-zip
 
-# Etapa 2: PHP + Apache (Debian)
+# ===== Etapa 2: PHP + Apache (Debian) =====
 FROM php:8.2-apache
 
-# Pacotes do sistema (adicione libzip-dev e zlib1g-dev)
+# Pacotes do sistema (inclui poppler e deps do GD/ZIP)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     poppler-utils \
     python3 python3-pip python3-pandas python3-openpyxl \
@@ -21,7 +21,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
  && docker-php-ext-install -j"$(nproc)" gd zip
 
-# (Opcional) Mudar DocumentRoot – já é /var/www/html por padrão
+# Aumenta limites de upload/tempo de execução (para PDFs grandes)
+RUN { \
+      echo 'file_uploads=On'; \
+      echo 'upload_max_filesize=128M'; \
+      echo 'post_max_size=128M'; \
+      echo 'memory_limit=512M'; \
+      echo 'max_file_uploads=50'; \
+      echo 'max_execution_time=300'; \
+      echo 'max_input_time=300'; \
+    } > /usr/local/etc/php/conf.d/zz-uploads.ini
+
+# (Opcional) evita warning de ServerName no Apache
+RUN printf "ServerName localhost\n" > /etc/apache2/conf-available/servername.conf \
+ && a2enconf servername
+
+# (Opcional) DocumentRoot – já é /var/www/html por padrão
 ENV APACHE_DOCUMENT_ROOT=/var/www/html
 RUN sed -ri 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
  && sed -ri 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
@@ -30,16 +45,15 @@ RUN sed -ri 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-avail
 WORKDIR /var/www/html
 COPY . .
 
-# Copia vendor do stage do Composer
+# Copia vendor da etapa do Composer
 COPY --from=vendor /app/vendor ./vendor
 
 # Dirs graváveis
 RUN mkdir -p uploads output logs \
  && chown -R www-data:www-data /var/www/html
 
-EXPOSE 80
-CMD ["apache2-foreground"]
+# Exponha 8080 (o Apache será reconfigurado para ouvir nessa porta)
+EXPOSE 8080
 
-# Faz o Apache ouvir na porta $PORT (Koyeb) ou 8080 (fallback) e inicia
-CMD ["sh","-c","sed -ri \"s/Listen 80/Listen ${PORT:-8080}/\" /etc/apache2/ports.conf && apache2-foreground"]
-
+# ÚNICO CMD: troca "Listen 80" por ${PORT:-8080} e inicia o Apache
+CMD ["sh","-c","sed -ri 's/^Listen 80$/Listen ${PORT:-8080}/' /etc/apache2/ports.conf && apache2-foreground"]
