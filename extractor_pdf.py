@@ -9,7 +9,7 @@ import sys
 import json
 import shutil
 
-# Caso queira alterar o texto que vai para a coluna "Cód. Tipo Unidade" nas vagas:
+# Valor padrão para vagas quando "Tipo de unidade" vier vazio
 DEFAULT_TIPO_VAGA = "VAGA"
 
 def _resolver_pdftotext(caminho_forcado: Optional[str] = None) -> str:
@@ -99,7 +99,7 @@ class ExtractorPDF:
 
     def extrair_valor_simples(self, texto: str, chave: str, split_chars: Optional[list] = None, split_first_word: bool = False) -> str:
         padrao = rf'{re.escape(chave)}\s*:\s*(.*?)\s*(?:\n|$)'
-        match = re.search(padrao, texto)
+        match = re.search(padrao, texto, flags=re.IGNORECASE)
         if match:
             valor = match.group(1).strip()
             if not valor or valor in (':', '-'):
@@ -215,26 +215,60 @@ class ExtractorPDF:
         return list(set(celulares))
 
     def extrair_cpf_cnpj(self, bloco: str) -> str:
-        """Prioriza CPF/CNPJ do morador/pagador e evita o CNPJ do condomínio do cabeçalho."""
-        def pega_primeiro(chunk: str) -> Optional[str]:
-            m = re.search(r'(?:CPF|CNPJ)\s*:\s*([\d./-]+)', chunk)
-            return m.group(1).strip() if m else None
+        """
+        Retorna um único CPF/CNPJ por unidade:
+        - Prioriza 'Dados pessoais'
+        - Se 'Dados do pagador/Dados gerais' existir e for diferente, usa ele
+        - Ignora cabeçalho de página (Condomínio ... CNPJ ...)
+        - Evita capturar o CNPJ do condomínio
+        """
+        # 0) CNPJ do cabeçalho do condomínio (se estiver dentro do bloco por causa da quebra)
+        header_cnpj = None
+        m_header = re.search(r'Condom[ií]nio\s*:.*?CNPJ\s*:\s*([\d./-]+)', bloco, re.IGNORECASE | re.DOTALL)
+        if m_header:
+            header_cnpj = m_header.group(1).strip()
 
-        limites = r'(?:Telefone/e-mail do cliente|Dados gerais|Observações|Rateio/frações|Endereço de cobrança)'
-        m = re.search(r'Dados pessoais(.*?){limites}'.format(limites=limites), bloco, re.DOTALL|re.IGNORECASE)
-        if m:
-            v = pega_primeiro(m.group(1))
-            if v:
-                return v
+        # 1) Utilitário: limpa linhas típicas de cabeçalho e busca CPF/CNPJ
+        def limpar_e_pegar(chunk: str) -> Optional[str]:
+            if not chunk:
+                return None
+            chunk = re.sub(
+                r'^(?:\s*Relat[óo]rio.*|'
+                r'\s*Condom[ií]nio\s*:.*|'
+                r'\s*Emitido\s+em.*|'
+                r'\s*P[áa]gina\s+\d+.*)$',
+                '', chunk, flags=re.IGNORECASE | re.MULTILINE
+            )
+            m = re.search(
+                r'Tipo\s+de\s+pessoa\s*:\s*(?:F[ií]sica|Jur[ií]dica).*?(?:CPF|CNPJ)\s*:\s*([\d./-]+)',
+                chunk, flags=re.IGNORECASE | re.DOTALL
+            )
+            if not m:
+                m = re.search(r'(?:CPF|CNPJ)\s*:\s*([\d./-]+)', chunk, flags=re.IGNORECASE)
+            if not m:
+                return None
+            cand = m.group(1).strip()
+            if header_cnpj and cand == header_cnpj:
+                return None
+            return cand
 
-        m = re.search(r'Dados do pagador(.*?){limites}'.format(limites=limites), bloco, re.DOTALL|re.IGNORECASE)
-        if m:
-            v = pega_primeiro(m.group(1))
-            if v:
-                return v
+        # 2) delimitações de seções
+        limites = r'(?:Telefone/e-mail do cliente|Dados gerais|Dados do pagador|Observações|Rateio/frações|Endereço de cobrança)'
+        m_dp = re.search(r'Dados pessoais(.*?){lim}'.format(lim=limites), bloco, flags=re.IGNORECASE | re.DOTALL)
+        m_dg = re.search(r'(?:Dados do pagador|Dados gerais)(.*?){lim}'.format(lim=limites), bloco, flags=re.IGNORECASE | re.DOTALL)
 
-        v = pega_primeiro(bloco)
-        return v or ""
+        val_dp = limpar_e_pegar(m_dp.group(1) if m_dp else '')
+        val_dg = limpar_e_pegar(m_dg.group(1) if m_dg else '')
+
+        # 3) se diferirem, prioriza dados do pagador/gerais
+        if val_dg and (not val_dp or val_dp != val_dg):
+            return val_dg
+        if val_dp:
+            return val_dp
+
+        # 4) fallback no bloco inteiro (evitando CNPJ do condomínio)
+        val_any = limpar_e_pegar(bloco)
+        return val_any or ""
 
     def merge_dados(self, orig: dict, novo: dict) -> dict:
         for k, v in novo.items():
@@ -248,7 +282,7 @@ class ExtractorPDF:
         if not self.colunas_modelo:
             raise ValueError("Modelo não configurado. Use configurar_modelo() primeiro.")
 
-        # [AJUSTE] aceitar unidade alfa-numérica (ex.: VG0196), e não apenas dígitos
+        # aceita unidade alfa-numérica (ex.: VG0196), e não apenas dígitos
         unidade_regex = r'(Bloco:\s*\w+\s+Unidade:\s*\S+\s*[-–].+?Código do cliente:\s*\d+)'
         indices = [m.start() for m in re.finditer(unidade_regex, texto, flags=re.DOTALL | re.IGNORECASE)]
         indices.append(len(texto))
@@ -256,9 +290,8 @@ class ExtractorPDF:
         unidades_dict = {}
         for i in range(len(indices) - 1):
             bloco = texto[indices[i]:indices[i + 1]]
-            bloco = bloco.replace('\x0c', '').replace('\f', '')
+            bloco = bloco.replace('\x0c', '').replace('\f', '')  # remove quebras de página
 
-            # [AJUSTE] unidade alfa-numérica
             cabecalho = re.search(
                 r'Bloco:\s*(\w+)\s+Unidade:\s*(\S+)\s*[-–]\s*(.+?)\s+Código do cliente:\s*(\d+)',
                 bloco, re.DOTALL | re.IGNORECASE
@@ -268,7 +301,6 @@ class ExtractorPDF:
 
             bloco_id, unidade_raw, nome, cod_cliente = cabecalho.groups()
             unidade_raw = unidade_raw.strip()
-            # Zero-pad só se for número puro
             if unidade_raw.isdigit():
                 unidade_fmt = unidade_raw.zfill(4)
             else:
@@ -284,7 +316,7 @@ class ExtractorPDF:
             if "Código do Cliente" in campos:
                 campos["Código do Cliente"] = cod_cliente
 
-            # CPF/CNPJ
+            # CPF/CNPJ (robusto contra cabeçalho do condomínio)
             campos["CPF/CNPJ"] = self.extrair_cpf_cnpj(bloco)
 
             # Emails / Telefones
@@ -298,19 +330,19 @@ class ExtractorPDF:
                 else:
                     campos["Telefones Comercial"] = ", ".join(sorted(set(encontrados)))
 
-            # Campos padrão
+            # Tipo de unidade: pega exatamente entre "Tipo de unidade" e "Dias de prazo"
             tipo_unidade = self.extrair_texto_entre_campos(bloco, "Tipo de unidade", "Dias de prazo")
-            tipo_unidade = tipo_unidade.strip() if tipo_unidade else ""
-            # sem fallback para "VAGA": se vier vazio, fica vazio mesmo
+            # se unidade começa com VG e o campo veio vazio, marcar como VAGA
+            if not tipo_unidade and unidade_fmt.upper().startswith("VG"):
+                tipo_unidade = DEFAULT_TIPO_VAGA
             campos["Cód. Tipo Unidade"] = tipo_unidade
-
 
             campos["Tipo Corresp. Cobrança"] = self.extrair_valor_simples(bloco, "Tipo de correspondência", split_first_word=True)
             campos["Cód. Classificação Unidade"] = self.extrair_valor_simples(bloco, "Classificação", split_chars=["-"])
             campos["Aos Cuidados"] = self.extrair_ac_refinado(bloco)
 
             # Endereço (último do bloco)
-            enderecos = re.findall(r'Endereço:\s*([^\n\r\f]+)', bloco)
+            enderecos = re.findall(r'Endereço:\s*([^\n\r\f]+)', bloco, flags=re.IGNORECASE)
             if enderecos:
                 raw = enderecos[-1].strip()
                 tipo_log, nome_rua, numero, bairro, cidade, estado, cep, compl = self.extrair_campos_endereco(raw)
@@ -324,11 +356,11 @@ class ExtractorPDF:
                 campos["Complemento Cobrança"] = compl
 
             # Frações/áreas
-            fx = re.findall(r'Fração unidade:\s*([\d,.]+)', bloco)
+            fx = re.findall(r'Fração unidade:\s*([\d,.]+)', bloco, flags=re.IGNORECASE)
             campos["Fração Unidade"] = self.converter_ponto_para_virgula(fx[-1]) if fx else ""
-            mt = re.findall(r'Metragem total:\s*([\d,.]+)', bloco)
+            mt = re.findall(r'Metragem total:\s*([\d,.]+)', bloco, flags=re.IGNORECASE)
             campos["Metragem"] = self.converter_ponto_para_virgula(mt[-1]) if mt else ""
-            ac = re.findall(r'Área construída:\s*([\d,.]+)', bloco)
+            ac = re.findall(r'Área construída:\s*([\d,.]+)', bloco, flags=re.IGNORECASE)
             campos["Área Construída"] = self.converter_ponto_para_virgula(ac[-1]) if ac else ""
 
             # Frações extras
@@ -361,7 +393,6 @@ class ExtractorPDF:
         caminho_txt = os.path.join(self.pasta_saida, nome_txt)
 
         try:
-            # usa o executável resolvido
             subprocess.run([exe, '-layout', caminho_pdf, caminho_txt], check=True)
             with open(caminho_txt, "r", encoding="utf-8") as f:
                 texto = f.read()
