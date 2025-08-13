@@ -3,6 +3,13 @@ require_once __DIR__ . '/auth/bootstrap.php';
 auth_require_login(); // exige login
 app_log('page.view', ['page'=>basename(__FILE__)]);
 
+// >>> Força o Python no Windows (usa "python" do PATH; ajuste se quiser o caminho completo)
+if (stripos(PHP_OS_FAMILY, 'Windows') !== false) {
+    putenv('PYTHON_BIN=python'); 
+    // Se preferir apontar direto pro executável, use:
+    // putenv('PYTHON_BIN=C:\\Users\\SeuUsuario\\AppData\\Local\\Programs\\Python\\Python312\\python.exe');
+}
+
 require_once __DIR__ . '/vendor/autoload.php';  // <<< importa as classes instaladas pelo Composer
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
