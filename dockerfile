@@ -56,4 +56,4 @@ RUN mkdir -p uploads output logs \
 EXPOSE 8080
 
 # ÚNICO CMD: troca "Listen 80" por ${PORT:-8080} e inicia o Apache
-CMD ["sh","-c","sed -ri 's/^Listen 80$/Listen ${PORT:-8080}/' /etc/apache2/ports.conf && apache2-foreground"]
+CMD ["sh","-c","sed -ri \"s/^Listen 80$/Listen ${PORT:-8080}/\" /etc/apache2/ports.conf && apache2-foreground"]
