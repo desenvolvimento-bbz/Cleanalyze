@@ -221,5 +221,26 @@ if ($_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
     </html>
     <?php
 } else {
-    echo "Erro no upload do PDF!";
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_FILES['pdf'])) {
+        $err = "Nenhum arquivo recebido (verifique se o formulário tem enctype='multipart/form-data').";
+    } else {
+        $code = $_FILES['pdf']['error'] ?? -1;
+        $map = [
+            UPLOAD_ERR_INI_SIZE   => 'Arquivo excedeu upload_max_filesize (php.ini).',
+            UPLOAD_ERR_FORM_SIZE  => 'Arquivo excedeu MAX_FILE_SIZE do formulário.',
+            UPLOAD_ERR_PARTIAL    => 'Upload enviado parcialmente.',
+            UPLOAD_ERR_NO_FILE    => 'Nenhum arquivo enviado.',
+            UPLOAD_ERR_NO_TMP_DIR => 'Pasta temporária ausente no servidor.',
+            UPLOAD_ERR_CANT_WRITE => 'Falha ao gravar o arquivo em disco.',
+            UPLOAD_ERR_EXTENSION  => 'Upload bloqueado por extensão do PHP.',
+            -1                    => 'Erro desconhecido.'
+        ];
+        $err = "Erro no upload do PDF! Código=$code — " . ($map[$code] ?? 'Desconhecido');
+
+        // Diagnóstico rápido dos limites atuais
+        $err .= " (upload_max_filesize=" . ini_get('upload_max_filesize')
+              . ", post_max_size=" . ini_get('post_max_size') . ")";
+    }
+}
 }
