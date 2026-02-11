@@ -1,0 +1,19 @@
+{
+  "nome": "inadimplencia",
+  "mapeamento": {
+    "Condomínio": "Cód. Condomínio",
+    "ContaBancaria": "Cód. Conta Bancária",
+    "Bloco": "Cód. Bloco",
+    "Unidade": "Cód. Unidade",
+    "Vencimento": "Vencimento",
+    "Conta": "Cód. Conta Contábil",
+    "Histórico": "Descrição",
+    "Complemento": "Complemento",
+    "Valor": "Valor",
+    "Recibo": "Nro. Bancário"
+  },
+  "normalizacao": {
+    "Valor": { "tipo": "decimal_br" },
+    "Vencimento": { "tipo": "data_br_formatada" }
+  }
+}

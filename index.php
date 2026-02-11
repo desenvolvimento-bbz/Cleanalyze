@@ -99,20 +99,30 @@ app_log('page.view', ['page'=>basename(__FILE__)]);
           <h4 class="m-0">📄 Extrair do PDF → XLSX</h4>
           <p class="card-text text-secondary">Envie um PDF padronizado para gerar a planilha de importação.</p>
 
-          <form action="extrair.php" method="post" enctype="multipart/form-data" class="mt-3">
-            <div class="mb-3">
-              <label for="pdf" class="form-label">Selecione o PDF e o sistema:</label>
-              <div class="input-group">
-                <input type="file" name="pdf" id="pdf" accept="application/pdf" class="form-control" required>
-                <select name="modelo_nome" class="form-select" style="max-width:200px" required>
-                  <option value="ahreas" selected>Ahreas</option>
-                  <!-- futuro: outras opções -->
-                </select>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Extrair Dados</button>
-            <a href="comparar.php" class="btn btn-outline-secondary ms-2">Ir para Comparar</a>
-          </form>
+<form action="/Cleanalyze/web/executar_extracao.php" method="post" enctype="multipart/form-data" class="row g-3">
+
+  <!-- arquivo PDF (o name PRECISA ser "pdf") -->
+  <div class="col-md-8">
+    <input type="file" name="pdf" accept="application/pdf" class="form-control" required>
+  </div>
+
+  <!-- dropdown de tipo (o name PRECISA ser "tipo") -->
+  <div class="col-md-4">
+    <select name="tipo" class="form-select" required>
+      <option value="ahreas">Ahreas (Unidades)</option>
+      <option value="inadimplencia">Inadimplência</option>
+    </select>
+  </div>
+
+  <!-- nome opcional do XLSX -->
+  <div class="col-md-6">
+    <input type="text" name="saidaBase" class="form-control" placeholder="Nome do XLSX (opcional)">
+  </div>
+
+  <div class="col-md-6 text-end">
+    <button class="btn btn-primary" type="submit">Extrair Dados</button>
+  </div>
+</form>
         </div>
       </div>
     </main>

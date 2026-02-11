@@ -1,0 +1,3 @@
+"C:\Users\DESENV-ERICH\AppData\Local\Programs\Python\Python312\python.exe" "C:\xampp\htdocs\Cleanalyze\cleanalize_cli.py" --pdftotext "C:\poppler\Library\bin\pdftotext.exe" --pdf "C:\xampp\htdocs\Cleanalyze\uploads\20260211_123559_RelPendentes _22_.pdf" --tipo inadimplencia --config "C:\xampp\htdocs\Cleanalyze\config\inadimplencia.json" --modelo "C:\xampp\htdocs\Cleanalyze\modelo_planilha_inadimplencia.xlsx" --saida "C:\xampp\htdocs\Cleanalyze\uploads\Inadimplencia_20260211_123559.xlsx" --ocr --tesseract "C:\Program Files\Tesseract-OCR\tesseract.exe" --ocr-lang "por+eng" --poppler "C:\poppler\Library\bin" --dpi 200 --debug-save-text 2>&1
+
+2026-02-11 12:35:59
