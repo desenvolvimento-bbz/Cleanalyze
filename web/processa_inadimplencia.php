@@ -45,7 +45,7 @@ function tpl($msg, $saidaXlsx, $cmd, $stdout, $exit, $stderr) {
   <div class="mb-3">
     <a href="extrair_inadimplencia.php" class="btn btn-outline-secondary">⬅️ Novo arquivo</a>
     <?php if ($exit === 0 && $saidaXlsx && file_exists($saidaXlsx)): ?>
-      <a href="<?php echo htmlspecialchars('/Cleanalyze/uploads/' . basename($saidaXlsx)); ?>"
+      <a href="<?php echo htmlspecialchars('../uploads/' . basename($saidaXlsx)); ?>"
          class="btn btn-primary ms-2" download>📥 Baixar planilha</a>
     <?php endif; ?>
   </div>

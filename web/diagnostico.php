@@ -39,14 +39,14 @@ $UPLOADS_DIR  = $BASE . '\\uploads';
 
 <nav class="navbar navbar-expand-lg">
   <div class="container">
-    <a class="navbar-brand" href="/Cleanalyze/index.php">Cleanalyze BBZ</a>
+    <a class="navbar-brand" href="../index.php">Cleanalyze BBZ</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="/Cleanalyze/index.php">Extrair</a></li>
-        <li class="nav-item"><a class="nav-link" href="/Cleanalyze/comparar.php">Comparar</a></li>
+        <li class="nav-item"><a class="nav-link" href="../index.php">Extrair</a></li>
+        <li class="nav-item"><a class="nav-link" href="../comparar.php">Comparar</a></li>
       </ul>
     </div>
   </div>
@@ -58,10 +58,10 @@ $UPLOADS_DIR  = $BASE . '\\uploads';
     <aside class="col-md-3">
       <h4 class="m-0">Menu</h4>
       <div class="list-group">
-        <a href="/Cleanalyze/index.php" class="list-group-item list-group-item-action">
+        <a href="../index.php" class="list-group-item list-group-item-action">
           📄 Extrair (PDF → XLSX)
         </a>
-        <a href="/Cleanalyze/comparar.php" class="list-group-item list-group-item-action">
+        <a href="../comparar.php" class="list-group-item list-group-item-action">
           🔍 Comparar (A × B)
         </a>
         <a href="diagnostico.php" class="list-group-item list-group-item-action active">

@@ -99,7 +99,7 @@ app_log('page.view', ['page'=>basename(__FILE__)]);
           <h4 class="m-0">📄 Extrair do PDF → XLSX</h4>
           <p class="card-text text-secondary">Envie um PDF padronizado para gerar a planilha de importação.</p>
 
-<form action="/Cleanalyze/web/executar_extracao.php" method="post" enctype="multipart/form-data" class="row g-3">
+<form action="web/executar_extracao.php" method="post" enctype="multipart/form-data" class="row g-3">
 
   <!-- arquivo PDF (o name PRECISA ser "pdf") -->
   <div class="col-md-8">

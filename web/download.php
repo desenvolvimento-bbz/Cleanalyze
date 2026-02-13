@@ -4,7 +4,7 @@
  * Faz o download (stream) de um arquivo gerado em /uploads com checagem de segurança.
  *
  * Uso:
- *   /Cleanalyze/web/download.php?f=C:%5Cxampp%5Chtdocs%5CCleanalyze%5Cuploads%5Carquivo.xlsx
+ *   web/download.php?f=<caminho_absoluto_do_arquivo>
  *
  * Regras de segurança:
  *  - Aceita caminho absoluto, porém exige que ele esteja dentro de C:\xampp\htdocs\Cleanalyze\uploads

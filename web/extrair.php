@@ -27,14 +27,14 @@
 
 <nav class="navbar navbar-expand-lg">
   <div class="container">
-    <a class="navbar-brand" href="/Cleanalyze/index.php">Cleanalyze BBZ</a>
+    <a class="navbar-brand" href="../index.php">Cleanalyze BBZ</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link active" href="/Cleanalyze/index.php">Extrair</a></li>
-        <li class="nav-item"><a class="nav-link" href="/Cleanalyze/comparar.php">Comparar</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../index.php">Extrair</a></li>
+        <li class="nav-item"><a class="nav-link" href="../comparar.php">Comparar</a></li>
       </ul>
     </div>
   </div>
@@ -46,10 +46,10 @@
     <aside class="col-md-3">
       <h4 class="m-0">Menu</h4>
       <div class="list-group">
-        <a href="/Cleanalyze/index.php" class="list-group-item list-group-item-action active">
+        <a href="../index.php" class="list-group-item list-group-item-action active">
           📄 Extrair (PDF → XLSX)
         </a>
-        <a href="/Cleanalyze/comparar.php" class="list-group-item list-group-item-action">
+        <a href="../comparar.php" class="list-group-item list-group-item-action">
           🔍 Comparar (A × B)
         </a>
       </div>
@@ -103,7 +103,7 @@
           <ul class="mb-0">
             <li><strong>Unidades (Ahreas)</strong>: usa <code>config/ahreas.json</code> + <code>modelo_planilha_importacao.xlsx</code></li>
             <li><strong>Inadimplência</strong>: usa <code>config/inadimplencia.json</code> + <code>modelo_planilha_inadimplencia.xlsx</code></li>
-            <li>Os arquivos gerados ficam em <code>/Cleanalyze/uploads</code></li>
+            <li>Os arquivos gerados ficam na pasta <code>uploads/</code></li>
           </ul>
         </div>
       </div>
