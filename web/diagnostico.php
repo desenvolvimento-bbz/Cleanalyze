@@ -135,13 +135,26 @@ $UPLOADS_DIR  = APP_UPLOADS;
             <div class="card-header">3. Bibliotecas Python</div>
             <div class="card-body">
               <?php
-              $cmd = "\"$PYTHON\" -c \"import pandas; import pdf2image; import pytesseract; print('OK')\" 2>&1";
-              $result = shell_exec($cmd);
-              if (trim($result) === 'OK') {
-                  echo "<p class='ok mb-0'>✅ Todas as bibliotecas Python estão instaladas (pandas, pdf2image, pytesseract)</p>";
-              } else {
-                  echo "<p class='erro'>❌ Erro ao importar bibliotecas:</p>";
-                  echo "<pre class='mb-0'>" . htmlspecialchars($result) . "</pre>";
+              $libs = ['pandas', 'openpyxl', 'pdfplumber', 'pdf2image', 'pytesseract'];
+              $ok_libs = [];
+              $fail_libs = [];
+              foreach ($libs as $lib) {
+                  $cmd = "\"$PYTHON\" -c \"import $lib; print('OK')\" 2>&1";
+                  $result = trim(shell_exec($cmd) ?? '');
+                  if ($result === 'OK') {
+                      $ok_libs[] = $lib;
+                  } else {
+                      $fail_libs[] = ['name' => $lib, 'error' => $result];
+                  }
+              }
+              foreach ($ok_libs as $lib) {
+                  echo "<p class='ok mb-1'>✅ $lib</p>";
+              }
+              foreach ($fail_libs as $info) {
+                  echo "<p class='erro mb-1'>❌ {$info['name']}: " . htmlspecialchars($info['error']) . "</p>";
+              }
+              if (empty($fail_libs)) {
+                  echo "<p class='ok mt-2 mb-0'><strong>Todas as bibliotecas Python estão instaladas.</strong></p>";
               }
               ?>
             </div>

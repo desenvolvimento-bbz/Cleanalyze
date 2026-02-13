@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
 # Biblioteca Python para extração de PDF (pdfplumber)
-RUN pip3 install --no-cache-dir --break-system-packages pdfplumber
+RUN pip3 install --no-cache-dir --break-system-packages pdfplumber pdf2image pytesseract
 
 # Extensões do PHP: gd + zip
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
