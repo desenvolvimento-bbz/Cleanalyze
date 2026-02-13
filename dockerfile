@@ -41,6 +41,11 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html
 RUN sed -ri 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
  && sed -ri 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 
+# Alias /Cleanalyze -> raiz, para que URLs com prefixo /Cleanalyze/ funcionem no Docker
+RUN printf 'Alias /Cleanalyze /var/www/html\n<Directory /var/www/html>\n  Require all granted\n</Directory>\n' \
+      > /etc/apache2/conf-available/cleanalyze-alias.conf \
+ && a2enconf cleanalyze-alias
+
 # Copia o app
 WORKDIR /var/www/html
 COPY . .
