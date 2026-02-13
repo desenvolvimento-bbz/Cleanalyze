@@ -1,0 +1,735 @@
+Relação Analítica de Pendentes
+                                                    Período de: 01/01/1901 até 30/11/2025 Posição em: 30/11/2025
+
+
+
+
+ Recibo             Vencimento       Emissão         Conta     Histórico                                                          Valor       Total recibo         Total
+
+ Condomínio: 7404 - CONDOMÍNIO SPA LIFE GARDEN
+ Bloco: 0 Unidade: ADM CONDOMÍNIO SPA LIFE GARDEN CNPJ: 24.255.808/0001-88
+ 5218887        15/09/2025  194633          938 RATEIO EXTRA 4/4                                                                  33,07              33,07        33,07
+ Bloco: A Unidade: 003 SERGIO ASSIS DOS SANTOS CPF: 734.135.935-87
+ 5175353        15/01/2025    189745          3 COTA CONDOMINIAL JAN/2025                                                        380,88
+                                                          13   RECOMP FUNDO RESERVA 10/10                                         36,14
+                                                        260    PINTURA 07/18                                                     101,19
+                                                        845    CONSUMO DE GÁS - DEZ/2024 40,3867 m³                              257,64
+                                                        830    CONSUMO DE ÁGUA - DEZ/2024 33,074 m³                              331,12          1.106,97
+ 4986764             15/02/2025      190185                3   COTA CONDOMINIAL FEV/2025                                         446,12
+                                                        260    PINTURA 08/18                                                     101,19
+                                                        845    CONSUMO DE GÁS - JAN/2025 34,3789 m³                              232,40
+                                                        830    CONSUMO DE ÁGUA - JAN/2025 38,398 m³                              336,61          1.116,32
+ 5017536             15/03/2025      190690                3   COTA CONDOMINIAL MAR/2025                                         446,12
+                                                        260    PINTURA 09/18                                                     101,19
+                                                        845    CONSUMO DE GÁS - FEV/2025 29,07 m³                                180,47
+                                                        830    CONSUMO DE ÁGUA - FEV/2025 33,235 m³                              289,22          1.017,00
+ 5046487             15/04/2025      191182                3   COTA CONDOMINIAL ABR/2025                                         446,12
+                                                        260    PINTURA 10/18                                                     101,19
+                                                        845    CONSUMO DE GÁS - MAR/2025 33,22 m³                                216,42
+                                                        830    CONSUMO DE ÁGUA - MAR/2025 29,868 m³                              314,73          1.078,46
+ 5078034             15/05/2025      191858                3   COTA CONDOMINIAL MAI/2025                                         446,12
+                                                        260    PINTURA 11/18                                                     101,19
+                                                        845    CONSUMO DE GÁS - ABR/2025 36,01 m³                                210,00
+                                                        830    CONSUMO DE ÁGUA - ABR/2025 29,973 m³                              250,20          1.007,51
+ 5110221             15/06/2025      192542                3   COTA CONDOMINIAL JUN/2025                                         446,12
+                                                        260    PINTURA 12/18                                                     101,19
+                                                        938    RATEIO EXTRA 1/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - MAI/2025 29,492 m³                              244,63
+                                                        845    CONSUMO DE GÁS - MAI/2025 42,3 m³                                 268,88          1.093,89
+ 5148143             15/07/2025      193050                3   COTA CONDOMINIAL JUL/2025                                         446,12
+                                                        260    PINTURA 13/18                                                     101,19
+                                                        938    RATEIO EXTRA 2/4                                                   33,07
+                                                        845    CONSUMO DE GÁS - JUN/2025 55,23 m³                                295,53
+                                                        830    CONSUMO DE ÁGUA - JUN/2025 32,157 m³                              266,37          1.142,28
+ 5183692             15/08/2025      193736                3   COTA CONDOMINIAL AGO/2025                                         446,12
+                                                        260    PINTURA 14/18                                                     101,19
+                                                        938    RATEIO EXTRA 3/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - JUL/2025 30,011 m³                              247,93
+                                                        845    CONSUMO DE GÁS - JUL/2025 61,13 m³                                456,63          1.284,94
+ 5218889             15/09/2025      194633                3   COTA CONDOMINIAL SET/2025                                         446,12
+                                                        260    PINTURA 15/18                                                     101,19
+                                                        938    RATEIO EXTRA 4/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - AGO/2025 31,523 m³                              264,18
+                                                        845    CONSUMO DE GÁS - AGO/2025 53,64 m³                                387,66          1.232,22
+ 5251848             15/10/2025      195166                3   COTA CONDOMINIAL OUT/2025                                         446,12
+                                                        260    PINTURA 16/18                                                     101,19
+                                                        845    CONSUMO DE GÁS SET/2025 42,48 m³                                  236,33
+                                                        830    CONSUMO DE ÁGUA SET/2025 21,431 m³                                174,57             958,21
+ 5294377             15/11/2025      195702                3   COTA CONDOMINIAL NOV/2025                                         446,12
+                                                        260    PINTURA 17/18                                                     101,19
+                                                        845    CONSUMO DE GÁS - OUT/2025 11,01 m³                                 66,89
+                                                        195    CONSUMO AGUA OUT/2025 13,084 m3                                   103,29             717,49    11.755,29
+ Bloco: A Unidade: 005 ANTONIO CARLOS DOS SANTOS CPF: 567.069.528-34
+ 4647201        15/06/2021   184401          3 Condomínio JUNHO/2021                                                               9,22
+                                                        830    Consumo de Água 5,293 M³                                           58,00
+                                                        845    Consumo de Gas 7,04 m³                                             33,44             100,66
+ 4647202             15/01/2022      184403                3   Condomínio JANEIRO/2022                                           387,13
+                                                        459    Rateio Extra 06/10                                                 21,29
+                                                        830    Consumo de Agua 6,321 M³                                           58,00
+                                                        845    Consumo de Gas 6,76 m³                                             38,17             504,59
+ 4647203             15/02/2022      184404                3   Condomínio FEVEREIRO/2022                                         387,13
+                                                        459    Rateio Extra 07/10                                                 21,29
+                                                        845    Consumo de Gás 7,82 m³                                             55,21
+                                                        830    Consumo de Água 5,685 M³                                           58,00             521,63
+ 4647206             15/03/2022      184405                3   Condomínio MARÇO/2022                                             387,13
+Legenda: (A) - Acordo (AE) - Acordo Extrajudicial (AJ) - Acordo Judicial (J) - Jurídico (D) - Depósito identificado (B) - Boleto bancário ( P) - Protesto
+
+    - Recibo do Inadimplência Zero                                                                                         Emitido em 01/12/2025 12:45:07 - Página 1 de 10
+                                                           Relação Analítica de Pendentes
+                                                    Período de: 01/01/1901 até 30/11/2025 Posição em: 30/11/2025
+
+
+
+
+ Recibo             Vencimento       Emissão         Conta     Histórico                                                          Valor       Total recibo         Total
+
+ Condomínio: 7404 - CONDOMÍNIO SPA LIFE GARDEN
+ Bloco: A Unidade: 005 ANTONIO CARLOS DOS SANTOS CPF: 567.069.528-34
+ 4647206        15/03/2022   184405        459 Rateio Extra 08/10                                                                 21,29
+                                                        845    Consumo de Gás 7,44 m³                                             43,23
+                                                        830    Consumo de Água 6,651 M³                                           58,00             509,65
+ 4647207             15/05/2022      184406                3   Condomínio MAIO/2022                                              387,13
+                                                        459    Rateio Extra 10/10                                                 21,29
+                                                        845    Consumo de Gás 8,43 m³                                             59,24
+                                                        830    Consumo de Água 7,923 M³                                           58,00             525,66
+ 4647209             15/06/2022      184407                3   Condomínio JUNHO/2022                                             387,13
+                                                        830    Consumo de Água 7,966 M³                                           65,44
+                                                        845    Consumo de Gás 12,03 m³                                            76,06             528,63
+ 4647453             15/10/2022      184408                3   Condomínio OUTUBRO/2022                                           387,13
+                                                        845    Consumo de Gás 8,09 m³                                             58,21
+                                                        830    Consumo de Água 5,001 M³                                           65,44             510,78
+ 4647456             15/11/2022      184409                3   Condomínio NOVEMBRO/2022                                          425,95
+                                                        845    Consumo de Gás 11,11 m³                                            75,47
+                                                        830    Consumo de Água 5,804 M³                                           65,44
+                                                          13   Fundo de Reserva                                                   21,30             588,16
+ 4647457             17/02/2023      184410                3   Condomínio FEVEREIRO/2023                                         425,95
+                                                          13   Fundo de Reserva                                                   21,30
+                                                        845    Consumo de Gás 11,72 m³                                            97,72
+                                                        830    Consumo de Água 7,487 M³                                           65,44             610,41
+ 4647458             15/03/2023      184411                3   Condomínio MARÇO/2023                                             425,95
+                                                          13   Fundo de Reserva                                                   21,30
+                                                        845    Consumo de Gás 10,4 m³                                             92,71
+                                                        830    Consumo de Água 6,381 M³                                           65,44             605,40
+ 4647459             15/04/2023      184412                3   Condomínio ABRIL/2023                                             425,95
+                                                          13   Fundo de Reserva                                                   21,30
+                                                        845    Consumo de Gás 12,6 m³                                             75,93
+                                                        830    Consumo de Água 6,954 M³                                           65,44             588,62
+ 4647460             15/05/2023      184413                3   Condomínio MAIO/2023                                              425,95
+                                                          13   Fundo de Reserva                                                   21,30
+                                                        845    Consumo de Gás 2,35 m³                                             15,90
+                                                        830    Consumo de Água 1,36 M³                                            65,44             528,59
+ 4647461             15/09/2023      184414                3   Condomínio SETEMBRO/2023                                          425,95
+                                                        845    Consumo de Gás 31,21 m³                                           191,99
+                                                        830    Consumo de Água 11,169 M³                                          74,90
+                                                        260    Pintura 01/10                                                      58,52             751,36
+ 4647463             15/10/2023      184400                3   Condomínio OUTUBRO/2023                                           425,95
+                                                        260    Pintura 02/10                                                      58,52
+                                                        830    Consumo de Águ 12,385 M³                                           84,76
+                                                        845    Consumo de Gás 22,63 m³                                           183,70             752,93
+ 4647465             15/11/2023      184415                3   Condomínio NOVEMBRO/2023                                          425,95
+                                                        260    Pintura 03/10                                                      58,52
+                                                        845    Consumo de Gás 19,75                                              131,73
+                                                        830    Consumo de Água 9,938 M³                                           65,44             681,64
+ 4647466             15/12/2023      184416                3   Condomínio DEZEMBRO/2023                                          425,95
+                                                        260    Pintura 04/10                                                      58,52
+                                                        845    Consumo de Gás 24,53 m³                                           136,80
+                                                        830    Consumo de Água 11,164 M³                                          74,75             696,02
+ 4647467             15/01/2024      184417                3   Condomínio JANEIRO/2024                                           425,95
+                                                        260    Pintura 05/10                                                      58,52
+                                                        845    Consumo de Gás 17,44 m³                                           106,81
+                                                        830    Consumo de Água 12,452 M³                                          85,75             677,03
+ 4626758             15/02/2024      183978                3   COTA CONDOMINIAL FEV/2024                                         425,95
+                                                        260    PINTURA 05/10                                                      58,52
+                                                        845    CONSUMO DE GÁS - JAN/2024 17,6 m³                                 133,62
+                                                        830    CONSUMO DE ÁGUA - JAN/2024 9,918 m³                                65,44             683,53
+ 4656927             15/03/2024      184333                3   COTA CONDOMINIAL MAR/2024                                         425,95
+                                                        260    PINTURA 06/10                                                      58,52
+                                                        845    CONSUMO DE GÁS - FEV/2024 15,62 m³                                 97,24
+                                                        830    CONSUMO DE ÁGUA - FEV/2024 10,99 m³                                73,29             655,00
+ 4686133             15/04/2024      184794                3   COTA CONDOMINIAL ABR/2024                                         456,62
+                                                        260    PINTURA 08/10                                                      58,52
+
+
+Legenda: (A) - Acordo (AE) - Acordo Extrajudicial (AJ) - Acordo Judicial (J) - Jurídico (D) - Depósito identificado (B) - Boleto bancário ( P) - Protesto
+
+    - Recibo do Inadimplência Zero                                                                                         Emitido em 01/12/2025 12:45:07 - Página 2 de 10
+                                                           Relação Analítica de Pendentes
+                                                    Período de: 01/01/1901 até 30/11/2025 Posição em: 30/11/2025
+
+
+
+
+ Recibo             Vencimento       Emissão         Conta     Histórico                                                          Valor       Total recibo         Total
+
+ Condomínio: 7404 - CONDOMÍNIO SPA LIFE GARDEN
+ Bloco: A Unidade: 005 ANTONIO CARLOS DOS SANTOS CPF: 567.069.528-34
+ 4686133        15/04/2024   184794         13 RECOMP FUNDO RESERVA 01/10                                                         37,00
+                                                        845    CONSUMO DE GÁS - MAR/2024 12,09 m³                                 89,29
+                                                        830    CONSUMO DE ÁGUA - MAR/2024 9,148 m³                                65,44             706,87
+ 4716615             15/05/2024      185239                3   COTA CONDOMINIAL MAI/2024                                         456,62
+                                                        260    PINTURA 09/10                                                      58,52
+                                                          13   RECOMP FUNDO RESERVA 02/10                                         37,00
+                                                        845    CONSUMO DE GÁS - ABR/2024 12,33 m³                                 88,42
+                                                        830    CONSUMO DE ÁGUA - ABR/2024 8,735 m³                                65,44             706,00
+ 4749968             20/06/2024      185664                3   COTA CONDOMINIAL JUN/2024                                         456,62
+                                                        260    PINTURA 10/10                                                      58,52
+                                                          13   RECOMP FUNDO RESERVA 03/10                                         37,00
+                                                        830    CONSUMO DE AGUA - MAIO/2024 9,987 m³                               65,44
+                                                        845    CONSUMO DE GÁS - MAIO/2024 13,48 m³                                91,04             708,62
+ 4782280             15/07/2024      186067                3   COTA CONDOMINIAL JUL/2024                                         456,62
+                                                          13   RECOMP FUNDO RESERVA 04/10                                         37,00
+                                                        260    PINTURA 01/18                                                     103,57
+                                                        845    CONSUMO DE GÁS - JUN/2024 17,3 m³                                 117,69
+                                                        830    CONSUMO DE ÁGUA - JUN/2024 10,373 m³                               68,46             783,34
+ 4811008             15/08/2024      187235                3   COTA CONDOMINIAL AGO/2024                                         456,62
+                                                          13   RECOMP FUNDO RESERVA 05/10                                         37,00
+                                                        260    PINTURA 02/18                                                     103,57
+                                                        845    CONSUMO DE GÁS - JUL/2024 22,76 m³                                173,32
+                                                        830    CONSUMO DE ÁGUA - JUL/2024 8,93 m³                                 76,68             847,19
+ 4840625             15/09/2024      187603                3   COTA CONDOMINIAL SET/2024                                         456,62
+                                                          13   RECOMP FUNDO RESERVA 06/10                                         37,00
+                                                        260    PINTURA 03/18                                                     103,57
+                                                        845    CONSUMO DE GÁS - AGO/2024 18,37 m³                                124,52
+                                                        830    CONSUMO DE ÁGUA - AGO/2024 7,87 m³                                 76,68             798,39
+ 4871945             15/10/2024      188184                3   COTA CONDOMINIAL OUT/2024                                         456,62
+                                                          13   RECOMP FUNDO RESERVA 07/10                                         37,00
+                                                        260    PINTURA 04/18                                                     103,57
+                                                        845    CONSUMO DE GÁS - SET/2024 17,05 m³                                119,84
+                                                        830    CONSUMO DE ÁGUA - SET/2024 9,213 m³                                75,92             792,95
+ 4900278             15/11/2024      188756                3   COTA CONDOMINIAL NOV/2024                                         456,62
+                                                          13   RECOMP FUNDO RESERVA 08/10                                         37,00
+                                                        260    PINTURA 05/18                                                     103,57
+                                                        830    CONSUMO DE ÁGUA 11,19 m³                                           85,46
+                                                        845    CONSUMO DE GÁS 15,74 m³                                           101,30             783,95
+ 4928569             15/12/2024      189151                3   COTA CONDOMINIAL DEZ/2024                                         456,62
+                                                          13   RECOMP FUNDO RESERVA 09/10                                         37,00
+                                                        260    PINTURA 06/18                                                     103,57
+                                                        845    CONSUMO DE GÁS - NOV/2024 19,21 m³                                140,93
+                                                        830    CONSUMO DE ÁGUA - NOV/2024 10,614 m³                               81,22             819,34
+ 4957909             15/01/2025      189745                3   COTA CONDOMINIAL JAN/2025                                         456,62
+                                                          13   RECOMP FUNDO RESERVA 10/10                                         37,00
+                                                        260    PINTURA 07/18                                                     103,57
+                                                        845    CONSUMO DE GÁS - DEZ/2024 17,3333 m³                              110,57
+                                                        830    CONSUMO DE ÁGUA - DEZ/2024 10,3393 m³                              79,67             787,43
+ 4986765             15/02/2025      190185                3   COTA CONDOMINIAL FEV/2025                                         456,62
+                                                        260    PINTURA 08/18                                                     103,57
+                                                        845    CONSUMO DE GÁS - JAN/2025 3,8167 m³                                25,80
+                                                        830    CONSUMO DE ÁGUA - JAN/2025 13,5 m³                                108,05             694,04
+ 5017537             15/03/2025      190690                3   COTA CONDOMINIAL MAR/2025                                         456,62
+                                                        260    PINTURA 09/18                                                     103,57
+                                                        845    CONSUMO DE GÁS - FEV/2025 18,56 m³                                115,22
+                                                        830    CONSUMO DE ÁGUA - FEV/2025 13,003 m³                              103,49             778,90
+ 5046488             15/04/2025      191182                3   COTA CONDOMINIAL ABR/2025                                         456,62
+                                                        260    PINTURA 10/18                                                     103,57
+                                                        845    CONSUMO DE GÁS - MAR/2025 16,82 m³                                109,58
+                                                        830    CONSUMO DE ÁGUA - MAR/2025 11,485 m³                               93,77             763,54
+ 5078035             15/05/2025      191858                3   COTA CONDOMINIAL MAI/2025                                         456,62
+                                                        260    PINTURA 11/18                                                     103,57
+                                                        845    CONSUMO DE GÁS - ABR/2025 21,07 m³                                122,88
+
+
+Legenda: (A) - Acordo (AE) - Acordo Extrajudicial (AJ) - Acordo Judicial (J) - Jurídico (D) - Depósito identificado (B) - Boleto bancário ( P) - Protesto
+
+    - Recibo do Inadimplência Zero                                                                                         Emitido em 01/12/2025 12:45:07 - Página 3 de 10
+                                                           Relação Analítica de Pendentes
+                                                    Período de: 01/01/1901 até 30/11/2025 Posição em: 30/11/2025
+
+
+
+
+ Recibo              Vencimento      Emissão         Conta     Histórico                                                          Valor       Total recibo         Total
+
+ Condomínio: 7404 - CONDOMÍNIO SPA LIFE GARDEN
+ Bloco: A Unidade: 005 ANTONIO CARLOS DOS SANTOS CPF: 567.069.528-34
+ 5078035        15/05/2025   191858        830 CONSUMO DE ÁGUA - ABR/2025 11,702 m³                                               90,77             773,84
+ 5110222             15/06/2025      192542                3   COTA CONDOMINIAL JUN/2025                                         456,62
+                                                        260    PINTURA 12/18                                                     103,57
+                                                        938    RATEIO EXTRA 1/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - MAI/2025 11,767 m³                               91,21
+                                                        845    CONSUMO DE GÁS - MAI/2025 22,61 m³                                143,72             828,19
+ 5148144             15/07/2025      193050                3   COTA CONDOMINIAL JUL/2025                                         456,62
+                                                        260    PINTURA 13/18                                                     103,57
+                                                        938    RATEIO EXTRA 2/4                                                   33,07
+                                                        845    CONSUMO DE GÁS - JUN/2025 25,93 m³                                138,75
+                                                        830    CONSUMO DE ÁGUA - JUN/2025 13,624 m³                              107,07             839,08
+ 5183693             15/08/2025      193736                3   COTA CONDOMINIAL AGO/2025                                         456,62
+                                                        260    PINTURA 14/18                                                     103,57
+                                                        938    RATEIO EXTRA 3/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - JUL/2025 10,743 m³                               82,31
+                                                        845    CONSUMO DE GÁS - JUL/2025 28,18 m³                                210,50             886,07
+ 5218890             15/09/2025      194633                3   COTA CONDOMINIAL SET/2025                                         456,62
+                                                        260    PINTURA 15/18                                                     103,57
+                                                        938    RATEIO EXTRA 4/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - AGO/2025 12,384 m³                               96,77
+                                                        845    CONSUMO DE GÁS - AGO/2025 27,31 m³                                197,37             887,40
+ 5251849             15/10/2025      195166                3   COTA CONDOMINIAL OUT/2025                                         456,62
+                                                        260    PINTURA 16/18                                                     103,57
+                                                        845    CONSUMO DE GÁS SET/2025 27,16 m³                                  151,10
+                                                        830    CONSUMO DE ÁGUA SET/2025 11,92 m³                                  92,49             803,78
+ 5294378             15/11/2025      195702                3   COTA CONDOMINIAL NOV/2025                                         456,62
+                                                        260    PINTURA 17/18                                                     103,57
+                                                        845    CONSUMO DE GÁS - OUT/2025 24,07 m³                                146,22
+                                                        195    CONSUMO AGUA OUT/2025 12,533 m3                                    98,40             804,81    26.814,02
+ Bloco: A Unidade: 012 WANDERLEI SANTANA DE FARIA CPF: 335.558.308-13
+ 5203985     AE 15/02/2025   190185        260 PINTURA 08/18                                                                      50,34
+                                                        845    CONSUMO DE GÁS - JAN/2025 0,2 m³                                    1,35
+                                                        830    CONSUMO DE ÁGUA - JAN/2025 0,002 m³                                75,92             127,61
+ 5017540        AE   15/03/2025      190690                3   COTA CONDOMINIAL MAR/2025                                         359,67
+                                                        260    PINTURA 09/18                                                      81,58
+                                                        845    CONSUMO DE GÁS - FEV/2025 16,35 m³                                101,50
+                                                        830    CONSUMO DE ÁGUA - FEV/2025 22,241 m³                              188,29             731,04
+ 5046491        AE   15/04/2025      191182                3   COTA CONDOMINIAL ABR/2025                                         359,67
+                                                        260    PINTURA 10/18                                                      81,58
+                                                        845    CONSUMO DE GÁS - MAR/2025 15,78 m³                                102,80
+                                                        830    CONSUMO DE ÁGUA - MAR/2025 22,523 m³                              226,45             770,50
+ 5294381             15/11/2025      195702                3   COTA CONDOMINIAL NOV/2025                                         359,67
+                                                        260    PINTURA 17/18                                                      81,58
+                                                        845    CONSUMO DE GÁS - OUT/2025 3,66 m³                                  22,23
+                                                        195    CONSUMO AGUA OUT/2025 10,09 m3                                     76,72             540,20     2.169,35
+ Bloco: A Unidade: 015 DANILO FELIX DE LIMA CPF: 352.933.178-30
+ 4749974     AE 20/06/2024    185664            3 COTA CONDOMINIAL JUN/2024                                                      429,50
+                                                        260    PINTURA 10/10                                                      55,05
+                                                          13   RECOMP FUNDO RESERVA 03/10                                         34,80
+                                                        830    CONSUMO DE AGUA - MAIO/2024 34,607 m³                             264,92
+                                                        845    CONSUMO DE GÁS - MAIO/2024 1,77 m³                                 11,95             796,22
+ 4782286        AE   15/07/2024      186067                3   COTA CONDOMINIAL JUL/2024                                         429,50
+                                                          13   RECOMP FUNDO RESERVA 04/10                                         34,80
+                                                        260    PINTURA 01/18                                                      97,42
+                                                        830    CONSUMO DE ÁGUA - JUN/2024 30,611 m³                              232,53             794,25
+ 5294384             15/11/2025      195702                3   COTA CONDOMINIAL NOV/2025                                         429,50
+                                                        260    PINTURA 17/18                                                      97,42
+                                                        845    CONSUMO DE GÁS - OUT/2025 47,08 m³                                286,01
+                                                        195    CONSUMO AGUA OUT/2025 26,495 m3                                   222,33          1.035,26      2.625,73
+ Bloco: A Unidade: 053 VAGNER ALVES DOS REIS CPF: 992.467.838-91
+ 5271649        15/03/2023   184411           3 Condomínio MARÇO/2023                                                            165,56
+                                                          13   Fundo de Reserva                                                   20,88
+                                                        845    Consumo de Gás 24,16 m³                                           215,38
+                                                        830    Consumo de Água 22,175 M³                                         151,95             553,77
+
+Legenda: (A) - Acordo (AE) - Acordo Extrajudicial (AJ) - Acordo Judicial (J) - Jurídico (D) - Depósito identificado (B) - Boleto bancário ( P) - Protesto
+
+    - Recibo do Inadimplência Zero                                                                                         Emitido em 01/12/2025 12:45:07 - Página 4 de 10
+                                                           Relação Analítica de Pendentes
+                                                    Período de: 01/01/1901 até 30/11/2025 Posição em: 30/11/2025
+
+
+
+
+ Recibo             Vencimento       Emissão         Conta     Histórico                                                          Valor       Total recibo         Total
+
+ Condomínio: 7404 - CONDOMÍNIO SPA LIFE GARDEN
+ Bloco: A Unidade: 053 VAGNER ALVES DOS REIS CPF: 992.467.838-91
+ 4647535        15/04/2023   184412           3 Condomínio ABRIL/2023                                                            417,69
+                                                          13   Fundo de Reserva                                                   20,88
+                                                        845    Consumo de Gás 28,19 m³                                           169,87
+                                                        830    Consumo de Água 23,468 M³                                         162,16             770,60
+ 4647536             15/05/2023      184413                3   Condomínio MAIO/2023                                              417,69
+                                                          13   Fundo de Reserva                                                   20,88
+                                                        845    Consumo de Gás 26,34 m³                                           178,23
+                                                        830    Consumo de Água 4,638 M³                                           65,44             682,24
+ 4647537             15/06/2023      184418                3   Condomínio JUNHO/2023                                             417,69
+                                                          13   Fundo de Reserva                                                   20,88
+                                                        845    Consumo de Gás 34,68 m³                                           213,71
+                                                        830    Consumo de Água 16,7603 M³                                        116,71             768,99
+ 4647538             15/07/2023      184424                3   Condomínio JULHO/2023                                             417,69
+                                                          13   Fundo de Reserva                                                   20,88
+                                                        845    Consumo de Gás 36,31 m³                                           245,00
+                                                        830    Consumo de Água 0,0444 M³                                          65,44             749,01
+ 4647539             15/08/2023      184419                3   Condomínio AGOSTO/2023                                            417,69
+                                                          13   Fundo de Reserva                                                   20,88
+                                                        845    Consumo de Gás 31,59 m³                                           214,26
+                                                        830    Consumo de Água 7,1476 M³                                          65,44             718,27
+ 4647540             15/09/2023      184414                3   Condomínio SETEMBRO/2023                                          417,69
+                                                        845    Consumo de Gás 42,78 m³                                           263,17
+                                                        830    Consumo de Água                                                    65,44
+                                                        260    Pintura 01/10                                                      57,39             803,69
+ 4647541             15/10/2023      184400                3   Condomínio OUTUBRO/2023                                           417,69
+                                                        260    Pintura 02/10                                                      57,39
+                                                        830    Consumo de Águ                                                     65,44
+                                                        845    Consumo de Gás 34,33 m³                                           278,67             819,19
+ 4647542             15/11/2023      184415                3   Condomínio NOVEMBRO/2023                                          417,69
+                                                        260    Pintura 03/10                                                      57,39
+                                                        845    Consumo de Gás 26,08                                              173,95
+                                                        830    Consumo de Água                                                    65,44             714,47
+ 4647543             15/12/2023      184416                3   Condomínio DEZEMBRO/2023                                          417,69
+                                                        260    Pintura 04/10                                                      57,39
+                                                        845    Consumo de Gás 34,3967 m³                                         191,83
+                                                        830    Consumo de Água                                                    65,44             732,35
+ 4647544             15/01/2024      184417                3   Condomínio JANEIRO/2024                                           417,69
+                                                        260    Pintura 05/10                                                      57,39
+                                                        845    Consumo de Gás 31,6022 m³                                         193,54
+                                                        830    Consumo de Água                                                    65,44             734,06
+ 4626786             15/02/2024      183978                3   COTA CONDOMINIAL FEV/2024                                         417,69
+                                                        260    PINTURA 05/10                                                      57,39
+                                                        830    CONSUMO DE ÁGUA - JAN/2024                                         65,44             540,52
+ 4656955             15/03/2024      184333                3   COTA CONDOMINIAL MAR/2024                                         417,69
+                                                        260    PINTURA 06/10                                                      57,39
+                                                        830    CONSUMO DE ÁGUA - FEV/2024 0,006 m³                                65,44             540,52
+ 4686161             15/04/2024      184794                3   COTA CONDOMINIAL ABR/2024                                         447,76
+                                                        260    PINTURA 08/10                                                      57,39
+                                                          13   RECOMP FUNDO RESERVA 01/10                                         36,28
+                                                        830    CONSUMO DE ÁGUA - MAR/2024                                         65,44             606,87
+ 4716643             15/05/2024      185239                3   COTA CONDOMINIAL MAI/2024                                         447,76
+                                                        260    PINTURA 09/10                                                      57,39
+                                                          13   RECOMP FUNDO RESERVA 02/10                                         36,28
+                                                        830    CONSUMO DE ÁGUA - ABR/2024                                         65,44             606,87
+ 4749996             20/06/2024      185664                3   COTA CONDOMINIAL JUN/2024                                         447,76
+                                                        260    PINTURA 10/10                                                      57,39
+                                                          13   RECOMP FUNDO RESERVA 03/10                                         36,28
+                                                        830    CONSUMO DE AGUA - MAIO/2024                                        65,44             606,87
+ 4782308             15/07/2024      186067                3   COTA CONDOMINIAL JUL/2024                                         447,76
+                                                          13   RECOMP FUNDO RESERVA 04/10                                         36,28
+                                                        260    PINTURA 01/18                                                     101,56
+                                                        830    CONSUMO DE ÁGUA - JUN/2024                                         65,44             651,04
+ 4840653             15/09/2024      187603                3   COTA CONDOMINIAL SET/2024                                         447,76
+
+
+Legenda: (A) - Acordo (AE) - Acordo Extrajudicial (AJ) - Acordo Judicial (J) - Jurídico (D) - Depósito identificado (B) - Boleto bancário ( P) - Protesto
+
+    - Recibo do Inadimplência Zero                                                                                         Emitido em 01/12/2025 12:45:07 - Página 5 de 10
+                                                           Relação Analítica de Pendentes
+                                                    Período de: 01/01/1901 até 30/11/2025 Posição em: 30/11/2025
+
+
+
+
+ Recibo             Vencimento       Emissão         Conta     Histórico                                                          Valor       Total recibo         Total
+
+ Condomínio: 7404 - CONDOMÍNIO SPA LIFE GARDEN
+ Bloco: A Unidade: 053 VAGNER ALVES DOS REIS CPF: 992.467.838-91
+ 4840653        15/09/2024   187603          13 RECOMP FUNDO RESERVA 06/10                                                        36,28
+                                                        260    PINTURA 03/18                                                     101,56
+                                                        845    CONSUMO DE GÁS - AGO/2024 0,2767 m³                                 1,88
+                                                        830    CONSUMO DE ÁGUA - AGO/2024                                         76,68             664,16
+ 4871973             15/10/2024      188184                3   COTA CONDOMINIAL OUT/2024                                         447,76
+                                                          13   RECOMP FUNDO RESERVA 07/10                                         36,28
+                                                        260    PINTURA 04/18                                                     101,56
+                                                        845    CONSUMO DE GÁS - SET/2024 0,3689 m³                                 2,59
+                                                        830    CONSUMO DE ÁGUA - SET/2024                                         75,92             664,11
+ 4900306             15/11/2024      188756                3   COTA CONDOMINIAL NOV/2024                                         447,76
+                                                          13   RECOMP FUNDO RESERVA 08/10                                         36,28
+                                                        260    PINTURA 05/18                                                     101,56
+                                                        830    CONSUMO DE ÁGUA                                                    75,92             661,52
+ 4928597             15/12/2024      189151                3   COTA CONDOMINIAL DEZ/2024                                         447,76
+                                                          13   RECOMP FUNDO RESERVA 09/10                                         36,28
+                                                        260    PINTURA 06/18                                                     101,56
+                                                        830    CONSUMO DE ÁGUA - NOV/2024                                         75,92             661,52
+ 4957937             15/01/2025      189745                3   COTA CONDOMINIAL JAN/2025                                         447,76
+                                                          13   RECOMP FUNDO RESERVA 10/10                                         36,28
+                                                        260    PINTURA 07/18                                                     101,56
+                                                        845    CONSUMO DE GÁS - DEZ/2024 0,123 m³                                  0,78
+                                                        830    CONSUMO DE ÁGUA - DEZ/2024 3,239 m³                                75,92             662,30
+ 4986793             15/02/2025      190185                3   COTA CONDOMINIAL FEV/2025                                         447,76
+                                                        260    PINTURA 08/18                                                     101,56
+                                                        845    CONSUMO DE GÁS - JAN/2025 38,08 m³                                257,42
+                                                        830    CONSUMO DE ÁGUA - JAN/2025 23,991 m³                              204,36          1.011,10
+ 5017565             15/03/2025      190690                3   COTA CONDOMINIAL MAR/2025                                         447,76
+                                                        260    PINTURA 09/18                                                     101,56
+                                                        845    CONSUMO DE GÁS - FEV/2025 37,12 m³                                230,45
+                                                        830    CONSUMO DE ÁGUA - FEV/2025 15,976 m³                              130,78             910,55
+ 5046516             15/04/2025      191182                3   COTA CONDOMINIAL ABR/2025                                         447,76
+                                                        260    PINTURA 10/18                                                     101,56
+                                                        845    CONSUMO DE GÁS - MAR/2025 35,23 m³                                229,52
+                                                        830    CONSUMO DE ÁGUA - MAR/2025 13,948 m³                              123,37             902,21
+ 5078063             15/05/2025      191858                3   COTA CONDOMINIAL MAI/2025                                         447,76
+                                                        260    PINTURA 11/18                                                     101,56
+                                                        845    CONSUMO DE GÁS - ABR/2025 39,39 m³                                229,71
+                                                        830    CONSUMO DE ÁGUA - ABR/2025 24,57 m³                               203,05             982,08
+ 5110250             15/06/2025      192542                3   COTA CONDOMINIAL JUN/2025                                         447,76
+                                                        260    PINTURA 12/18                                                     101,56
+                                                        938    RATEIO EXTRA 1/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - MAI/2025 32,464 m³                              270,36
+                                                        845    CONSUMO DE GÁS - MAI/2025 43,33 m³                                275,43          1.128,18
+ 5148172             15/07/2025      193050                3   COTA CONDOMINIAL JUL/2025                                         447,76
+                                                        260    PINTURA 13/18                                                     101,56
+                                                        938    RATEIO EXTRA 2/4                                                   33,07
+                                                        845    CONSUMO DE GÁS - JUN/2025 54,98 m³                                294,20
+                                                        830    CONSUMO DE ÁGUA - JUN/2025 32,056 m³                              265,50          1.142,09
+ 5183721             15/08/2025      193736                3   COTA CONDOMINIAL AGO/2025                                         447,76
+                                                        260    PINTURA 14/18                                                     101,56
+                                                        938    RATEIO EXTRA 3/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - JUL/2025 27,246 m³                              224,16
+                                                        845    CONSUMO DE GÁS - JUL/2025 55,75 m³                                416,44          1.222,99
+ 5218918             15/09/2025      194633                3   COTA CONDOMINIAL SET/2025                                         447,76
+                                                        260    PINTURA 15/18                                                     101,56
+                                                        938    RATEIO EXTRA 4/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - AGO/2025 29,906 m³                              250,04
+                                                        845    CONSUMO DE GÁS - AGO/2025 53,21 m³                                384,56          1.216,99
+ 5251877             15/10/2025      195166                3   COTA CONDOMINIAL OUT/2025                                         447,76
+                                                        260    PINTURA 16/18                                                     101,56
+                                                        845    CONSUMO DE GÁS SET/2025 49,78 m³                                  276,95
+                                                        830    CONSUMO DE ÁGUA SET/2025 26,189 m³                                215,63          1.041,90
+ 5294406             15/11/2025      195702                3   COTA CONDOMINIAL NOV/2025                                         447,76
+
+
+Legenda: (A) - Acordo (AE) - Acordo Extrajudicial (AJ) - Acordo Judicial (J) - Jurídico (D) - Depósito identificado (B) - Boleto bancário ( P) - Protesto
+
+    - Recibo do Inadimplência Zero                                                                                         Emitido em 01/12/2025 12:45:07 - Página 6 de 10
+                                                           Relação Analítica de Pendentes
+                                                    Período de: 01/01/1901 até 30/11/2025 Posição em: 30/11/2025
+
+
+
+
+ Recibo             Vencimento       Emissão         Conta     Histórico                                                          Valor       Total recibo         Total
+
+ Condomínio: 7404 - CONDOMÍNIO SPA LIFE GARDEN
+ Bloco: A Unidade: 053 VAGNER ALVES DOS REIS CPF: 992.467.838-91
+ 5294406        15/11/2025   195702         260 PINTURA 17/18                                                                    101,56
+                                                        845    CONSUMO DE GÁS - OUT/2025 46,71 m³                                283,76
+                                                        195    CONSUMO AGUA OUT/2025 28,153 m3                                   237,04          1.070,12     25.541,15
+ Bloco: A Unidade: 055 MARCEL HENRIQUE PEREIRA MARIS CPF: 316.697.778-39
+ 5251879        15/10/2025    195166          3 COTA CONDOMINIAL OUT/2025                                                        429,50
+                                                        260    PINTURA 16/18                                                      97,42
+                                                        845    CONSUMO DE GÁS SET/2025 1,69 m³                                     9,40
+                                                        830    CONSUMO DE ÁGUA SET/2025 1,729 m³                                  75,92             612,24       612,24
+ Bloco: A Unidade: 064 MARLENE OLIVEIRA DOS SANTOS CPF: 161.100.068-82
+ 5294413        15/11/2025   195702           3 COTA CONDOMINIAL NOV/2025                                                        384,28
+                                                        260    PINTURA 17/18                                                      87,16
+                                                        845    CONSUMO DE GÁS - OUT/2025 19,29 m³                                117,19
+                                                        195    CONSUMO AGUA OUT/2025 10,67 m3                                     81,87             670,50       670,50
+ Bloco: A Unidade: 074 DOUGLAS SANTOS DE ALMEIDA CPF: 229.929.778-29
+ 5294419        15/11/2025   195702          3 COTA CONDOMINIAL NOV/2025                                                         384,28
+                                                        260    PINTURA 17/18                                                      87,16
+                                                        845    CONSUMO DE GÁS - OUT/2025 14,9 m³                                  90,52
+                                                        195    CONSUMO AGUA OUT/2025 8,341 m3                                     75,92             637,88       637,88
+ Bloco: A Unidade: 154 ARILSON FRANCISCO DA SILVA CPF: 139.695.988-26
+ 5218979     AE 15/09/2025    194633          3 COTA CONDOMINIAL SET/2025                                                        656,25
+                                                        260    PINTURA 15/18                                                     148,85
+                                                        938    RATEIO EXTRA 4/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - AGO/2025 20,482 m³                              167,61
+                                                        845    CONSUMO DE GÁS - AGO/2025 40,21 m³                                290,60          1.296,38
+ 5251938             15/10/2025      195166                3   COTA CONDOMINIAL OUT/2025                                         656,25
+                                                        260    PINTURA 16/18                                                     148,85
+                                                        845    CONSUMO DE GÁS SET/2025 31,81 m³                                  176,97
+                                                        830    CONSUMO DE ÁGUA SET/2025 21,864 m³                                178,31          1.160,38
+ 5294467             15/11/2025      195702                3   COTA CONDOMINIAL NOV/2025                                         656,25
+                                                        260    PINTURA 17/18                                                     148,85
+                                                        845    CONSUMO DE GÁS - OUT/2025 32,09 m³                                194,95
+                                                        195    CONSUMO AGUA OUT/2025 21,505 m3                                   178,04          1.178,09      3.634,85
+ Bloco: A Unidade: 155 GILDACIO V B. SOARES/DIVA B. SOARE CPF: 061.952.968-72
+ 5251939        15/10/2025    195166         805 SALÃO DE FESTAS 20/07/2025                                                       92,00
+                                                           3   COTA CONDOMINIAL OUT/2025                                         751,39
+                                                        260    PINTURA 16/18                                                     170,43
+                                                        845    CONSUMO DE GÁS SET/2025 7,09 m³                                    39,44
+                                                        830    CONSUMO DE ÁGUA SET/2025 0,418 m³                                  75,92          1.129,18      1.129,18
+ Bloco: B Unidade: 003 DANIELE DE SOUZA ANDRADE MATOS CPF: 353.124.358-64
+ 5294471        15/11/2025    195702         3 COTA CONDOMINIAL NOV/2025                                                         456,62
+                                                        260    PINTURA 17/18                                                     103,57
+                                                        845    CONSUMO DE GÁS - OUT/2025 25,42 m³                                154,43
+                                                        195    CONSUMO AGUA OUT/2025 16,798 m3                                   136,26             850,88       850,88
+ Bloco: B Unidade: 013 IRENE ROSE COSMAI CORTESE CPF: 075.332.738-42
+ 4782378        15/07/2024    186067          3 COTA CONDOMINIAL JUL/2024                                                        429,50
+                                                          13   RECOMP FUNDO RESERVA 04/10                                         34,80
+                                                        260    PINTURA 01/18                                                      97,42
+                                                        845    CONSUMO DE GÁS - JUN/2024 47,6 m³                                 323,82
+                                                        830    CONSUMO DE ÁGUA - JUN/2024 11,0626 m³                              74,05             959,59
+ 4811106             15/08/2024      187235                3   COTA CONDOMINIAL AGO/2024                                         429,50
+                                                          13   RECOMP FUNDO RESERVA 05/10                                         34,80
+                                                        260    PINTURA 02/18                                                      97,42
+                                                        845    CONSUMO DE GÁS - JUL/2024 55,52 m³                                422,78
+                                                        830    CONSUMO DE ÁGUA - JUL/2024 11,31 m³                                87,81          1.072,31
+ 4840723             15/09/2024      187603                3   COTA CONDOMINIAL SET/2024                                         429,50
+                                                          13   RECOMP FUNDO RESERVA 06/10                                         34,80
+                                                        260    PINTURA 03/18                                                      97,42
+                                                        845    CONSUMO DE GÁS - AGO/2024 50,01 m³                                339,00
+                                                        830    CONSUMO DE ÁGUA - AGO/2024 11,34 m³                                92,58             993,30
+ 4872043             15/10/2024      188184                3   COTA CONDOMINIAL OUT/2024                                         429,50
+                                                          13   RECOMP FUNDO RESERVA 07/10                                         34,80
+                                                        260    PINTURA 04/18                                                      97,42
+                                                        845    CONSUMO DE GÁS - SET/2024 44,43 m³                                312,29
+                                                        830    CONSUMO DE ÁGUA - SET/2024 11,2384 m³                              85,84             959,85
+ 4928667             15/12/2024      189151                3   COTA CONDOMINIAL DEZ/2024                                         429,50
+Legenda: (A) - Acordo (AE) - Acordo Extrajudicial (AJ) - Acordo Judicial (J) - Jurídico (D) - Depósito identificado (B) - Boleto bancário ( P) - Protesto
+
+    - Recibo do Inadimplência Zero                                                                                         Emitido em 01/12/2025 12:45:07 - Página 7 de 10
+                                                           Relação Analítica de Pendentes
+                                                    Período de: 01/01/1901 até 30/11/2025 Posição em: 30/11/2025
+
+
+
+
+ Recibo              Vencimento      Emissão         Conta     Histórico                                                          Valor       Total recibo         Total
+
+ Condomínio: 7404 - CONDOMÍNIO SPA LIFE GARDEN
+ Bloco: B Unidade: 013 IRENE ROSE COSMAI CORTESE CPF: 075.332.738-42
+ 4928667        15/12/2024    189151         13 RECOMP FUNDO RESERVA 09/10                                                        34,80
+                                                        260    PINTURA 06/18                                                      97,42
+                                                        845    CONSUMO DE GÁS - NOV/2024 38,63 m³                                283,41
+                                                        830    CONSUMO DE ÁGUA - NOV/2024 11,2914 m³                              87,08             932,21
+ 4958007             15/01/2025      189745                3   COTA CONDOMINIAL JAN/2025                                         429,50
+                                                          13   RECOMP FUNDO RESERVA 10/10                                         34,80
+                                                        260    PINTURA 07/18                                                      97,42
+                                                        845    CONSUMO DE GÁS - DEZ/2024 37,34 m³                                238,20
+                                                        830    CONSUMO DE ÁGUA - DEZ/2024 11,2756 m³                              90,03             889,95
+ 4986863             15/02/2025      190185                3   COTA CONDOMINIAL FEV/2025                                         429,50
+                                                        260    PINTURA 08/18                                                      97,42
+                                                        845    CONSUMO DE GÁS - JAN/2025 38,39 m³                                259,52
+                                                        830    CONSUMO DE ÁGUA - JAN/2025 3,519 m³                                75,92             862,36
+ 5046586             15/04/2025      191182                3   COTA CONDOMINIAL ABR/2025                                         429,50
+                                                        260    PINTURA 10/18                                                      97,42
+                                                        845    CONSUMO DE GÁS - MAR/2025 27,26 m³                                177,59
+                                                        830    CONSUMO DE ÁGUA - MAR/2025 7,9845 m³                               75,92             780,43
+ 5078133             15/05/2025      191858                3   COTA CONDOMINIAL MAI/2025                                         429,50
+                                                        260    PINTURA 11/18                                                      97,42
+                                                        845    CONSUMO DE GÁS - ABR/2025 31,8 m³                                 185,45
+                                                        830    CONSUMO DE ÁGUA - ABR/2025 5,6542 m³                               75,92             788,29
+ 5110320             15/06/2025      192542                3   COTA CONDOMINIAL JUN/2025                                         429,50
+                                                        260    PINTURA 12/18                                                      97,42
+                                                        938    RATEIO EXTRA 1/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - MAI/2025 6,3659 m³                               75,92
+                                                        845    CONSUMO DE GÁS - MAI/2025 42,43 m³                                269,71             905,62
+ 5148242             15/07/2025      193050                3   COTA CONDOMINIAL JUL/2025                                         429,50
+                                                        260    PINTURA 13/18                                                      97,42
+                                                        938    RATEIO EXTRA 2/4                                                   33,07
+                                                        845    CONSUMO DE GÁS - JUN/2025 51,58 m³                                276,00
+                                                        830    CONSUMO DE ÁGUA - JUN/2025 27,8756 m³                             229,57          1.065,56
+ 5183791             15/08/2025      193736                3   COTA CONDOMINIAL AGO/2025                                         429,50
+                                                        260    PINTURA 14/18                                                      97,42
+                                                        938    RATEIO EXTRA 3/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - JUL/2025 28,835 m³                              237,82
+                                                        845    CONSUMO DE GÁS - JUL/2025 57,2 m³                                 427,27          1.225,08
+ 5218988             15/09/2025      194633                3   COTA CONDOMINIAL SET/2025                                         429,50
+                                                        260    PINTURA 15/18                                                      97,42
+                                                        938    RATEIO EXTRA 4/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - AGO/2025 22,097 m³                              181,73
+                                                        845    CONSUMO DE GÁS - AGO/2025 56,04 m³                                405,01          1.146,73
+ 5251947             15/10/2025      195166                3   COTA CONDOMINIAL OUT/2025                                         429,50
+                                                        260    PINTURA 16/18                                                      97,42
+                                                        845    CONSUMO DE GÁS SET/2025 44,96 m³                                  250,13
+                                                        830    CONSUMO DE ÁGUA SET/2025 22,914 m³                                187,37             964,42
+ 5294476             15/11/2025      195702                3   COTA CONDOMINIAL NOV/2025                                         429,50
+                                                        260    PINTURA 17/18                                                      97,42
+                                                        845    CONSUMO DE GÁS - OUT/2025 41,27 m³                                250,71
+                                                        195    CONSUMO AGUA OUT/2025 25,27 m3                                    211,45             989,08    14.534,78
+ Bloco: B Unidade: 016 DANIELLE MONIQUE RODRIGUES DE SOUSA CPF: 338.042.208-86
+ 5294479        15/11/2025    195702          3 COTA CONDOMINIAL NOV/2025                                                        359,67
+                                                        260    PINTURA 17/18                                                      81,58
+                                                        845    CONSUMO DE GÁS - OUT/2025 11,01 m³                                 66,89
+                                                        195    CONSUMO AGUA OUT/2025 8,602 m3                                     75,92             584,06       584,06
+ Bloco: B Unidade: 023 FLAVIA COSTA PAULINO CPF: 303.124.828-76
+ 5269075     AE 15/08/2025     193736          3 COTA CONDOMINIAL AGO/2025                                                       362,47
+                                                        260    PINTURA 14/18                                                     101,56
+                                                        938    RATEIO EXTRA 3/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - JUL/2025 17,712 m³                              142,21
+                                                        845    CONSUMO DE GÁS - JUL/2025 30,87 m³                                230,59             869,90
+ 5218994        AE   15/09/2025      194633                3   COTA CONDOMINIAL SET/2025                                         447,76
+                                                        260    PINTURA 15/18                                                     101,56
+                                                        938    RATEIO EXTRA 4/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - AGO/2025 16,144 m³                              129,66
+Legenda: (A) - Acordo (AE) - Acordo Extrajudicial (AJ) - Acordo Judicial (J) - Jurídico (D) - Depósito identificado (B) - Boleto bancário ( P) - Protesto
+
+    - Recibo do Inadimplência Zero                                                                                         Emitido em 01/12/2025 12:45:07 - Página 8 de 10
+                                                           Relação Analítica de Pendentes
+                                                    Período de: 01/01/1901 até 30/11/2025 Posição em: 30/11/2025
+
+
+
+
+ Recibo              Vencimento      Emissão         Conta     Histórico                                                          Valor       Total recibo         Total
+
+ Condomínio: 7404 - CONDOMÍNIO SPA LIFE GARDEN
+ Bloco: B Unidade: 023 FLAVIA COSTA PAULINO CPF: 303.124.828-76
+ 5218994     AE 15/09/2025     194633        845 CONSUMO DE GÁS - AGO/2025 26,83 m³                                              193,90             905,95
+ 5251953             15/10/2025      195166                3   COTA CONDOMINIAL OUT/2025                                         447,76
+                                                        260    PINTURA 16/18                                                     101,56
+                                                        845    CONSUMO DE GÁS SET/2025 23 m³                                     127,96
+                                                        830    CONSUMO DE ÁGUA SET/2025 16,728 m³                                133,98             811,26
+ 5294482             15/11/2025      195702                3   COTA CONDOMINIAL NOV/2025                                         447,76
+                                                        260    PINTURA 17/18                                                     101,56
+                                                        845    CONSUMO DE GÁS - OUT/2025 26,54 m³                                161,23
+                                                        195    CONSUMO AGUA OUT/2025 16,662 m3                                   135,05             845,60     3.432,71
+ Bloco: B Unidade: 035 PEDRO DIAS DE MIRANDA CPF: 096.434.208-17
+ 5294490        15/11/2025    195702          3 COTA CONDOMINIAL NOV/2025                                                        447,76
+                                                        260    PINTURA 17/18                                                     101,56
+                                                        845    CONSUMO DE GÁS - OUT/2025 9,82 m³                                  59,66
+                                                        195    CONSUMO AGUA OUT/2025 5,866 m3                                     75,92             684,90       684,90
+ Bloco: B Unidade: 046 MARCOS CARDOSO LIMA COSTA CPF: 301.561.168-20
+ 5251969        15/10/2025   195166          3 COTA CONDOMINIAL OUT/2025                                                         359,67
+                                                        260    PINTURA 16/18                                                      81,58
+                                                        845    CONSUMO DE GÁS SET/2025 1,3 m³                                      7,23
+                                                        830    CONSUMO DE ÁGUA SET/2025 9,056 m³                                  75,92             524,40
+ 5294498             15/11/2025      195702                3   COTA CONDOMINIAL NOV/2025                                         359,67
+                                                        260    PINTURA 17/18                                                      81,58
+                                                        195    CONSUMO AGUA OUT/2025                                              75,92             517,17     1.041,57
+ Bloco: B Unidade: 066 RAFAEL SOUZA DE MORAES CPF: 359.088.398-76
+ 5148276        15/07/2025    193050          3 COTA CONDOMINIAL JUL/2025                                                        359,67
+                                                        260    PINTURA 13/18                                                      81,58
+                                                        938    RATEIO EXTRA 2/4                                                   33,07
+                                                        845    CONSUMO DE GÁS - JUN/2025 13,05 m³                                 69,83
+                                                        830    CONSUMO DE ÁGUA - JUN/2025 6,127 m³                                75,92             620,07
+ 5294510             15/11/2025      195702                3   COTA CONDOMINIAL NOV/2025                                         359,67
+                                                        260    PINTURA 17/18                                                      81,58
+                                                        845    CONSUMO DE GÁS - OUT/2025 16,1 m³                                  97,81
+                                                        195    CONSUMO AGUA OUT/2025 7,44 m3                                      75,92             614,98     1.235,05
+ Bloco: B Unidade: 083 PAULO SILAS REIS CPF: 201.421.457-34
+ 5219031     AE 15/09/2025    194633            3 COTA CONDOMINIAL SET/2025                                                      447,76
+                                                        260    PINTURA 15/18                                                     101,56
+                                                        938    RATEIO EXTRA 4/4                                                   33,07
+                                                        830    CONSUMO DE ÁGUA - AGO/2025 22,852 m³                              188,34
+                                                        845    CONSUMO DE GÁS - AGO/2025 26,1667 m³                              189,11             959,84
+ 5251990             15/10/2025      195166                3   COTA CONDOMINIAL OUT/2025                                         447,76
+                                                        260    PINTURA 16/18                                                     101,56
+                                                        845    CONSUMO DE GÁS SET/2025 21,7922 m³                                121,24
+                                                        830    CONSUMO DE ÁGUA SET/2025 23,026 m³                                188,34             858,90
+ 5294519             15/11/2025      195702                3   COTA CONDOMINIAL NOV/2025                                         447,76
+                                                        260    PINTURA 17/18                                                     101,56
+                                                        845    CONSUMO DE GÁS - OUT/2025 15,9863 m³                               97,12
+                                                        195    CONSUMO AGUA OUT/2025 18,939 m3                                   155,26             801,70     2.620,44
+ Bloco: B Unidade: 102 DIEGO FERNANDO LUISI CPF: 349.019.868-99
+ 5294530        15/11/2025    195702          3 COTA CONDOMINIAL NOV/2025                                                        359,67
+                                                        260    PINTURA 17/18                                                      81,58
+                                                        845    CONSUMO DE GÁS - OUT/2025 38,65 m³                                234,80
+                                                        195    CONSUMO AGUA OUT/2025 28,386 m3                                   239,11             915,16       915,16
+ Bloco: B Unidade: 111 ROBERT J FERREIRA/CARINA B FERREIRA CPF: 357.203.468-05
+ 5294603     AJ 15/12/2024    189151           3 COTA CONDOMINIAL DEZ/2024                                                        41,10
+                                                          13   RECOMP FUNDO RESERVA 09/10                                         31,13
+                                                        260    PINTURA 06/18                                                      87,16
+                                                        845    CONSUMO DE GÁS - NOV/2024 5,39 m³                                  39,54
+                                                        830    CONSUMO DE ÁGUA - NOV/2024 4,975 m³                                75,92             274,85
+ 5252006        AJ   15/10/2025      195166                3   COTA CONDOMINIAL OUT/2025                                         384,28
+                                                        260    PINTURA 16/18                                                      87,16
+                                                        845    CONSUMO DE GÁS SET/2025 5,51 m³                                    30,65
+                                                        830    CONSUMO DE ÁGUA SET/2025 4,817 m³                                  75,92             578,01
+ 5294535             15/11/2025      195702                3   COTA CONDOMINIAL NOV/2025                                         384,28
+                                                        260    PINTURA 17/18                                                      87,16
+                                                        845    CONSUMO DE GÁS - OUT/2025 5,46 m³                                  33,17
+
+
+Legenda: (A) - Acordo (AE) - Acordo Extrajudicial (AJ) - Acordo Judicial (J) - Jurídico (D) - Depósito identificado (B) - Boleto bancário ( P) - Protesto
+
+    - Recibo do Inadimplência Zero                                                                                         Emitido em 01/12/2025 12:45:07 - Página 9 de 10
+                                                           Relação Analítica de Pendentes
+                                                    Período de: 01/01/1901 até 30/11/2025 Posição em: 30/11/2025
+
+
+
+
+ Recibo             Vencimento       Emissão         Conta     Histórico                                                          Valor       Total recibo        Total
+
+ Condomínio: 7404 - CONDOMÍNIO SPA LIFE GARDEN
+ Bloco: B Unidade: 111 ROBERT J FERREIRA/CARINA B FERREIRA CPF: 357.203.468-05
+ 5294535        15/11/2025    195702         195 CONSUMO AGUA OUT/2025 5,437 m3                                                   75,92             580,53     1.433,39
+ Bloco: B Unidade: 141 HELEN SALVADOR DE LIMA DALLO CPF: 093.974.726-07
+ 5294553        15/11/2025    195702          3 COTA CONDOMINIAL NOV/2025                                                        384,28
+                                                        260    PINTURA 17/18                                                      87,16
+                                                        845    CONSUMO DE GÁS - OUT/2025 36,81 m³                                223,62
+                                                        195    CONSUMO AGUA OUT/2025 16,86 m3                                    136,81             831,87      831,87
+ Bloco: B Unidade: 145 EDNA DOS SANTOS MARINI CPF: 213.098.738-95
+ 5294557        15/11/2025    195702          3 COTA CONDOMINIAL NOV/2025                                                        447,76
+                                                        260    PINTURA 17/18                                                     101,56
+                                                        845    CONSUMO DE GÁS - OUT/2025 22,02 m³                                133,77
+                                                        195    CONSUMO AGUA OUT/2025 13,465 m3                                   106,67             789,76      789,76
+ Quantidade de Unidades inadimplentes do Condomínio: 23                                                                                            Total:    104.577,83
+
+
+                                                     Tipo do processo                Qtde de unidades                  Valor total
+                                                     Acordo Judicial                           1                            852,86
+                                                     Acordo ExtraJudicial                      5                          7.251,69
+
+
+
+
+Legenda: (A) - Acordo (AE) - Acordo Extrajudicial (AJ) - Acordo Judicial (J) - Jurídico (D) - Depósito identificado (B) - Boleto bancário ( P) - Protesto
+
+    - Recibo do Inadimplência Zero                                                                                       Emitido em 01/12/2025 12:45:07 - Página 10 de 10

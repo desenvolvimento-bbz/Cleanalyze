@@ -256,15 +256,13 @@ def main():
 
     df = aplicar_mapeamento(registros, args.config, args.modelo)
 
-    # Ordenar por Bloco e Unidade (para inadimplência)
+    # Manter ordem original do PDF (sem reordenar)
     if tipo == "inadimplencia" and not df.empty:
         if "Cód. Bloco" in df.columns and "Cód. Unidade" in df.columns:
-            # Converter para numérico para ordenação correta
+            # Converter para numérico (sem reordenar - preserva ordem do PDF)
             df["Cód. Bloco"] = pd.to_numeric(df["Cód. Bloco"], errors="coerce")
             df["Cód. Unidade"] = pd.to_numeric(df["Cód. Unidade"], errors="coerce")
-            df = df.sort_values(by=["Cód. Bloco", "Cód. Unidade"], na_position="last")
-            df = df.reset_index(drop=True)
-            print("[INFO] Dados ordenados por Bloco e Unidade")
+            print("[INFO] Ordem original do PDF preservada")
 
         # Abreviar e truncar descrição para 28 caracteres
         if "Descrição" in df.columns:

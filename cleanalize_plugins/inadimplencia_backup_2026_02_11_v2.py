@@ -82,50 +82,6 @@ def _normalizar_medida_no_historico(txt: str) -> str:
 
     return txt
 
-
-def _normalizar_medida_implicita(line: str) -> str:
-    """
-    Detecta linhas de consumo de gás sem marcador M3 e insere 'M3' implícito.
-
-    Problema: O pdfplumber às vezes perde o 'm3' na extração, fazendo com que
-    a medida de volume (ex: 19,75) pareça um valor monetário.
-
-    Ex: '845 Consumo de Gás 19,75 131,73' -> '845 Consumo de Gás 19,75 M3 131,73'
-
-    Condições para ativar (todas devem ser verdadeiras):
-    1. Linha contém keyword de consumo de gás ("consumo de gás/gas")
-    2. NÃO contém nenhum marcador M3/m3/M³/M?
-    3. NÃO contém M corrompido (M sem expoente)
-    4. Tem 2+ valores monetários (medida com 2 decimais + valor real)
-    """
-    if not line:
-        return line
-
-    # Apenas linhas de consumo de gás
-    if not re.search(r'consumo\s+de\s+g[aáÁ]s', line, re.IGNORECASE):
-        return line
-
-    # Já tem marcador M3?
-    if re.search(r'[Mm]\s*[3³\?]', line):
-        return line
-
-    # Já tem M corrompido (sem expoente)?
-    if re.search(r'\d+,\d+\s+[Mm](?=\s+\d)', line):
-        return line
-
-    # Tem 2+ valores monetários?
-    padrao_valor = r'\d{1,3}(?:\.\d{3})*,\d{2}(?![\d/])'
-    vals = list(re.finditer(padrao_valor, line))
-    if len(vals) >= 2:
-        # Inserir M3 após o primeiro valor (a medida)
-        first_end = vals[0].end()
-        line = line[:first_end] + ' M3' + line[first_end:]
-        if DEBUG_PARSER:
-            print(f'[DEBUG] Medida implicita (gas sem m3): inserido M3 -> {line.strip()[:80]}')
-
-    return line
-
-
 # ==================== DETECÇÃO DE RUÍDO (NOISE LINES) ====================
 
 # Padrões de texto que indicam linhas de ruído (cabeçalhos, rodapés, etc.)
@@ -221,7 +177,7 @@ def _is_pure_header_footer(line: str) -> bool:
     s_low = s.lower()
 
     # Se contém valor monetário, NÃO é ruído puro (pode conter lançamento)
-    if re.search(r'\d{1,3}(?:\.\d{3})*,\d{2}(?![\d/])', s):
+    if re.search(r'\d{1,3}(?:\.\d{3})*,\d{2}', s):
         return False
 
     # Padrões de cabeçalho/rodapé conhecidos
@@ -617,17 +573,10 @@ def _extrair_valor_monetario_final(line: str, conta: str = "") -> Optional[Tuple
     line = line.rstrip()
 
     # Padrão para valores monetários formatados (com vírgula decimal)
-    padrao_valor = r'-?\d{1,3}(?:\.\d{3})*,\d{2}(?![\d/])'
+    padrao_valor = r'-?\d{1,3}(?:\.\d{3})*,\d{2}'
 
     # Encontrar TODOS os valores monetários na linha
     todos_valores = [(m.group(), m.start(), m.end()) for m in re.finditer(padrao_valor, line)]
-
-    # Diagnóstico: detectar tokens data-parcial que parecem valor mas não são
-    # Ex: "30,31/12" (dia 30 e 31 de dezembro) — excluído pelo (?!/) acima
-    if DEBUG_PARSER:
-        for m_dp in re.finditer(r'\d{1,2},\d{1,2}/\d{1,2}', line):
-            print(f"[DEBUG] token data-parcial detectado no historico: "
-                  f"{m_dp.group()} (ignorado como valor)")
 
     # ===== DETECÇÃO DE M3 (incluindo M corrompido sem expoente) =====
     # Normal: "0,514 M3", "0,133 M³", "0,061 M?"
@@ -862,7 +811,7 @@ def _diagnosticar_linhas_nao_parseadas(texto: str, registros: List[Dict]):
     recibos_extraidos = set(r.get("Recibo", "") for r in registros)
 
     pat_data = re.compile(r'\d{1,2}/\d{1,2}/\d{4}')
-    pat_valor = re.compile(r'\d{1,3}(?:\.\d{3})*,\d{2}(?![\d/])')
+    pat_valor = re.compile(r'\d{1,3}(?:\.\d{3})*,\d{2}')
 
     total_candidatas = 0
     parseadas = 0
@@ -1131,9 +1080,6 @@ class Extractor:
             # Normalizar layout compacto (data+emissão coladas)
             line_clean = _normalizar_layout_compacto(line_clean, debug=debug)
 
-            # Normalizar medida implícita (gas sem m3)
-            line_clean = _normalizar_medida_implicita(line_clean)
-
             # Aplicar split para linhas com múltiplas contas
             if re.match(r'^\s*\d', line_clean):
                 sub_lines = _split_multiple_accounts(line_clean)
@@ -1275,11 +1221,8 @@ class Extractor:
                     current_recibo_ocr_indices.append(len(registros) - 1)
                 # Extrair total_recibo: ultimo valor com virgula na linha
                 all_line_vals = [m.group() for m in
-                                 re.finditer(r'-?\d{1,3}(?:\.\d{3})*,\d{2}(?![\d/])', line)]
+                                 re.finditer(r'-?\d{1,3}(?:\.\d{3})*,\d{2}', line)]
                 if len(all_line_vals) >= 2 and all_line_vals[-1] != valor:
-                    current_recibo_total = all_line_vals[-1]
-                elif len(all_line_vals) >= 1 and valor not in all_line_vals and all_line_vals[-1] != valor:
-                    # Valor extraído via OCR/não-padrão: único valor monetário = total_recibo
                     current_recibo_total = all_line_vals[-1]
 
                 continue
@@ -1312,14 +1255,14 @@ class Extractor:
                 valor = ""
 
                 if resto.strip():
-                    m_resto = re.match(r"^(\d{1,8})\s*(.+)$", resto.strip())
+                    m_resto = re.match(r"^(\d+)\s+(.+)$", resto.strip())
                     if m_resto:
                         conta = m_resto.group(1).strip()
                         texto_apos_conta = m_resto.group(2).strip()
                         resultado_valor = _extrair_valor_monetario_final(resto, conta)
                         if resultado_valor:
                             valor, valor_pos_resto = resultado_valor
-                            hist = texto_apos_conta[:texto_apos_conta.find(valor)].strip() if valor in texto_apos_conta else texto_apos_conta
+                            hist = texto_apos_conta[:texto_apos_conta.rfind(valor)].strip() if valor in texto_apos_conta else texto_apos_conta
                             hist = _recolher_medida_quebrada(line, hist)
                         else:
                             hist = texto_apos_conta
@@ -1397,7 +1340,7 @@ class Extractor:
 
             # Validação final: conta deve ser numérica
             if conta and not re.match(r"^\d+$", conta):
-                m_conta_hist = re.match(r"^(\d{1,8})\s*(.+)$", hist)
+                m_conta_hist = re.match(r"^(\d+)\s+(.+)$", hist)
                 if m_conta_hist:
                     conta = m_conta_hist.group(1).strip()
                     hist = m_conta_hist.group(2).strip()
@@ -1435,10 +1378,8 @@ class Extractor:
             if _last_extraction_was_ocr:
                 current_recibo_ocr_indices.append(len(registros) - 1)
             all_line_vals = [m.group() for m in
-                             re.finditer(r'-?\d{1,3}(?:\.\d{3})*,\d{2}(?![\d/])', line)]
+                             re.finditer(r'-?\d{1,3}(?:\.\d{3})*,\d{2}', line)]
             if len(all_line_vals) >= 2 and all_line_vals[-1] != valor:
-                current_recibo_total = all_line_vals[-1]
-            elif len(all_line_vals) >= 1 and valor not in all_line_vals and all_line_vals[-1] != valor:
                 current_recibo_total = all_line_vals[-1]
 
         # Reconciliar ultimo recibo
