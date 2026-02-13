@@ -83,29 +83,29 @@ if (strtolower(pathinfo($_FILES['pdf']['name'], PATHINFO_EXTENSION)) !== 'pdf') 
   fail("Arquivo enviado não é PDF.");
 }
 
-/* ==== 2) Caminhos base ==== */
+/* ==== 2) Caminhos base (auto-detecta Windows vs Docker) ==== */
 
-$BASE      = 'C:\\xampp\\htdocs\\Cleanalyze'; // raiz do projeto
-$PYTHON    = 'C:\\Users\\DESENV-ERICH\\AppData\\Local\\Programs\\Python\\Python312\\python.exe'; // AJUSTE se necessário
-$PDFTOTEXT = 'C:\\poppler\\Library\\bin\\pdftotext.exe';
-$CLI       = $BASE . '\\cleanalize_cli.py';
-$config    = $BASE . '\\config\\inadimplencia.json';
-$modelo    = $BASE . '\\modelo_planilha_inadimplencia.xlsx';
+require_once __DIR__ . '/../config/paths.php';
+$S         = APP_SEP;
+$BASE      = APP_BASE;
+$PYTHON    = APP_PYTHON;
+$PDFTOTEXT = APP_PDFTOTEXT;
+$CLI       = $BASE . $S . 'cleanalize_cli.py';
+$config    = $BASE . $S . 'config' . $S . 'inadimplencia.json';
+$modelo    = $BASE . $S . 'modelo_planilha_inadimplencia.xlsx';
 
-if (!file_exists($PYTHON))    fail("Python não encontrado em $PYTHON");
-if (!file_exists($PDFTOTEXT)) fail("pdftotext (Poppler) não encontrado em $PDFTOTEXT");
 if (!file_exists($CLI))       fail("CLI não encontrado em $CLI");
 if (!file_exists($config))    fail("Config JSON não encontrado em $config");
 if (!file_exists($modelo))    fail("Modelo XLSX não encontrado em $modelo");
 
 /* ==== 3) Salvar PDF em uploads com nome único ==== */
 
-$uploadsDir = $BASE . '\\uploads';
+$uploadsDir = APP_UPLOADS;
 if (!is_dir($uploadsDir)) @mkdir($uploadsDir, 0777, true);
 
 $origName = preg_replace('/[^\w\-. ]+/', '_', $_FILES['pdf']['name']);
 $ts = date('Ymd_His');
-$pdfPath = $uploadsDir . '\\' . $ts . '_' . $origName;
+$pdfPath = $uploadsDir . $S . $ts . '_' . $origName;
 if (!move_uploaded_file($_FILES['pdf']['tmp_name'], $pdfPath)) {
   fail("Falha ao mover PDF para uploads.");
 }
@@ -114,7 +114,7 @@ if (!move_uploaded_file($_FILES['pdf']['tmp_name'], $pdfPath)) {
 
 $saidaBase = trim($_POST['saidaBase'] ?? '');
 if ($saidaBase === '') $saidaBase = "Inadimplencia_" . $ts;
-$saidaXlsx = $uploadsDir . '\\' . $saidaBase . '.xlsx';
+$saidaXlsx = $uploadsDir . $S . $saidaBase . '.xlsx';
 
 /* ==== 5) Montar e executar comando ==== */
 

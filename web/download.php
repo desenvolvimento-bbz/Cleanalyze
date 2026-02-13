@@ -7,15 +7,16 @@
  *   web/download.php?f=<caminho_absoluto_do_arquivo>
  *
  * Regras de segurança:
- *  - Aceita caminho absoluto, porém exige que ele esteja dentro de C:\xampp\htdocs\Cleanalyze\uploads
+ *  - Aceita caminho absoluto, porém exige que ele esteja dentro de uploads/
  *  - Normaliza com realpath() e compara prefixo
  */
 
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
-$BASE    = 'C:\\xampp\\htdocs\\Cleanalyze';
-$UPLOADS = $BASE . '\\uploads';
+require_once __DIR__ . '/../config/paths.php';
+$BASE    = APP_BASE;
+$UPLOADS = APP_UPLOADS;
 
 if (!isset($_GET['f']) || $_GET['f'] === '') {
   http_response_code(400);

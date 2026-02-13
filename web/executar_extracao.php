@@ -16,16 +16,17 @@ ini_set('display_errors', 1); // Ativar para debug
 set_time_limit(600); // 10 minutos
 ini_set('memory_limit', '512M');
 
-// ---------- CONFIGURAÇÕES DOS BINÁRIOS ----------
-$PYTHON       = 'C:\\Users\\DESENV-ERICH\\AppData\\Local\\Programs\\Python\\Python312\\python.exe';
-$PDFTOTEXT    = 'C:\\poppler\\Library\\bin\\pdftotext.exe';
-$TESSERACT    = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe';
-$OCR_LANG     = 'por+eng';
-$POPPLER_BIN  = 'C:\\poppler\\Library\\bin';
+// ---------- CONFIGURAÇÕES (auto-detecta Windows vs Docker) ----------
+require_once __DIR__ . '/../config/paths.php';
+$PYTHON       = APP_PYTHON;
+$PDFTOTEXT    = APP_PDFTOTEXT;
+$TESSERACT    = APP_TESSERACT;
+$OCR_LANG     = APP_OCR_LANG;
+$POPPLER_BIN  = APP_POPPLER;
 
 // ---------- PASTAS DO PROJETO ----------
-$BASE         = 'C:\\xampp\\htdocs\\Cleanalyze';
-$UPLOADS_DIR  = $BASE . '\\uploads';
+$BASE         = APP_BASE;
+$UPLOADS_DIR  = APP_UPLOADS;
 @mkdir($UPLOADS_DIR, 0777, true);
 
 // ---------- ENTRADAS DO FORM ----------
@@ -50,7 +51,7 @@ if ($pdfFromForm && $pdfFromForm['error'] === UPLOAD_ERR_OK) {
   } else {
     $ts = date('Ymd_His');
     $safeName = preg_replace('/[^A-Za-z0-9_\-\. ]/', '_', $origName);
-    $finalPdfPath = $UPLOADS_DIR . '\\' . $ts . '_' . $safeName;
+    $finalPdfPath = $UPLOADS_DIR . APP_SEP . $ts . '_' . $safeName;
     if (!move_uploaded_file($pdfFromForm['tmp_name'], $finalPdfPath)) {
       $erros[] = "Falha ao salvar PDF enviado.";
     }
@@ -78,13 +79,14 @@ if ($erros) {
 }
 
 // ---------- SELEÇÃO DE CONFIG E MODELO ----------
+$S = APP_SEP;
 if ($tipo === 'inadimplencia') {
-  $config = $BASE . '\\config\\inadimplencia.json';
-  $modelo = $BASE . '\\modelo_planilha_inadimplencia.xlsx';
+  $config = $BASE . $S . 'config' . $S . 'inadimplencia.json';
+  $modelo = $BASE . $S . 'modelo_planilha_inadimplencia.xlsx';
   $prefixoSaida = 'Inadimplencia';
 } else { // 'ahreas'
-  $config = $BASE . '\\config\\ahreas.json';
-  $modelo = $BASE . '\\modelo_planilha_importacao.xlsx';
+  $config = $BASE . $S . 'config' . $S . 'ahreas.json';
+  $modelo = $BASE . $S . 'modelo_planilha_importacao.xlsx';
   $prefixoSaida = 'Unidades';
 }
 
@@ -96,7 +98,7 @@ if ($blocoSafe !== '') {
 } else {
   $saidaBase = "{$prefixoSaida}_{$ts}.xlsx";
 }
-$saida = $UPLOADS_DIR . '\\' . $saidaBase;
+$saida = $UPLOADS_DIR . APP_SEP . $saidaBase;
 
 // ---------- PÁGINAS (opcional, ex.: "1-2") ----------
 $firstPage = $lastPage = '';
@@ -106,7 +108,7 @@ if ($pages !== '' && preg_match('/^\s*(\d+)\s*-\s*(\d+)\s*$/', $pages, $m)) {
 }
 
 // ---------- MONTA O COMANDO PYTHON (OCR sempre habilitado) ----------
-$cmd = "\"$PYTHON\" \"$BASE\\cleanalize_cli.py\" "
+$cmd = "\"$PYTHON\" \"$BASE{$S}cleanalize_cli.py\" "
      . "--pdftotext \"$PDFTOTEXT\" "
      . "--pdf \"$finalPdfPath\" "
      . "--tipo $tipo "
@@ -128,7 +130,7 @@ $out = [];
 $code = 0;
 
 // Log do comando para debug
-$logFile = $UPLOADS_DIR . '\\ultimo_comando.txt';
+$logFile = $UPLOADS_DIR . APP_SEP . 'ultimo_comando.txt';
 file_put_contents($logFile, $cmd . "\n\n" . date('Y-m-d H:i:s'));
 
 // Executar comando

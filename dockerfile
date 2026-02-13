@@ -8,14 +8,18 @@ RUN composer install --no-dev --prefer-dist --no-progress --no-interaction \
 # ===== Etapa 2: PHP + Apache (Debian) =====
 FROM php:8.2-apache
 
-# Pacotes do sistema (inclui poppler e deps do GD/ZIP)
+# Pacotes do sistema (poppler, tesseract, Python + deps, GD/ZIP)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     poppler-utils \
+    tesseract-ocr tesseract-ocr-por tesseract-ocr-eng \
     python3 python3-pip python3-pandas python3-openpyxl \
     git unzip \
     libfreetype6-dev libjpeg62-turbo-dev libpng-dev \
     libzip-dev zlib1g-dev \
   && rm -rf /var/lib/apt/lists/*
+
+# Biblioteca Python para extração de PDF (pdfplumber)
+RUN pip3 install --no-cache-dir --break-system-packages pdfplumber
 
 # Extensões do PHP: gd + zip
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \

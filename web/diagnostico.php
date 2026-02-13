@@ -8,12 +8,13 @@ ini_set('display_errors', 1);
 
 header('Content-Type: text/html; charset=utf-8');
 
-// Configurações
-$PYTHON       = 'C:\\Users\\DESENV-ERICH\\AppData\\Local\\Programs\\Python\\Python312\\python.exe';
-$PDFTOTEXT    = 'C:\\poppler\\Library\\bin\\pdftotext.exe';
-$TESSERACT    = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe';
-$BASE         = 'C:\\xampp\\htdocs\\Cleanalyze';
-$UPLOADS_DIR  = $BASE . '\\uploads';
+// Configurações (auto-detecta Windows vs Docker)
+require_once __DIR__ . '/../config/paths.php';
+$PYTHON       = APP_PYTHON;
+$PDFTOTEXT    = APP_PDFTOTEXT;
+$TESSERACT    = APP_TESSERACT;
+$BASE         = APP_BASE;
+$UPLOADS_DIR  = APP_UPLOADS;
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -163,7 +164,7 @@ $UPLOADS_DIR  = $BASE . '\\uploads';
                   echo "<li class='erro'>❌ Pasta uploads NÃO existe: $UPLOADS_DIR</li>";
               }
 
-              $testFile = $UPLOADS_DIR . '\\teste_' . date('YmdHis') . '.txt';
+              $testFile = $UPLOADS_DIR . APP_SEP . 'teste_' . date('YmdHis') . '.txt';
               if (@file_put_contents($testFile, 'teste')) {
                   echo "<li class='ok'>✅ Consegue criar arquivos na pasta uploads</li>";
                   @unlink($testFile);
@@ -181,12 +182,13 @@ $UPLOADS_DIR  = $BASE . '\\uploads';
             <div class="card-body">
               <ul class="mb-0">
               <?php
+              $S = APP_SEP;
               $configs = [
-                  'cleanalize_cli.py' => $BASE . '\\cleanalize_cli.py',
-                  'config/inadimplencia.json' => $BASE . '\\config\\inadimplencia.json',
-                  'config/ahreas.json' => $BASE . '\\config\\ahreas.json',
-                  'modelo_planilha_inadimplencia.xlsx' => $BASE . '\\modelo_planilha_inadimplencia.xlsx',
-                  'modelo_planilha_importacao.xlsx' => $BASE . '\\modelo_planilha_importacao.xlsx',
+                  'cleanalize_cli.py' => $BASE . $S . 'cleanalize_cli.py',
+                  'config/inadimplencia.json' => $BASE . $S . 'config' . $S . 'inadimplencia.json',
+                  'config/ahreas.json' => $BASE . $S . 'config' . $S . 'ahreas.json',
+                  'modelo_planilha_inadimplencia.xlsx' => $BASE . $S . 'modelo_planilha_inadimplencia.xlsx',
+                  'modelo_planilha_importacao.xlsx' => $BASE . $S . 'modelo_planilha_importacao.xlsx',
               ];
 
               foreach ($configs as $nome => $path) {
@@ -207,24 +209,24 @@ $UPLOADS_DIR  = $BASE . '\\uploads';
             <div class="card-body">
               <?php
               $testPdf = '';
-              $pdfs = glob($UPLOADS_DIR . '\\*.pdf');
+              $pdfs = glob($UPLOADS_DIR . DIRECTORY_SEPARATOR . '*.pdf');
               if (count($pdfs) > 0) {
                   $testPdf = $pdfs[0];
                   echo "<p>Usando PDF de teste: <code>" . htmlspecialchars(basename($testPdf)) . "</code></p>";
 
-                  $saida = $UPLOADS_DIR . '\\DIAG_teste_' . date('YmdHis') . '.xlsx';
+                  $saida = $UPLOADS_DIR . $S . 'DIAG_teste_' . date('YmdHis') . '.xlsx';
 
-                  $cmd = "\"$PYTHON\" \"$BASE\\cleanalize_cli.py\" "
+                  $cmd = "\"$PYTHON\" \"$BASE{$S}cleanalize_cli.py\" "
                        . "--pdftotext \"$PDFTOTEXT\" "
                        . "--pdf \"$testPdf\" "
                        . "--tipo inadimplencia "
-                       . "--config \"$BASE\\config\\inadimplencia.json\" "
-                       . "--modelo \"$BASE\\modelo_planilha_inadimplencia.xlsx\" "
+                       . "--config \"$BASE{$S}config{$S}inadimplencia.json\" "
+                       . "--modelo \"$BASE{$S}modelo_planilha_inadimplencia.xlsx\" "
                        . "--saida \"$saida\" "
                        . "--ocr "
                        . "--tesseract \"$TESSERACT\" "
-                       . "--ocr-lang por+eng "
-                       . "--poppler \"C:\\poppler\\Library\\bin\" "
+                       . "--ocr-lang \"" . APP_OCR_LANG . "\" "
+                       . "--poppler \"" . APP_POPPLER . "\" "
                        . "--dpi 200 "
                        . "--debug-save-text 2>&1";
 
