@@ -260,19 +260,10 @@ HTML;
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <title>Comparar Planilhas</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <title>Comparar Planilhas — Cleanalyze</title>
+  <?php include __DIR__ . '/includes/head.php'; ?>
   <style>
-    :root{ --azul:#04193b; --cinza:#b8b8c4; --cinzaClaro:#efeff4; }
-    body{ background:var(--cinzaClaro); color:var(--azul); }
-    .navbar{ background:var(--azul); }
-    .navbar .navbar-brand, .navbar a{ color:#fff !important; }
-    .btn-primary{ background:var(--azul); border-color:var(--azul); }
     .btn-outline-secondary{ border-color: var(--cinza); color: var(--azul); }
-    .card{ border-color:var(--cinza); }
-
     .pane-grid{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -300,104 +291,13 @@ HTML;
     @media (max-width: 992px){
       .pane-grid{ grid-template-columns: 1fr; height: auto; }
     }
-    .sidebar-collapsed {
-  width: 60px !important;
-    }
-    .sidebar-collapsed .list-group-item {
-      text-align: center;
-      padding-left: 0;
-      padding-right: 0;
-    }
-    .sidebar-collapsed .list-group-item span {
-      display: none; /* Esconde textos */
-    }
-    /* opcional: anima largura da sidebar */
-    #sidebarCol { 
-      transition: flex-basis .25s ease, max-width .25s ease, width .25s ease;
-    }
-    .sidebar-slim {
-      flex: 0 0 0 !important;
-      max-width: 0 !important;
-      width: 0 !important;
-      overflow: hidden;
-    }
   </style>
 </head>
 <body>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet">
-<nav class="navbar navbar-expand-lg" style="font-family: 'Manrope', sans-serif;">
-  <div class="container">
-    <a class="navbar-brand" href="index.php">Cleanalyze BBZ</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link<?= basename($_SERVER['PHP_SELF']) === 'index.php' ? ' active' : '' ?>" href="index.php">
-            Extrair
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link<?= basename($_SERVER['PHP_SELF']) === 'comparar.php' ? ' active' : '' ?>" href="comparar.php">
-            Comparar
-          </a>
-        </li>
-        <?php if (auth_is_admin()): ?>
-        <li class="nav-item">
-          <a class="nav-link<?= basename($_SERVER['PHP_SELF']) === 'invite.php' ? ' active' : '' ?>" href="auth/invite.php">
-            Gerenciar Convites
-          </a>
-        </li>
-        <?php endif; ?>
-          <li class="nav-item">
-            <span class="nav-link disabled" style="opacity:.85; cursor:default;">
-              <?= htmlspecialchars($_SESSION['user_email'] ?? '') ?>
-            </span>
-          </li>
-
-          <!-- Sair -->
-          <li class="nav-item">
-            <a class="nav-link<?= basename($_SERVER['PHP_SELF']) === 'logout.php' ? ' active' : '' ?>" href="auth/logout.php">
-              Sair
-            </a>
-          </li>
-      </ul>
-    </div>
-  </div>
-</nav>
+<?php $activePage = 'comparar'; include __DIR__ . '/includes/navbar.php'; ?>
 
 
   <div class="container py-4">
-  <div class="row g-4">
-    <!-- Lateral: menu vertical -->
-    <aside class="col-md-3" id="sidebarCol">
-      <h4 class="m-0">Menu</h4>
-      <div class="list-group" style="font-family: 'Manrope', sans-serif;">
-        <a href="index.php"
-           class="list-group-item list-group-item-action<?= basename($_SERVER['PHP_SELF']) === 'index.php' ? ' active' : '' ?>">
-          📄 Extrair (PDF → XLSX)
-        </a>
-        <a href="comparar.php"
-           class="list-group-item list-group-item-action<?= basename($_SERVER['PHP_SELF']) === 'comparar.php' ? ' active' : '' ?>">
-          🔍 Comparar (A × B)
-        </a>
-        <?php if (auth_is_admin()): ?>
-        <a href="auth/invite.php"
-           class="list-group-item list-group-item-action<?= basename($_SERVER['PHP_SELF']) === 'invite.php' ? ' active' : '' ?>">
-          🛠️ Gerenciar Convites
-        </a>
-        <?php endif; ?>
-      </div>
-    </aside>
-
-    <!-- Conteúdo principal: Comparação -->
-    <main class="col-md-9" id="contentCol">
-      <div class="d-flex align-items-center justify-content-between mb-2">
-        <button id="toggleSidebar" class="btn btn-sm btn-outline-secondary">⮜ Ocultar menu</button>
-      </div>
       <div class="card">
         <div class="card-body">
           <h4 class="card-title">🔍 Comparar Planilhas XLSX</h4>
@@ -454,7 +354,6 @@ HTML;
           <?php endif; ?>
         </div>
       </div>
-    </main>
   </div>
 </div>
   <script>
@@ -548,30 +447,6 @@ HTML;
     });
 
 
-  (function() {
-    const btn  = document.getElementById('toggleSidebar');
-    const side = document.getElementById('sidebarCol');
-    const main = document.getElementById('contentCol');
-
-    if (!btn || !side || !main) return;
-
-    let hidden = false;
-    btn.addEventListener('click', function () {
-      hidden = !hidden;
-
-      if (hidden) {
-        side.classList.add('d-none');
-        main.classList.remove('col-md-9');
-        main.classList.add('col-md-12');
-        btn.textContent = '⮞ Mostrar menu';
-      } else {
-        side.classList.remove('d-none');
-        main.classList.remove('col-md-12');
-        main.classList.add('col-md-9');
-        btn.textContent = '⮜ Ocultar menu';
-      }
-    });
-  })();
     </script>
   
 </body>

@@ -1,0 +1,11 @@
+# Pasta de referência local (não vai pro GitHub)
+Claude/
+
+# Uploads e outputs gerados
+uploads/
+output/
+
+# Dependências
+vendor/
+__pycache__/
+*.pyc

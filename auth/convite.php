@@ -75,7 +75,7 @@ body{ background:var(--cinzaClaro); color:var(--azul); font-family:'Manrope',san
 
 <nav class="navbar navbar-expand-lg navbar-dark">
   <div class="container">
-    <a class="navbar-brand" href="index.php">Cleanalyze BBZ</a>
+    <a class="navbar-brand" href="index.php">Cleanalyze</a>
   </div>
 </nav>
 

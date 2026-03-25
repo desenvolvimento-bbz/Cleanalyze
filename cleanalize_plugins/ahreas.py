@@ -249,12 +249,12 @@ class Extractor:
 
         # ============ Cabeçalho (Bloco, Unidade, Código) ============
         cabec = re.search(
-            _a(r"Bloco:\s*([A-Za-z0-9]+)\s+Unidade:\s*([0-9]{1,6})\s*-\s*(.+?)\s+Código do cliente:\s*([0-9]{1,10})"),
+            _a(r"Bloco:\s*([A-Za-z0-9]+)\s+Unidade:\s*([A-Za-z0-9]{1,10})\s*-\s*(.+?)\s+Código do cliente:\s*([0-9]{1,10})"),
             b
         )
         if not cabec:
             cabec = re.search(
-                r"Bloco:\s*([A-Za-z0-9]+)\s+Unidade:\s*([0-9]{1,6})\s*-\s*(.+)$",
+                r"Bloco:\s*([A-Za-z0-9]+)\s+Unidade:\s*([A-Za-z0-9]{1,10})\s*-\s*(.+)$",
                 b, flags=re.M
             )
             bloco = cabec.group(1).strip() if cabec else ""

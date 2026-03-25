@@ -1,164 +1,145 @@
 <?php
 require_once __DIR__ . '/auth/bootstrap.php';
-auth_require_login(); // exige login
+auth_require_login();
 app_log('page.view', ['page'=>basename(__FILE__)]);
+$userEmail = auth_user_email() ?? 'Usuário';
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Cleanalyze BBZ</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Cleanalyze</title>
+  <?php include __DIR__ . '/includes/head.php'; ?>
   <style>
-    :root{ --azul:#04193b; --cinza:#b8b8c4; --cinzaClaro:#efeff4; }
-    body{ background:var(--cinzaClaro); color:var(--azul); }
-    .navbar{ background:var(--azul); }
-    .navbar .navbar-brand, .navbar a{ color:#fff !important; }
-    .btn-primary{ background:var(--azul); border-color:var(--azul); }
-    .card{ border-color:var(--cinza); }
+    .welcome-section{
+      background: linear-gradient(135deg, #04193b 0%, #0a3d7a 100%);
+      color:#fff; border-radius:12px; padding:2rem 2.5rem; margin-bottom:2rem;
+    }
+    .welcome-section h2{ font-weight:700; margin:0; }
+    .welcome-section p{ opacity:.8; margin:.5rem 0 0; }
+
+    .nav-card{
+      border:none; border-radius:12px; transition:transform .15s, box-shadow .15s;
+      cursor:pointer; text-decoration:none; color:var(--azul); height:100%;
+    }
+    .nav-card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 8px 24px rgba(0,0,0,.12);
+    }
+    .nav-card .card-body{ padding:1.8rem; }
+    .nav-card .icon{ font-size:2.5rem; margin-bottom:.8rem; display:block; }
+    .nav-card h5{ font-weight:700; margin-bottom:.4rem; }
+    .nav-card p{ color:#666; font-size:.85rem; margin:0; }
+    .nav-card-extrair{ border-left:5px solid #4472C4; }
+    .nav-card-comparar{ border-left:5px solid #ED7D31; }
+    .nav-card-prestacao{ border-left:5px solid #548235; }
+    .nav-card-convites{ border-left:5px solid #7B2D8E; }
+
+    .changelog-card{ border-color:var(--cinza); border-radius:10px; }
+    .changelog-card .card-header{ background:#fff; border-bottom:1px solid var(--cinza); }
   </style>
 </head>
 <body>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet">
-<nav class="navbar navbar-expand-lg" style="font-family: 'Manrope', sans-serif;">
-  <div class="container">
-    <a class="navbar-brand" href="index.php">Cleanalyze BBZ</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link<?= basename($_SERVER['PHP_SELF']) === 'index.php' ? ' active' : '' ?>" href="index.php">
-            Extrair
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link<?= basename($_SERVER['PHP_SELF']) === 'comparar.php' ? ' active' : '' ?>" href="comparar.php">
-            Comparar
-          </a>
-        </li>
-        <?php if (auth_is_admin()): ?>
-        <li class="nav-item">
-          <a class="nav-link<?= basename($_SERVER['PHP_SELF']) === 'invite.php' ? ' active' : '' ?>" href="auth/invite.php">
-            Gerenciar Convites
-          </a>
-        </li>
-        <?php endif; ?>
-          <li class="nav-item">
-            <span class="nav-link disabled" style="opacity:.85; cursor:default;">
-              <?= htmlspecialchars($_SESSION['user_email'] ?? '') ?>
-            </span>
-          </li>
-
-          <!-- Sair -->
-          <li class="nav-item">
-            <a class="nav-link<?= basename($_SERVER['PHP_SELF']) === 'logout.php' ? ' active' : '' ?>" href="auth/logout.php">
-              Sair
-            </a>
-          </li>
-      </ul>
-    </div>
-  </div>
-</nav>
+<?php $activePage = 'index'; include __DIR__ . '/includes/navbar.php'; ?>
 
 <div class="container py-4">
-  <div class="row g-4">
-    <!-- Sidebar -->
-    <aside class="col-md-3" id="sidebarCol">
-      <h4 class="m-0">Menu</h4>
-      <div class="list-group" style="font-family: 'Manrope', sans-serif;">
-        <a href="index.php"
-           class="list-group-item list-group-item-action<?= basename($_SERVER['PHP_SELF']) === 'index.php' ? ' active' : '' ?>">
-          📄 Extrair (PDF → XLSX)
-        </a>
-        <a href="comparar.php"
-           class="list-group-item list-group-item-action<?= basename($_SERVER['PHP_SELF']) === 'comparar.php' ? ' active' : '' ?>">
-          🔍 Comparar (A × B)
-        </a>
-        <?php if (auth_is_admin()): ?>
-        <a href="auth/invite.php"
-           class="list-group-item list-group-item-action<?= basename($_SERVER['PHP_SELF']) === 'invite.php' ? ' active' : '' ?>">
-          🛠️ Gerenciar Convites
-        </a>
-        <?php endif; ?>
-      </div>
-    </aside>
 
-    <!-- Main -->
-    <main class="col-md-9" id="contentCol">
-      <div class="d-flex align-items-center justify-content-between mb-2">
-        <button id="toggleSidebar" class="btn btn-sm btn-outline-secondary">⮜ Ocultar menu</button>
-      </div>
+  <!-- Welcome -->
+  <div class="welcome-section">
+    <h2>Bem-vindo, <?= htmlspecialchars($userEmail) ?></h2>
+    <p>Selecione uma ferramenta abaixo para começar.</p>
+  </div>
 
-      <div class="card h-100">
+  <!-- Navigation Cards -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <a href="extrair-form.php" class="nav-card card nav-card-extrair">
         <div class="card-body">
-          <h4 class="m-0">📄 Extrair do PDF → XLSX</h4>
-          <p class="card-text text-secondary">Envie um PDF padronizado para gerar a planilha de importação.</p>
-
-<form action="web/executar_extracao.php" method="post" enctype="multipart/form-data" class="row g-3">
-
-  <!-- arquivo PDF (o name PRECISA ser "pdf") -->
-  <div class="col-md-8">
-    <input type="file" name="pdf" accept="application/pdf" class="form-control" required>
-  </div>
-
-  <!-- dropdown de tipo (o name PRECISA ser "tipo") -->
-  <div class="col-md-4">
-    <select name="tipo" class="form-select" required>
-      <option value="ahreas">Ahreas (Unidades)</option>
-      <option value="inadimplencia">Inadimplência</option>
-    </select>
-  </div>
-
-  <!-- nome opcional do XLSX -->
-  <div class="col-md-6">
-    <input type="text" name="saidaBase" class="form-control" placeholder="Nome do XLSX (opcional)">
-  </div>
-
-  <div class="col-md-6 text-end">
-    <button class="btn btn-primary" type="submit">Extrair Dados</button>
-  </div>
-</form>
+          <span class="icon">📄</span>
+          <h5>Extrair</h5>
+          <p>Extraia dados de um PDF padronizado e gere a planilha XLSX de importação.</p>
         </div>
-      </div>
-    </main>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a href="comparar.php" class="nav-card card nav-card-comparar">
+        <div class="card-body">
+          <span class="icon">🔍</span>
+          <h5>Comparar Planilhas</h5>
+          <p>Compare duas planilhas XLSX lado a lado e identifique diferenças célula a célula.</p>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a href="prestacao.php" class="nav-card card nav-card-prestacao">
+        <div class="card-body">
+          <span class="icon">📊</span>
+          <h5>Prestação de Contas</h5>
+          <p>Compare dois PDFs de Prestação de Contas e veja as diferenças entre meses.</p>
+        </div>
+      </a>
+    </div>
+    <?php if (auth_is_admin()): ?>
+    <div class="col-md-4">
+      <a href="auth/invite.php" class="nav-card card nav-card-convites">
+        <div class="card-body">
+          <span class="icon">🛠️</span>
+          <h5>Gerenciar Usuários</h5>
+          <p>Gerencie acessos e defina administradores do sistema.</p>
+        </div>
+      </a>
+    </div>
+    <?php endif; ?>
   </div>
+
+  <!-- Changelog -->
+  <?php
+  $changelogFile = __DIR__ . '/changelog.json';
+  if (file_exists($changelogFile)):
+      $changelog = json_decode(file_get_contents($changelogFile), true);
+      if ($changelog):
+          usort($changelog, function($a, $b) {
+              return version_compare($b['versao'], $a['versao']);
+          });
+          $ultimaVersao = $changelog[0]['versao'] ?? '';
+  ?>
+  <div class="card changelog-card">
+    <div class="card-header d-flex justify-content-between align-items-center"
+         style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#changelogBody" aria-expanded="false">
+      <span>
+        <strong>Novidades</strong>
+        <span class="badge bg-primary ms-2">v<?= htmlspecialchars($ultimaVersao) ?></span>
+      </span>
+      <small class="text-muted">clique para expandir</small>
+    </div>
+    <div class="collapse" id="changelogBody">
+      <div class="card-body" style="max-height:400px; overflow-y:auto;">
+        <?php foreach ($changelog as $release): ?>
+        <div class="mb-3">
+          <h6 class="mb-1">
+            v<?= htmlspecialchars($release['versao']) ?>
+            <small class="text-muted ms-2"><?= htmlspecialchars($release['data']) ?></small>
+          </h6>
+          <?php if (!empty($release['titulo'])): ?>
+          <small class="text-muted d-block mb-1"><?= htmlspecialchars($release['titulo']) ?></small>
+          <?php endif; ?>
+          <ul class="mb-0 small">
+            <?php foreach ($release['itens'] as $item): ?>
+            <li><?= htmlspecialchars($item) ?></li>
+            <?php endforeach; ?>
+          </ul>
+        </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </div>
+  <?php
+      endif;
+  endif;
+  ?>
+
 </div>
 
-<script>
-(function() {
-  const btn  = document.getElementById('toggleSidebar');
-  const side = document.getElementById('sidebarCol');
-  const main = document.getElementById('contentCol');
-
-  if (!btn || !side || !main) return;
-
-  let hidden = false;
-  btn.addEventListener('click', function () {
-    hidden = !hidden;
-
-    if (hidden) {
-      side.classList.add('d-none');
-      main.classList.remove('col-md-9');
-      main.classList.add('col-md-12');
-      btn.textContent = '⮞ Mostrar menu';
-    } else {
-      side.classList.remove('d-none');
-      main.classList.remove('col-md-12');
-      main.classList.add('col-md-9');
-      btn.textContent = '⮜ Ocultar menu';
-    }
-  });
-})();
-</script>
-
-  <footer class="text-center text-muted my-4">
-  2025 © Desenvolvimento BBZ.
-</footer>
+<footer class="text-center text-muted my-4">2025 &copy; Desenvolvimento BBZ.</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

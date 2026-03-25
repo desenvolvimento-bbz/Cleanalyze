@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git unzip \
     libfreetype6-dev libjpeg62-turbo-dev libpng-dev \
     libzip-dev zlib1g-dev \
+    libcurl4-openssl-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Biblioteca Python para extração de PDF (pdfplumber)
@@ -23,7 +24,7 @@ RUN pip3 install --no-cache-dir --break-system-packages pdfplumber pdf2image pyt
 
 # Extensões do PHP: gd + zip
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
- && docker-php-ext-install -j"$(nproc)" gd zip
+ && docker-php-ext-install -j"$(nproc)" gd zip curl
 
 # Aumenta limites de upload/tempo de execução (para PDFs grandes)
 RUN { \

@@ -20,7 +20,7 @@ $UPLOADS_DIR  = APP_UPLOADS;
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Diagnóstico - Cleanalyze BBZ</title>
+  <title>Diagnóstico - Cleanalyze</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -40,7 +40,7 @@ $UPLOADS_DIR  = APP_UPLOADS;
 
 <nav class="navbar navbar-expand-lg">
   <div class="container">
-    <a class="navbar-brand" href="../index.php">Cleanalyze BBZ</a>
+    <a class="navbar-brand" href="../index.php">Cleanalyze</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>

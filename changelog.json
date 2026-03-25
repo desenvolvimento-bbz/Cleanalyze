@@ -1,0 +1,46 @@
+[
+  {
+    "versao": "1.2.0",
+    "data": "25/03/2026",
+    "titulo": "Novo modulo e melhorias visuais",
+    "itens": [
+      "Novo modulo: Comparativo de Prestacao de Contas (mes anterior vs mes atual)",
+      "Detecta contas novas, ausentes e subcategorias alteradas entre periodos",
+      "Relatorio visual com cards de diferencas e exportacao em PDF e XLSX",
+      "Nova tela inicial com painel de navegacao por cards",
+      "Historico de novidades na pagina principal",
+      "Login com Google para contas @bbz.com.br (sem necessidade de senha)",
+      "Correcao para codigos de unidade alfanumericos (ex: LOJA01, CONSTR)"
+    ]
+  },
+  {
+    "versao": "1.1.0",
+    "data": "13/02/2026",
+    "titulo": "Modulo de Inadimplencia",
+    "itens": [
+      "Novo modulo de extracao: Relatorio de Inadimplencia",
+      "Reescrita do modulo de Cadastro: endereco separado em componentes e dados do locatario",
+      "Suporte a PDFs escaneados com reconhecimento de texto"
+    ]
+  },
+  {
+    "versao": "1.0.1",
+    "data": "13/08/2025",
+    "titulo": "Correcoes pos-lancamento",
+    "itens": [
+      "Correcao na extracao de CNPJ do condominio",
+      "Correcao de vagas e campos do cadastro",
+      "Ajustes em limites de tamanho de arquivo"
+    ]
+  },
+  {
+    "versao": "1.0.0",
+    "data": "08/08/2025",
+    "titulo": "Lancamento do Cleanalyze BBZ",
+    "itens": [
+      "Extracao de cadastro de unidades (PDF para XLSX)",
+      "Comparacao de planilhas (A x B)",
+      "Sistema de login com convites"
+    ]
+  }
+]

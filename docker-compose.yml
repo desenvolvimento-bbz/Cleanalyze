@@ -7,6 +7,7 @@ services:
  dockerfile: dockerfile
  environment:
  - PORT=8080
+ - GOOGLE_CLIENT_ID=330639050078-cuj6n6ag45fbpuior5aevo0scslp6n8c.apps.googleusercontent.com
  restart: unless-stopped
  networks:
  - proxy_default

@@ -44,10 +44,18 @@ py -3 cleanalize_cli.py --pdf "input.pdf" --tipo ahreas --config config/ahreas.j
 php -S localhost:8080
 ```
 
-### Docker
+### Docker (Local Development — preferred, no PHP/Python install needed)
+```bash
+docker compose -f docker-compose.local.yml up -d --build   # build + start on port 8080
+docker compose -f docker-compose.local.yml logs -f          # view logs
+docker compose -f docker-compose.local.yml down             # stop
+# Access: http://localhost:8080/Cleanalyze
+```
+
+### Docker (Production — Hostinger with Traefik)
 ```bash
 docker compose build
-docker compose up -d        # runs on port 8080
+docker compose up -d        # uses docker-compose.yml (Traefik, HTTPS, external network)
 ```
 
 ### Dependencies
@@ -66,6 +74,10 @@ pip install pandas openpyxl pdfplumber pdf2image pytesseract  # Python deps
 - **ahreas plugin** uses `pdftotext` by default
 - **No database**: Auth uses `auth/users.json` and `auth/invites.json`
 - **Dual environment**: `config/paths.php` auto-detects Windows vs Docker; Python CLI works in both
+- **Docker compose files**: `docker-compose.yml` is for Hostinger production (Traefik, external network, HTTPS). `docker-compose.local.yml` is for local development (port 8080 exposed, volumes for output/uploads). `Dockerfile` is shared by both — never needs environment-specific changes
+- **Changelog**: `changelog.json` in project root feeds the collapsible "Novidades" card on `index.php`. Keep entries user-facing only — no technical details (no library names, Docker internals, OCR engine names). Focus on what changed for the user (e.g., "Novo modulo de extracao: Inadimplencia", not "Added pdfplumber coordinate extraction"). Update this file whenever a user-visible change is made
+- **Claude/ folder**: Local-only reference folder for files shared with Claude Code (debug outputs, commit history, etc.). Listed in `.gitignore` — never pushed to GitHub
+- **Regex evolution**: When fixing extraction regex, prefer adding fallback patterns over modifying existing ones, to avoid breaking PDFs that already work. Test with both old and new PDFs after changes
 
 ## Important Details
 
@@ -74,3 +86,5 @@ pip install pandas openpyxl pdfplumber pdf2image pytesseract  # Python deps
 - `web/executar_extracao.php` calls `cleanalize_cli.py` via `proc_open()` with `PYTHONIOENCODING=utf-8`
 - Upload limits: 128MB file size, 300s timeout (configured in Dockerfile)
 - Docker exposes port 8080 with Apache alias `/Cleanalyze`
+- The ahreas plugin `UnidadeCodigo` regex accepts alphanumeric codes (`[A-Za-z0-9]{1,10}`) — not just digits. Changed in v1.2.0 to support codes like LOJA01, CONSTR, C00118
+- Bootstrap JS (`bootstrap.bundle.min.js`) is loaded in `index.php` for the changelog collapse feature
