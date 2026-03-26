@@ -178,10 +178,10 @@ def parse_despesas(raw_text: str) -> dict:
     if m:
         periodo = m.group(1)
 
-    # Cabeçalho do PDF usa "Condominio:" (sem acento).
-    # Padrão: "Condominio: 1219 - CONDOMINIO ED RES FAMILIA CASABLANCA"
-    # Evitar casar com lançamentos tipo "Honorários - Condomínio: 987 - Bloco: ..."
-    m = re.search(r"^Condominio:\s+(.+)", raw_text, re.MULTILINE)
+    # Cabeçalho do PDF usa "Condominio:" (sem acento) ou "Condomínio:" (com acento).
+    # Ancorar no início da linha para evitar casar com lançamentos tipo
+    # "Honorários - Condomínio: 987 - Bloco: ..."
+    m = re.search(r"^Condom[ií]nio:\s+(.+)", raw_text, re.MULTILINE)
     if m:
         condominio = m.group(1).strip()
 

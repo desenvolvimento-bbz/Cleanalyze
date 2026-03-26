@@ -87,7 +87,7 @@ pip install pandas openpyxl pdfplumber pdf2image pytesseract  # Python deps
 - Upload limits: 128MB file size, 300s timeout (configured in Dockerfile)
 - Docker exposes port 8080 with Apache alias `/Cleanalyze`
 - The ahreas plugin `UnidadeCodigo` regex accepts alphanumeric codes (`[A-Za-z0-9]{1,10}`) — not just digits. Changed in v1.2.0 to support codes like LOJA01, CONSTR, C00118
-- **Prestação de Contas PDF header**: The header line uses `Condominio:` (no accent on the `i`), while expense lines use `Condomínio:` (with accent). The regex in `compare_prestacao_cli.py` must anchor to line start (`^Condominio:`) to avoid matching mid-line honorário entries
+- **Prestação de Contas PDF header**: Some PDFs use `Condominio:` (no accent) and others use `Condomínio:` (with accent). The regex in `compare_prestacao_cli.py` uses `^Condom[ií]nio:` to match both, anchored to line start to avoid matching mid-line honorário entries
 - **Admin-only technical details**: `web/executar_prestacao.php`, `web/executar_extracao.php`, and `web/diagnostico.php` restrict technical details/diagnostics to admin users via `auth_is_admin()`. `diagnostico.php` requires admin for the entire page via `auth_require_admin()`
 - **Shared navbar**: All authenticated pages use `includes/navbar.php` (set `$activePage` before including). Pages in `web/` include it with `__DIR__ . '/../includes/navbar.php'`
 - **comparar.php PDF export**: Exports only columns with differences + up to 3 identifier columns for context. Uses `ini_set('memory_limit', '1G')` during export to handle large spreadsheets
