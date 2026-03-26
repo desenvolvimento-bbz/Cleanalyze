@@ -7,6 +7,14 @@
 $activePage = $activePage ?? '';
 $_navEmail = auth_user_email() ?? '';
 
+// Versão atual lida do changelog
+$_navVersion = '';
+$_changelogPath = dirname(__DIR__) . '/changelog.json';
+if (file_exists($_changelogPath)) {
+    $_cl = json_decode(file_get_contents($_changelogPath), true);
+    if ($_cl && isset($_cl[0]['versao'])) $_navVersion = $_cl[0]['versao'];
+}
+
 // Calcula base URL relativo ao diretório do includes/
 // __DIR__ aqui é /includes, então o pai é a raiz do app
 $_navBase = rtrim(str_replace('\\', '/', dirname(__DIR__)), '/');
@@ -18,7 +26,7 @@ if ($_navBaseUrl === '') $_navBaseUrl = '';
 ?>
 <nav class="navbar navbar-expand-lg" style="font-family:'Manrope',sans-serif;">
   <div class="container">
-    <a class="navbar-brand" href="<?= $_navBaseUrl ?>/index.php" style="font-weight:700; font-size:1.3rem;">Cleanalyze</a>
+    <a class="navbar-brand" href="<?= $_navBaseUrl ?>/index.php" style="font-weight:700; font-size:1.3rem;">Cleanalyze<?php if ($_navVersion): ?><span style="font-size:.6rem; font-weight:400; color:rgba(255,255,255,.45); margin-left:6px; vertical-align:middle;">v<?= htmlspecialchars($_navVersion) ?></span><?php endif; ?></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>

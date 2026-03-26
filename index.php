@@ -70,7 +70,8 @@ $userEmail = auth_user_email() ?? 'Usuário';
       </a>
     </div>
     <div class="col-md-4">
-      <a href="prestacao.php" class="nav-card card nav-card-prestacao">
+      <a href="prestacao.php" class="nav-card card nav-card-prestacao" style="position:relative;">
+        <span class="badge bg-success" style="position:absolute; top:10px; right:10px; font-size:.65rem; font-weight:600;">New!</span>
         <div class="card-body">
           <span class="icon">📊</span>
           <h5>Prestação de Contas</h5>
