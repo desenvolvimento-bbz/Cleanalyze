@@ -1,5 +1,17 @@
 [
   {
+    "versao": "1.2.1",
+    "data": "26/03/2026",
+    "titulo": "Ajustes e padronizacao visual",
+    "itens": [
+      "Correcao na identificacao do nome do condominio no comparativo de Prestacao de Contas",
+      "Periodos comparados agora ficam em destaque antes das tabelas",
+      "Padronizacao do menu superior em todas as paginas",
+      "Comparacao de planilhas agora aproveita toda a largura da tela ao exibir resultados",
+      "PDF de comparacao exporta apenas colunas e linhas com diferenca, facilitando a leitura"
+    ]
+  },
+  {
     "versao": "1.2.0",
     "data": "25/03/2026",
     "titulo": "Novo modulo e melhorias visuais",

@@ -2,10 +2,19 @@ services:
   cleanalyze:
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     environment:
       - PORT=8080
       - GOOGLE_CLIENT_ID=330639050078-cuj6n6ag45fbpuior5aevo0scslp6n8c.apps.googleusercontent.com
     restart: unless-stopped
     ports:
       - "8080:8080"
+    volumes:
+      - auth-data:/var/www/html/auth/data
+      - cleanalyze-uploads:/var/www/html/uploads
+      - cleanalyze-logs:/var/www/html/logs
+
+volumes:
+  auth-data:
+  cleanalyze-uploads:
+  cleanalyze-logs:

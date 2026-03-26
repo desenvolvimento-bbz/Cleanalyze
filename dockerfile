@@ -59,7 +59,7 @@ COPY . .
 COPY --from=vendor /app/vendor ./vendor
 
 # Dirs graváveis
-RUN mkdir -p uploads output logs \
+RUN mkdir -p uploads output logs auth/data \
  && chown -R www-data:www-data /var/www/html
 
 # Exponha 8080 (o Apache será reconfigurado para ouvir nessa porta)

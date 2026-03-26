@@ -10,13 +10,13 @@
  */
 
 error_reporting(E_ALL);
-ini_set('display_errors', 1); // Ativar para debug
+ini_set('display_errors', 1);
 
-// Aumentar timeout e memória para processar PDFs grandes
-set_time_limit(600); // 10 minutos
+set_time_limit(600);
 ini_set('memory_limit', '512M');
 
-// ---------- CONFIGURAÇÕES (auto-detecta Windows vs Docker) ----------
+require_once __DIR__ . '/../auth/bootstrap.php';
+auth_require_login();
 require_once __DIR__ . '/../config/paths.php';
 $PYTHON       = APP_PYTHON;
 $PDFTOTEXT    = APP_PDFTOTEXT;
@@ -163,41 +163,12 @@ $tipoLabel = $tipo === 'inadimplencia' ? 'Inadimplência' : 'Ahreas (Unidades)';
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand" href="../index.php">Cleanalyze</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link active" href="../index.php">Extrair</a></li>
-        <li class="nav-item"><a class="nav-link" href="../comparar.php">Comparar</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
+<?php $activePage = 'extrair'; include __DIR__ . '/../includes/navbar.php'; ?>
 
 <div class="container py-4">
-  <div class="row g-4">
-    <!-- Sidebar -->
-    <aside class="col-md-3" id="sidebarCol">
-      <h4 class="m-0">Menu</h4>
-      <div class="list-group">
-        <a href="../index.php" class="list-group-item list-group-item-action active">
-          📄 Extrair (PDF → XLSX)
-        </a>
-        <a href="../comparar.php" class="list-group-item list-group-item-action">
-          🔍 Comparar (A × B)
-        </a>
-      </div>
-    </aside>
-
-    <!-- Main -->
-    <main class="col-md-9">
       <div class="card">
         <div class="card-body">
-          <h4 class="mb-3">📋 Resultado da Extração</h4>
+          <h4 class="mb-3">Resultado da Extração</h4>
           <p class="text-secondary mb-4">Tipo: <strong><?= h($tipoLabel) ?></strong></p>
 
           <?php if ($code === 0): ?>
@@ -265,12 +236,13 @@ $tipoLabel = $tipo === 'inadimplencia' ? 'Inadimplência' : 'Ahreas (Unidades)';
             </div>
           <?php endif; ?>
 
-          <!-- Detalhes técnicos (colapsável) -->
+          <?php if (auth_is_admin()): ?>
+          <!-- Detalhes técnicos (somente admin) -->
           <div class="accordion" id="detalhesAcordion">
             <div class="accordion-item">
               <h2 class="accordion-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetalhes">
-                  🔧 Detalhes técnicos da execução
+                  Detalhes técnicos da execução
                 </button>
               </h2>
               <div id="collapseDetalhes" class="accordion-collapse collapse" data-bs-parent="#detalhesAcordion">
@@ -283,11 +255,10 @@ $tipoLabel = $tipo === 'inadimplencia' ? 'Inadimplência' : 'Ahreas (Unidades)';
               </div>
             </div>
           </div>
+          <?php endif; ?>
 
         </div>
       </div>
-    </main>
-  </div>
 </div>
 
 <footer class="text-center text-muted my-4">

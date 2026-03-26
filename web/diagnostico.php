@@ -8,7 +8,8 @@ ini_set('display_errors', 1);
 
 header('Content-Type: text/html; charset=utf-8');
 
-// Configurações (auto-detecta Windows vs Docker)
+require_once __DIR__ . '/../auth/bootstrap.php';
+auth_require_admin();
 require_once __DIR__ . '/../config/paths.php';
 $PYTHON       = APP_PYTHON;
 $PDFTOTEXT    = APP_PDFTOTEXT;
@@ -38,41 +39,9 @@ $UPLOADS_DIR  = APP_UPLOADS;
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand" href="../index.php">Cleanalyze</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="../index.php">Extrair</a></li>
-        <li class="nav-item"><a class="nav-link" href="../comparar.php">Comparar</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
+<?php $activePage = ''; include __DIR__ . '/../includes/navbar.php'; ?>
 
 <div class="container py-4">
-  <div class="row g-4">
-    <!-- Sidebar -->
-    <aside class="col-md-3">
-      <h4 class="m-0">Menu</h4>
-      <div class="list-group">
-        <a href="../index.php" class="list-group-item list-group-item-action">
-          📄 Extrair (PDF → XLSX)
-        </a>
-        <a href="../comparar.php" class="list-group-item list-group-item-action">
-          🔍 Comparar (A × B)
-        </a>
-        <a href="diagnostico.php" class="list-group-item list-group-item-action active">
-          🔧 Diagnóstico
-        </a>
-      </div>
-    </aside>
-
-    <!-- Main -->
-    <main class="col-md-9">
       <div class="card">
         <div class="card-body">
           <h4 class="mb-3">🔧 Diagnóstico do Sistema</h4>
@@ -285,8 +254,6 @@ $UPLOADS_DIR  = APP_UPLOADS;
 
         </div>
       </div>
-    </main>
-  </div>
 </div>
 
 <footer class="text-center text-muted my-4">

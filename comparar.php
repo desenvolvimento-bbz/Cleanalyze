@@ -186,74 +186,135 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
 }
-// ==== Exportação PDF (somente tabelas) ====
+// ==== Exportação PDF (somente diferenças) ====
 if (($_SERVER['REQUEST_METHOD'] === 'POST') && isset($_POST['export_pdf']) && $_POST['export_pdf'] === '1') {
-    // Segurança: garantir que temos os caminhos e conseguimos carregar dados
+    ini_set('memory_limit', '1G');
+
     if (!$pathA || !$pathB || !file_exists($pathA) || !file_exists($pathB)) {
-        // volta para a página com erro simples
         $erro = "Para exportar o PDF, envie os dois arquivos (.xlsx) e atualize a comparação.";
     } else {
-        // Reconstrói os dados/tabelas com o threshold/métrica atuais
         $dadosA = carregarDadosPlanilha($pathA);
         $dadosB = carregarDadosPlanilha($pathB);
 
-        // Se as colunas não baterem, aborta export
         $cabA = $dadosA[1] ?? [];
         $cabB = $dadosB[1] ?? [];
         if (implode('|', $cabA) !== implode('|', $cabB)) {
             $erro = "As planilhas possuem colunas diferentes. Gere ambas pelo mesmo modelo antes de comparar.";
         } else {
             marcarDiferencas($dadosA, $dadosB, $threshold, $metrica);
-            $htmlA = htmlTabelaComDiff($dadosA, "A");
-            $htmlB = htmlTabelaComDiff($dadosB, "B");
 
-            // HTML minimalista só com as tabelas, ajustando estilos para PDF
+            $cabecalho = $dadosA[1] ?? [];
+            $colKeys = array_keys($cabecalho);
+            $total = max(count($dadosA), count($dadosB));
+
+            // 1) Detectar quais colunas têm pelo menos uma diferença
+            $colsComDiff = [];
+            $linhasComDiff = []; // índices das linhas com diff
+            for ($i = 2; $i <= $total; $i++) {
+                $hasDiff = false;
+                foreach ($colKeys as $ck) {
+                    $celA = $dadosA[$i][$ck] ?? '';
+                    $celB = $dadosB[$i][$ck] ?? '';
+                    if ((is_array($celA) && $celA[0] === '__DIFF__') || (is_array($celB) && $celB[0] === '__DIFF__')) {
+                        $colsComDiff[$ck] = true;
+                        $hasDiff = true;
+                    }
+                }
+                if ($hasDiff) $linhasComDiff[] = $i;
+            }
+
+            // 2) Colunas de identificação: as primeiras colunas (até 3) que NÃO têm diff
+            //    servem como contexto (ex: Cód. Condomínio, Bloco, Unidade, Nome)
+            $colsId = [];
+            foreach ($colKeys as $ck) {
+                if (isset($colsComDiff[$ck])) continue;
+                $colsId[$ck] = true;
+                if (count($colsId) >= 3) break;
+            }
+
+            // 3) Colunas finais para o PDF: identificação + diferenças
+            $pdfCols = array_keys($colsId + $colsComDiff);
+
+            // 4) Montar HTML
+            $thsHtml = '<th>Ln</th>';
+            foreach ($pdfCols as $ck) {
+                $thsHtml .= '<th>' . htmlspecialchars((string)$cabecalho[$ck]) . '</th>';
+            }
+
+            $rowsA = '';
+            $rowsB = '';
+            foreach ($linhasComDiff as $i) {
+                $tdsA = '<td>' . ($i - 1) . '</td>';
+                $tdsB = '<td>' . ($i - 1) . '</td>';
+                foreach ($pdfCols as $ck) {
+                    $celA = $dadosA[$i][$ck] ?? '';
+                    $celB = $dadosB[$i][$ck] ?? '';
+                    $isDiffA = is_array($celA) && $celA[0] === '__DIFF__';
+                    $isDiffB = is_array($celB) && $celB[0] === '__DIFF__';
+                    $valA = htmlspecialchars((string)($isDiffA ? $celA[1] : $celA));
+                    $valB = htmlspecialchars((string)($isDiffB ? $celB[1] : $celB));
+                    $clsA = $isDiffA ? ' class="diff"' : '';
+                    $clsB = $isDiffB ? ' class="diff"' : '';
+                    $tdsA .= "<td{$clsA}>{$valA}</td>";
+                    $tdsB .= "<td{$clsB}>{$valB}</td>";
+                }
+                $rowsA .= "<tr>{$tdsA}</tr>";
+                $rowsB .= "<tr>{$tdsB}</tr>";
+            }
+
+            $diffCount = count($linhasComDiff);
+            $totalLinhasA = count($dadosA) - 1;
+            $numDiffCols = count($colsComDiff);
+            $numPdfCols = count($pdfCols);
+            $colsListHtml = '';
+            foreach (array_keys($colsComDiff) as $ck) {
+                $colsListHtml .= ($colsListHtml ? ', ' : '') . htmlspecialchars((string)$cabecalho[$ck]);
+            }
+
             $htmlPdf = <<<HTML
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
+<html><head><meta charset="UTF-8">
 <style>
-  body { font-family: DejaVu Sans, Arial, Helvetica, sans-serif; font-size: 11px; color: #04193b; }
-  h2 { margin: 0 0 12px 0; }
-  .wrap { display: flex; gap: 10px; }
-  /* neutraliza sticky/overflow do HTML da página */
-  .pane { border: none; }
-  .pane-header { padding: 4px 0; border: none; background: #fff; }
-  .pane-table { overflow: visible; }
-  .sticky-top { position: static !important; }
-  table { border-collapse: collapse; }
-  th, td { border: 1px solid #b8b8c4; padding: 4px 6px; white-space: nowrap; }
-  thead th { background: #b8b8c4; }
-  .diff-cell { background: #f8d7da; }
+  @page { margin: 10mm 8mm; }
+  body { font-family: DejaVu Sans, sans-serif; font-size: 8px; color: #04193b; margin: 0; }
+  h2 { font-size: 13px; margin: 0 0 4px; }
+  .info { font-size: 8px; color: #555; margin-bottom: 4px; }
+  .cols-info { font-size: 7px; color: #888; margin-bottom: 8px; }
+  h3 { font-size: 10px; margin: 10px 0 4px; padding: 3px 8px; background: #04193b; color: #fff; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+  th { background: #b8b8c4; padding: 3px 5px; text-align: left; font-size: 7.5px; }
+  td { padding: 2px 5px; border-bottom: 1px solid #ddd; }
+  .diff { background: #f8d7da; font-weight: 600; }
+  .page-break { page-break-before: always; }
 </style>
-</head>
-<body>
-  <h2>Comparação de Planilhas</h2>
-  <div style="margin-bottom:8px;">
-    Similaridade mínima: {$threshold}% &nbsp;|&nbsp; Métrica: {$metrica}
+</head><body>
+  <h2>Comparativo de Planilhas — Diferenças</h2>
+  <div class="info">
+    Similaridade mínima: {$threshold}% | Métrica: {$metrica} | {$diffCount} linhas com diferença de {$totalLinhasA} totais | {$numDiffCols} colunas com diferença
   </div>
-  <div class="wrap">
-    {$htmlA}
-    {$htmlB}
-  </div>
-</body>
-</html>
+  <div class="cols-info">Colunas com diferença: {$colsListHtml}</div>
+  <h3>Planilha A</h3>
+  <table><thead><tr>{$thsHtml}</tr></thead><tbody>{$rowsA}</tbody></table>
+  <div class="page-break"></div>
+  <h3>Planilha B</h3>
+  <table><thead><tr>{$thsHtml}</tr></thead><tbody>{$rowsB}</tbody></table>
+</body></html>
 HTML;
 
-            // Dompdf
+            // Liberar memória dos dados antes do render
+            unset($dadosA, $dadosB, $rowsA, $rowsB);
+
             $dompdf = new Dompdf();
-            $dompdf->set_option('isRemoteEnabled', true);
-            $dompdf->set_option('defaultFont', 'DejaVu Sans'); // acentuação
+            $dompdf->set_option('isRemoteEnabled', false);
+            $dompdf->set_option('defaultFont', 'DejaVu Sans');
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->loadHtml($htmlPdf, 'UTF-8');
+            unset($htmlPdf);
             $dompdf->render();
-            $dompdf->stream('comparacao.pdf', ['Attachment' => true]);
+            $dompdf->stream('comparacao_diferencas.pdf', ['Attachment' => true]);
             exit;
-            exit; // termina a request aqui
         }
     }
-    // Se chegou aqui com $erro, a página renderiza a mensagem como já faz
 }
 
 ?>
@@ -268,15 +329,12 @@ HTML;
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
-      height: calc(100vh - 320px);
-      min-height: 520px;
     }
     .pane{
       display:flex; flex-direction:column; min-width:0; background:#fff; border:1px solid var(--cinza); border-radius:.5rem;
     }
     .pane-header{ padding:.5rem .75rem; border-bottom:1px solid var(--cinza); background:var(--cinzaClaro); }
-    .pane-table{ flex:1; overflow:auto; }
-    /* Horizontal: largura natural, com rolagem */
+    .pane-table{ overflow-x:auto; }
     .pane-table table{ width: max-content; border-collapse: separate; }
     .pane-table th, .pane-table td{
       white-space: nowrap;  /* não quebra linha */
@@ -289,7 +347,7 @@ HTML;
         /* força esconder a linha, independente do CSS do Bootstrap */
 
     @media (max-width: 992px){
-      .pane-grid{ grid-template-columns: 1fr; height: auto; }
+      .pane-grid{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -297,10 +355,11 @@ HTML;
 <?php $activePage = 'comparar'; include __DIR__ . '/includes/navbar.php'; ?>
 
 
-  <div class="container py-4">
+  <?php $temResultado = !$erro && $htmlA && $htmlB; ?>
+  <div class="<?= $temResultado ? 'container-fluid px-4' : 'container' ?> py-4">
       <div class="card">
         <div class="card-body">
-          <h4 class="card-title">🔍 Comparar Planilhas XLSX</h4>
+          <h4 class="card-title">Comparar Planilhas XLSX</h4>
           <p class="text-secondary">Envie dois arquivos gerados pelo sistema para ver as diferenças lado a lado (A à esquerda, B à direita).</p>
 
           <form action="comparar.php" method="post" enctype="multipart/form-data" class="row g-3 mb-2">
@@ -355,7 +414,10 @@ HTML;
         </div>
       </div>
   </div>
-</div>
+
+<footer class="text-center text-muted my-4">2025 &copy; Desenvolvimento BBZ.</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // Sincroniza rolagem vertical e horizontal entre A e B
     const a = document.querySelector('#pane-A');

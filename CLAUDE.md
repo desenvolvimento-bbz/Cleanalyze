@@ -72,9 +72,9 @@ pip install pandas openpyxl pdfplumber pdf2image pytesseract  # Python deps
 - **Plugin field names**: Use camelCase matching the config JSON keys (e.g., `UnidadeCodigo`, `LogradouroCobranca`)
 - **inadimplencia plugin** always uses `pdfplumber` (coordinate-based extraction), not pdftotext
 - **ahreas plugin** uses `pdftotext` by default
-- **No database**: Auth uses `auth/users.json` and `auth/invites.json`
+- **No database**: Auth uses `auth/data/users.json` and `auth/data/invites.json` (inside `auth/data/` which is a Docker volume to persist across deploys)
 - **Dual environment**: `config/paths.php` auto-detects Windows vs Docker; Python CLI works in both
-- **Docker compose files**: `docker-compose.yml` is for Hostinger production (Traefik, external network, HTTPS). `docker-compose.local.yml` is for local development (port 8080 exposed, volumes for output/uploads). `Dockerfile` is shared by both — never needs environment-specific changes
+- **Docker compose files**: `docker-compose.yml` is for Hostinger production. `docker-compose.local.yml` is for local development (port 8080 exposed). Both mount `auth/data/`, `uploads/`, and `logs/` as volumes to persist data across deploys. `Dockerfile` is shared by both — never needs environment-specific changes
 - **Changelog**: `changelog.json` in project root feeds the collapsible "Novidades" card on `index.php`. Keep entries user-facing only — no technical details (no library names, Docker internals, OCR engine names). Focus on what changed for the user (e.g., "Novo modulo de extracao: Inadimplencia", not "Added pdfplumber coordinate extraction"). Update this file whenever a user-visible change is made
 - **Claude/ folder**: Local-only reference folder for files shared with Claude Code (debug outputs, commit history, etc.). Listed in `.gitignore` — never pushed to GitHub
 - **Regex evolution**: When fixing extraction regex, prefer adding fallback patterns over modifying existing ones, to avoid breaking PDFs that already work. Test with both old and new PDFs after changes
@@ -87,4 +87,8 @@ pip install pandas openpyxl pdfplumber pdf2image pytesseract  # Python deps
 - Upload limits: 128MB file size, 300s timeout (configured in Dockerfile)
 - Docker exposes port 8080 with Apache alias `/Cleanalyze`
 - The ahreas plugin `UnidadeCodigo` regex accepts alphanumeric codes (`[A-Za-z0-9]{1,10}`) — not just digits. Changed in v1.2.0 to support codes like LOJA01, CONSTR, C00118
+- **Prestação de Contas PDF header**: The header line uses `Condominio:` (no accent on the `i`), while expense lines use `Condomínio:` (with accent). The regex in `compare_prestacao_cli.py` must anchor to line start (`^Condominio:`) to avoid matching mid-line honorário entries
+- **Admin-only technical details**: `web/executar_prestacao.php`, `web/executar_extracao.php`, and `web/diagnostico.php` restrict technical details/diagnostics to admin users via `auth_is_admin()`. `diagnostico.php` requires admin for the entire page via `auth_require_admin()`
+- **Shared navbar**: All authenticated pages use `includes/navbar.php` (set `$activePage` before including). Pages in `web/` include it with `__DIR__ . '/../includes/navbar.php'`
+- **comparar.php PDF export**: Exports only columns with differences + up to 3 identifier columns for context. Uses `ini_set('memory_limit', '1G')` during export to handle large spreadsheets
 - Bootstrap JS (`bootstrap.bundle.min.js`) is loaded in `index.php` for the changelog collapse feature

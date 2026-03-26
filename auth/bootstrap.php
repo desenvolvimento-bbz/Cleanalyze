@@ -9,8 +9,9 @@ if (session_status() === PHP_SESSION_NONE) {
 /* ====== Config ====== */
 define('APP_IDLE_SECONDS', 15 * 60); // 15 min
 define('AUTH_DIR', __DIR__);
-define('USERS_FILE', AUTH_DIR . '/users.json');
-define('INVITES_FILE', AUTH_DIR . '/invites.json');
+define('AUTH_DATA_DIR', AUTH_DIR . '/data');
+define('USERS_FILE', AUTH_DATA_DIR . '/users.json');
+define('INVITES_FILE', AUTH_DATA_DIR . '/invites.json');
 define('LOG_DIR', dirname(__DIR__) . '/logs');
 define('LOG_FILE', LOG_DIR . '/app.log');
 
@@ -44,6 +45,14 @@ function users_save(array $u) { json_save(USERS_FILE, $u); }
 function invites_load() { return json_load(INVITES_FILE); }
 function invites_save(array $i) { json_save(INVITES_FILE, $i); }
 
+function _auth_touch_last_access(string $email) {
+    $users = users_load();
+    if (isset($users[$email])) {
+        $users[$email]['last_access'] = time();
+        users_save($users);
+    }
+}
+
 /* ====== Sessão: idle timeout ====== */
 if (!empty($_SESSION['auth'])) {
     $last = $_SESSION['auth']['last'] ?? time();
@@ -57,6 +66,12 @@ if (!empty($_SESSION['auth'])) {
         exit;
     } else {
         $_SESSION['auth']['last'] = time();
+        // Atualizar último acesso (throttle: 1x por minuto para não sobrecarregar I/O)
+        $email = $_SESSION['auth']['email'] ?? null;
+        if ($email && (time() - ($_SESSION['auth']['_touch'] ?? 0)) >= 60) {
+            $_SESSION['auth']['_touch'] = time();
+            _auth_touch_last_access($email);
+        }
     }
 }
 
@@ -66,6 +81,8 @@ function auth_login(string $email) {
         'email' => $email,
         'last'  => time(),
     ];
+    // Registrar último acesso no users.json
+    _auth_touch_last_access($email);
 }
 
 function auth_logout() {
