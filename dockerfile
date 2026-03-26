@@ -35,6 +35,7 @@ RUN { \
       echo 'max_file_uploads=50'; \
       echo 'max_execution_time=300'; \
       echo 'max_input_time=300'; \
+      echo 'date.timezone=America/Sao_Paulo'; \
     } > /usr/local/etc/php/conf.d/zz-uploads.ini
 
 # (Opcional) evita warning de ServerName no Apache
