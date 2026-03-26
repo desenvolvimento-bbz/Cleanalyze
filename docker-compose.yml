@@ -16,5 +16,8 @@ services:
 
 volumes:
   auth-data:
+    name: cleanalyze_auth-data
   cleanalyze-uploads:
+    name: cleanalyze_uploads
   cleanalyze-logs:
+    name: cleanalyze_logs
