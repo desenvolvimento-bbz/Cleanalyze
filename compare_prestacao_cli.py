@@ -121,7 +121,40 @@ KNOWN_SUBCATS = {
     "Obras/Melhorias", "Tarifa de Cobrança",
 }
 
-SECTION_NAMES = {"ORDINARIA", "OBRAS/MELHORIAS", "IMPOSTOS/TAXAS", "FUNDO DE RESERVA"}
+DEFAULT_SECTION_NAMES = {"ORDINARIA", "OBRAS/MELHORIAS", "IMPOSTOS/TAXAS", "FUNDO DE RESERVA"}
+
+
+def extrair_secoes_do_resumo(raw_text: str) -> set:
+    """Extrai nomes de seção do Resumo Financeiro Contábil (antes do TOTAL).
+
+    Cada linha do resumo tem formato: NOME_SECAO  valor valor valor valor
+    Isso nos dá as seções reais do condomínio, independente de quais sejam.
+    """
+    secoes = set()
+    in_resumo = False
+
+    for line in raw_text.split("\n"):
+        trimmed = line.strip()
+        if not trimmed:
+            continue
+
+        if "Resumo Financeiro Contábil" in trimmed or \
+           trimmed == "Saldo anterior  Créditos  Débitos  Saldo atual":
+            in_resumo = True
+            continue
+
+        if in_resumo:
+            m = re.match(
+                r"^([\w/\s\u00C0-\u024F]+?)\s{2,}(-?[\d.,]+)\s+([\d.,]+)\s+([\d.,]+)\s+(-?[\d.,]+)",
+                trimmed
+            )
+            if m and m.group(1).strip() != "TOTAL":
+                secoes.add(m.group(1).strip())
+            if trimmed.startswith("TOTAL"):
+                in_resumo = False
+                break  # só precisamos do primeiro resumo
+
+    return secoes if secoes else DEFAULT_SECTION_NAMES
 
 # Regex patterns
 RE_LANCTO_FULL = re.compile(
@@ -137,8 +170,9 @@ RE_TOTAL_CONTA = re.compile(r"^TOTAL DA CONTA\s+")
 RE_TOTAL_DESPESAS = re.compile(r"^TOTAL DAS DESPESAS")
 
 
-def _coletar_continuacao(lines: List[str], start_idx: int) -> str:
+def _coletar_continuacao(lines: List[str], start_idx: int, all_section_names: set = None) -> str:
     """Coleta linhas de continuação de descrição após um lançamento."""
+    stop_names = all_section_names or DEFAULT_SECTION_NAMES
     extra = ""
     for j in range(start_idx, len(lines)):
         nxt = lines[j].strip()
@@ -151,13 +185,13 @@ def _coletar_continuacao(lines: List[str], start_idx: int) -> str:
             break
         if nxt.startswith("Emitido") or nxt.startswith("Página") or nxt.startswith("Período"):
             break
-        if nxt.startswith("Condomínio") or nxt.startswith("Endereço"):
+        if nxt.startswith("Condomínio") or nxt.startswith("Condominio") or nxt.startswith("Endereço"):
             break
         if nxt == "Demonstrativo de Despesas" or nxt.startswith("PAGTO FUNCIONARIOS"):
             break
         if nxt in KNOWN_SUBCATS:
             break
-        if nxt in SECTION_NAMES:
+        if nxt in stop_names or nxt.upper() in {s.upper() for s in stop_names}:
             break
         if any(nxt == c for c in CONTA_NAMES):
             break
@@ -168,11 +202,14 @@ def _coletar_continuacao(lines: List[str], start_idx: int) -> str:
     return extra.strip()
 
 
-def parse_despesas(raw_text: str) -> dict:
+def parse_despesas(raw_text: str, section_names: set = None) -> dict:
     """Extrai lançamentos de despesas do texto estruturado do PDF."""
     expenses = []
     periodo = ""
     condominio = ""
+
+    if section_names is None:
+        section_names = DEFAULT_SECTION_NAMES
 
     m = re.search(r"Período:\s+([\d/]+ a [\d/]+)", raw_text)
     if m:
@@ -185,11 +222,16 @@ def parse_despesas(raw_text: str) -> dict:
     if m:
         condominio = m.group(1).strip()
 
+    # Nomes que são tanto seção quanto conta (aparecem como conta dentro da própria seção)
+    section_name_set = {s.upper() for s in section_names}
+
     lines = raw_text.split("\n")
     in_despesas = False
     current_section = ""
     current_conta = ""
     current_subcat = ""
+    # Rastrear se já entramos numa seção (para distinguir seção vs conta com mesmo nome)
+    seen_sections = set()
 
     for i, raw_line in enumerate(lines):
         line = raw_line.strip()
@@ -212,8 +254,8 @@ def parse_despesas(raw_text: str) -> dict:
             continue
 
         # Ignorar cabeçalhos
-        skip_prefixes = ("Página:", "Período:", "Condomínio:", "Endereço:",
-                         "Gerente:", "Emitido em", "Nº lancto.")
+        skip_prefixes = ("Página:", "Período:", "Condomínio:", "Condominio:",
+                         "Endereço:", "Gerente:", "Emitido em", "Nº lancto.")
         if any(line.startswith(p) for p in skip_prefixes):
             continue
 
@@ -221,7 +263,7 @@ def parse_despesas(raw_text: str) -> dict:
         if RE_TOTAL_CONTA.match(line) or RE_TOTAL_DESPESAS.match(line):
             continue
 
-        # --- Detecção de Seção ---
+        # --- Detecção de Seção (hardcoded para nomes ambíguos) ---
         if line == "ORDINARIA":
             current_section = "ORDINARIA"
             current_conta = ""
@@ -248,10 +290,28 @@ def parse_despesas(raw_text: str) -> dict:
             current_subcat = ""
             continue
 
+        # --- Detecção dinâmica de Seção (somente nomes que NÃO são contas) ---
+        line_upper = line.upper()
+        conta_name_set = {c.upper() for c in CONTA_NAMES}
+        is_section_only = (line_upper in section_name_set or line in section_names) and \
+                          line_upper not in conta_name_set and \
+                          line not in CONTA_NAMES
+        if is_section_only:
+            if line_upper not in seen_sections:
+                seen_sections.add(line_upper)
+                current_section = line
+                current_conta = ""
+                current_subcat = ""
+                continue
+            else:
+                current_conta = line
+                current_subcat = ""
+                continue
+
         # --- Detecção de Conta ---
         found_conta = False
         for conta in CONTA_NAMES:
-            if line == conta and conta not in ("ORDINARIA", "OBRAS/MELHORIAS", "IMPOSTOS/TAXAS"):
+            if line == conta:
                 current_conta = conta
                 current_subcat = ""
                 found_conta = True
@@ -302,7 +362,7 @@ def parse_despesas(raw_text: str) -> dict:
         m = RE_LANCTO_FULL.match(line)
         if m:
             desc = m.group(3).strip()
-            cont = _coletar_continuacao(lines, i + 1)
+            cont = _coletar_continuacao(lines, i + 1, section_names)
             if cont:
                 desc += " " + cont
             expenses.append({
@@ -331,7 +391,7 @@ def parse_despesas(raw_text: str) -> dict:
                     continue
                 desc = prev
                 break
-            cont = _coletar_continuacao(lines, i + 1)
+            cont = _coletar_continuacao(lines, i + 1, section_names)
             if cont:
                 desc += " " + cont
             expenses.append({
@@ -394,12 +454,18 @@ def parse_resumo(raw_text: str) -> List[dict]:
 # PARSING DE TOTAIS POR CONTA
 # =============================================================================
 
-def parse_totais_contas(raw_text: str) -> dict:
+def parse_totais_contas(raw_text: str, section_names: set = None) -> dict:
     """Extrai totais por conta (TOTAL DA CONTA ...) do texto."""
+    if section_names is None:
+        section_names = DEFAULT_SECTION_NAMES
+
+    section_name_set = {s.upper() for s in section_names}
+    conta_name_set = {c.upper() for c in CONTA_NAMES}
     totais = {}
     lines = raw_text.split("\n")
     current_section = ""
     in_despesas = False
+    seen_sections = set()
 
     for i, raw_line in enumerate(lines):
         trimmed = raw_line.strip()
@@ -411,19 +477,26 @@ def parse_totais_contas(raw_text: str) -> dict:
         if not in_despesas:
             continue
 
+        # Detecção de seção: hardcoded para 3 nomes ambíguos
+        trimmed_upper = trimmed.upper()
         if trimmed == "ORDINARIA":
             current_section = "ORDINARIA"
         elif trimmed == "OBRAS/MELHORIAS" and current_section != "OBRAS/MELHORIAS":
-            if current_section in ("ORDINARIA", ""):
-                current_section = "OBRAS/MELHORIAS"
-        elif trimmed == "IMPOSTOS/TAXAS" and current_section != "ORDINARIA":
+            current_section = "OBRAS/MELHORIAS"
+        elif trimmed == "IMPOSTOS/TAXAS" and current_section not in ("ORDINARIA",):
             current_section = "IMPOSTOS/TAXAS"
+        elif (trimmed_upper in section_name_set) and \
+             (trimmed_upper not in conta_name_set) and \
+             (trimmed not in CONTA_NAMES):
+            if trimmed_upper not in seen_sections:
+                seen_sections.add(trimmed_upper)
+                current_section = trimmed
 
         # Valor na mesma linha
         m = re.match(r"^TOTAL DA CONTA\s+(.+?)\s{2,}([\d.,]+)\s+([\d.,]+%)", trimmed)
         if m:
             conta_name = m.group(1).strip()
-            is_high = conta_name in ("ORDINARIA", "OBRAS/MELHORIAS", "IMPOSTOS/TAXAS")
+            is_high = conta_name.upper() in section_name_set
             section = conta_name if is_high else current_section
             key = conta_name if is_high else f"{section} > {conta_name}"
             totais[key] = {
@@ -440,7 +513,7 @@ def parse_totais_contas(raw_text: str) -> dict:
             vm = re.match(r"^([\d.,]+)\s+([\d.,]+%)$", next_line)
             if vm:
                 conta_name = m.group(1).strip()
-                is_high = conta_name in ("ORDINARIA", "OBRAS/MELHORIAS", "IMPOSTOS/TAXAS")
+                is_high = conta_name.upper() in section_name_set
                 section = conta_name if is_high else current_section
                 key = conta_name if is_high else f"{section} > {conta_name}"
                 totais[key] = {
@@ -493,7 +566,7 @@ def analisar_diferencas(old_expenses, new_expenses, old_totais, new_totais) -> L
         if old and new:
             continue
 
-        if not old and new and not new.get("isHighLevel"):
+        if not old and new and not new.get("isHighLevel") and new.get("conta", "").strip():
             conta_key = f"{new['secao']} > {new['conta']}"
             lancamentos = new_map.get(conta_key, {})
             all_lanc = []
@@ -510,7 +583,7 @@ def analisar_diferencas(old_expenses, new_expenses, old_totais, new_totais) -> L
                 "lancamentos": all_lanc,
             })
 
-        if old and not new and not old.get("isHighLevel"):
+        if old and not new and not old.get("isHighLevel") and old.get("conta", "").strip():
             conta_key = f"{old['secao']} > {old['conta']}"
             lancamentos = old_map.get(conta_key, {})
             all_lanc = []
@@ -534,6 +607,8 @@ def analisar_diferencas(old_expenses, new_expenses, old_totais, new_totais) -> L
         all_subcats = sorted(set(list(old_subcats.keys()) + list(new_subcats.keys())))
 
         for subcat in all_subcats:
+            if not subcat.strip():
+                continue  # Ignorar subcategorias sem nome
             old_items = old_subcats.get(subcat, [])
             new_items = new_subcats.get(subcat, [])
 
@@ -579,10 +654,11 @@ HEADER_FILL_BLUE = PatternFill("solid", fgColor="4472C4")
 HEADER_FILL_DARK_BLUE = PatternFill("solid", fgColor="2E75B6")
 HEADER_FILL_GREEN = PatternFill("solid", fgColor="548235")
 HEADER_FILL_RED = PatternFill("solid", fgColor="C00000")
-FILL_YELLOW = PatternFill("solid", fgColor="FFF2CC")
-FILL_PINK = PatternFill("solid", fgColor="FCE4EC")
-FILL_LIGHT_GREEN = PatternFill("solid", fgColor="E2EFDA")
-FILL_LIGHT_ORANGE = PatternFill("solid", fgColor="FBE5D6")
+# v2: NOVA=vermelho (perigo), AUSENTE=amarelo (atenção)
+FILL_NOVA = PatternFill("solid", fgColor="FCE4EC")          # Rosa/vermelho — conta/subcat nova
+FILL_AUSENTE = PatternFill("solid", fgColor="FFF2CC")       # Amarelo — conta/subcat ausente
+FILL_SUB_NOVA = PatternFill("solid", fgColor="FCE4EC")      # Rosa/vermelho — subcategoria nova
+FILL_SUB_REMOVIDA = PatternFill("solid", fgColor="FFF2CC")  # Amarelo — subcategoria removida
 ITALIC_GRAY = Font(italic=True, color="666666")
 FMT_BRL = '#,##0.00'
 
@@ -711,10 +787,10 @@ def criar_aba_totais(wb, old_totais, new_totais, old_expenses, new_expenses):
 
         if "NOVA" in obs:
             for cell in ws[row_idx]:
-                cell.fill = FILL_YELLOW
+                cell.fill = FILL_NOVA
         if "AUSENTE" in obs:
             for cell in ws[row_idx]:
-                cell.fill = FILL_PINK
+                cell.fill = FILL_AUSENTE
 
         # Detalhar lançamentos em contas novas/ausentes
         if "NOVA" in obs or "AUSENTE" in obs:
@@ -757,13 +833,20 @@ def criar_aba_diferencas(wb, diffs: List[dict]):
     _set_col_widths(ws, [22, 18, 28, 30, 18, 18, 70])
 
     color_map = {
-        "CONTA NOVA": FILL_YELLOW,
-        "CONTA AUSENTE": FILL_PINK,
-        "SUBCATEGORIA NOVA": FILL_LIGHT_GREEN,
-        "SUBCATEGORIA REMOVIDA": FILL_LIGHT_ORANGE,
+        "CONTA NOVA": FILL_NOVA,
+        "CONTA AUSENTE": FILL_AUSENTE,
+        "SUBCATEGORIA NOVA": FILL_SUB_NOVA,
+        "SUBCATEGORIA REMOVIDA": FILL_SUB_REMOVIDA,
     }
 
-    for d in diffs:
+    # Ordenar: NOVA primeiro, AUSENTE depois
+    tipo_ordem = {
+        "CONTA NOVA": 0, "SUBCATEGORIA NOVA": 1,
+        "CONTA AUSENTE": 2, "SUBCATEGORIA REMOVIDA": 3,
+    }
+    diffs_sorted = sorted(diffs, key=lambda d: tipo_ordem.get(d["tipo"], 9))
+
+    for d in diffs_sorted:
         ws.append([
             d["tipo"], d["secao"], d["conta"], d.get("subcategoria", ""),
             d.get("totalAnterior", 0), d.get("totalAtual", 0), d["detalhes"],
@@ -839,6 +922,232 @@ def _build_totais_comparativo(old_totais, new_totais) -> List[dict]:
     return result
 
 
+def _desc_label(descricao: str) -> str:
+    """Extrai label curto da descrição: parte antes do primeiro ' - '."""
+    if not descricao:
+        return ""
+    # Ignorar transferências internas
+    if "TRANSFERÊNCIA ENTRE CONTAS" in descricao.upper() or \
+       "TRANSFERENCIA ENTRE CONTAS" in descricao.upper():
+        return ""
+    # Pegar parte antes do primeiro " - " (nome do fornecedor geralmente vem depois)
+    parts = descricao.split(" - ", 1)
+    label = parts[0].strip()
+    # Limitar tamanho
+    if len(label) > 60:
+        label = label[:57] + "..."
+    return label
+
+
+def _build_conta_subcat_map_with_desc(expenses: List[dict]) -> dict:
+    """Mapa: 'SECAO > CONTA' -> {'SUBCATEGORIA_OU_DESC': [lancamentos]}
+
+    Usa descrição como fallback quando subcategoria é vazia.
+    """
+    m = {}
+    for e in expenses:
+        conta = e.get("conta", "").strip()
+        if not conta:
+            continue  # Ignorar expenses sem conta definida
+        ck = f"{e['secao']} > {conta}"
+        if ck not in m:
+            m[ck] = {}
+        sc = e["subcategoria"].strip()
+        if not sc:
+            # Fallback: usar label da descrição
+            sc = _desc_label(e.get("descricao", ""))
+        if not sc:
+            continue
+        if sc not in m[ck]:
+            m[ck][sc] = []
+        m[ck][sc].append(e)
+    return m
+
+
+def _build_subcategorias_por_conta(old_expenses, new_expenses) -> dict:
+    """Mapa de subcategorias por conta com totais anterior/atual para dropdown.
+
+    Usa descrição como fallback para subcategorias vazias.
+    """
+    old_map = _build_conta_subcat_map_with_desc(old_expenses)
+    new_map = _build_conta_subcat_map_with_desc(new_expenses)
+    all_keys = sorted(set(list(old_map.keys()) + list(new_map.keys())))
+
+    result = {}
+    for conta_key in all_keys:
+        old_subcats = old_map.get(conta_key, {})
+        new_subcats = new_map.get(conta_key, {})
+        all_subcats = sorted(set(list(old_subcats.keys()) + list(new_subcats.keys())))
+
+        subcats = []
+        for sc in all_subcats:
+            if not sc.strip():
+                continue
+            old_items = old_subcats.get(sc, [])
+            new_items = new_subcats.get(sc, [])
+            total_ant = sum(it.get("valor", 0) or 0 for it in old_items)
+            total_atu = sum(it.get("valor", 0) or 0 for it in new_items)
+
+            status = ""
+            if not old_items and new_items:
+                status = "NOVA"
+            elif old_items and not new_items:
+                status = "AUSENTE"
+
+            subcats.append({
+                "subcategoria": sc,
+                "totalAnterior": total_ant,
+                "totalAtual": total_atu,
+                "qtdAnterior": len(old_items),
+                "qtdAtual": len(new_items),
+                "status": status,
+            })
+        if subcats:
+            result[conta_key] = subcats
+    return result
+
+
+def _build_fundo_reserva_info(old_resumo, new_resumo, old_expenses, new_expenses) -> dict:
+    """Detecta lançamentos no Fundo de Reserva e monta alerta."""
+    info = {
+        "temDebito": False,
+        "debitoAnterior": 0,
+        "debitoAtual": 0,
+        "creditoAnterior": 0,
+        "creditoAtual": 0,
+        "saldoAnteriorInicio": 0,
+        "saldoAnteriorFim": 0,
+        "saldoAtualInicio": 0,
+        "saldoAtualFim": 0,
+        "lancamentos": [],
+    }
+
+    for r in old_resumo:
+        if "FUNDO DE RESERVA" in r.get("categoria", "").upper():
+            info["debitoAnterior"] = r.get("debitos", 0)
+            info["creditoAnterior"] = r.get("creditos", 0)
+            info["saldoAnteriorInicio"] = r.get("saldoAnterior", 0)
+            info["saldoAnteriorFim"] = r.get("saldoAtual", 0)
+    for r in new_resumo:
+        if "FUNDO DE RESERVA" in r.get("categoria", "").upper():
+            info["debitoAtual"] = r.get("debitos", 0)
+            info["creditoAtual"] = r.get("creditos", 0)
+            info["saldoAtualInicio"] = r.get("saldoAnterior", 0)
+            info["saldoAtualFim"] = r.get("saldoAtual", 0)
+
+    info["temDebitoAtual"] = info["debitoAtual"] > 0
+    info["temDebitoAnterior"] = info["debitoAnterior"] > 0
+
+    # Coletar lançamentos de despesa do Fundo de Reserva
+    for e in old_expenses:
+        if "FUNDO" in e.get("secao", "").upper() and "RESERVA" in e.get("secao", "").upper():
+            info["lancamentos"].append({
+                "periodo": "anterior",
+                "subcategoria": e.get("subcategoria", ""),
+                "descricao": e.get("descricao", ""),
+                "data": e.get("data", ""),
+                "valor": e.get("valor", 0),
+            })
+    for e in new_expenses:
+        if "FUNDO" in e.get("secao", "").upper() and "RESERVA" in e.get("secao", "").upper():
+            info["lancamentos"].append({
+                "periodo": "atual",
+                "subcategoria": e.get("subcategoria", ""),
+                "descricao": e.get("descricao", ""),
+                "data": e.get("data", ""),
+                "valor": e.get("valor", 0),
+            })
+
+    return info
+
+
+def _build_analise_mensal(old_expenses, new_expenses, new_periodo: str) -> dict:
+    """Agrupa lançamentos do período anterior por mês e compara com mês atual.
+
+    Identifica subcategorias que existiam no mesmo mês do ano anterior mas não
+    existem no mês atual, e vice-versa.
+    """
+    from collections import defaultdict
+
+    # Extrair mês/ano do período atual (formato "dd/mm/aaaa a dd/mm/aaaa")
+    m = re.match(r"(\d{2})/(\d{2})/(\d{4})", new_periodo)
+    mes_atual = int(m.group(2)) if m else 0
+    ano_atual = int(m.group(3)) if m else 0
+
+    # Agrupar expenses do anterior por mês -> seção > conta > subcategoria
+    mensal = defaultdict(float)  # (mes, secao>conta>subcat) -> total
+    mensal_contagem = defaultdict(set)  # secao>conta>subcat -> set de meses
+
+    for e in old_expenses:
+        data = e.get("data", "")
+        subcat = e.get("subcategoria", "").strip()
+        conta = e.get("conta", "").strip()
+        if not subcat or not conta:
+            continue
+        m_data = re.match(r"\d{2}/(\d{2})/(\d{4})", data)
+        if not m_data:
+            continue
+        mes = int(m_data.group(1))
+        # Ignorar seção na chave para evitar falsos positivos de seção diferente
+        chave = f"{conta} > {subcat}"
+        valor = e.get("valor", 0) or 0
+        mensal[(mes, chave)] += valor
+        mensal_contagem[chave].add(mes)
+
+    # Subcategorias do mês atual (mesma chave sem seção, só com data válida)
+    subcats_atual = defaultdict(float)
+    for e in new_expenses:
+        subcat = e.get("subcategoria", "").strip()
+        conta = e.get("conta", "").strip()
+        data = e.get("data", "")
+        if not subcat or not conta:
+            continue
+        # Ignorar linhas-resumo sem data (PAGTO FUNCIONARIOS, 13° SALARIO)
+        if not re.match(r"\d{2}/\d{2}/\d{4}", data):
+            continue
+        chave = f"{conta} > {subcat}"
+        subcats_atual[chave] += e.get("valor", 0) or 0
+
+    # Análise: o que existia no mesmo mês do ano anterior e não existe agora
+    ausentes_no_mes = []
+    if mes_atual > 0:
+        for chave, meses in mensal_contagem.items():
+            if mes_atual in meses and chave not in subcats_atual:
+                partes = chave.split(" > ", 1)
+                total_mesmo_mes = mensal.get((mes_atual, chave), 0)
+                ausentes_no_mes.append({
+                    "conta": partes[0] if len(partes) > 0 else "",
+                    "subcategoria": partes[1] if len(partes) > 1 else "",
+                    "totalMesmoMesAnterior": total_mesmo_mes,
+                    "mesesPresente": sorted(list(meses)),
+                    "recorrencia": len(meses),
+                })
+
+    # Novidades no mês atual que nunca existiram no período anterior
+    novas_sem_historico = []
+    for chave, total in subcats_atual.items():
+        if chave not in mensal_contagem:
+            partes = chave.split(" > ", 1)
+            novas_sem_historico.append({
+                "conta": partes[0] if len(partes) > 0 else "",
+                "subcategoria": partes[1] if len(partes) > 1 else "",
+                "totalAtual": total,
+            })
+
+    # Resumo mensal: total por mês para visão geral
+    totais_por_mes = defaultdict(float)
+    for (mes, chave), total in mensal.items():
+        totais_por_mes[mes] += total
+
+    return {
+        "mesAtual": mes_atual,
+        "anoAtual": ano_atual,
+        "ausentesNoMes": sorted(ausentes_no_mes, key=lambda x: -x["totalMesmoMesAnterior"]),
+        "novasSemHistorico": sorted(novas_sem_historico, key=lambda x: -x["totalAtual"]),
+        "totaisPorMes": {str(k): round(v, 2) for k, v in sorted(totais_por_mes.items())},
+    }
+
+
 def main():
     import json as json_mod
 
@@ -864,10 +1173,16 @@ def main():
 
     # 2. Parsear dados
     print("Parseando despesas...")
-    old_data = parse_despesas(text_old)
-    new_data = parse_despesas(text_new)
-    old_totais = parse_totais_contas(text_old)
-    new_totais = parse_totais_contas(text_new)
+    # Extrair seções dinâmicas do Resumo Financeiro de ambos os PDFs
+    old_sections = extrair_secoes_do_resumo(text_old)
+    new_sections = extrair_secoes_do_resumo(text_new)
+    all_sections = old_sections | new_sections
+    print(f"Seções detectadas: {', '.join(sorted(all_sections))}")
+
+    old_data = parse_despesas(text_old, all_sections)
+    new_data = parse_despesas(text_new, all_sections)
+    old_totais = parse_totais_contas(text_old, all_sections)
+    new_totais = parse_totais_contas(text_new, all_sections)
     old_resumo = parse_resumo(text_old)
     new_resumo = parse_resumo(text_new)
 
@@ -893,6 +1208,15 @@ def main():
     # 5. Gerar JSON para o frontend
     json_path = args.json if args.json else args.saida.replace(".xlsx", ".json")
     totais_comp = _build_totais_comparativo(old_totais, new_totais)
+    subcats_por_conta = _build_subcategorias_por_conta(
+        old_data["expenses"], new_data["expenses"]
+    )
+    fundo_reserva = _build_fundo_reserva_info(
+        old_resumo, new_resumo, old_data["expenses"], new_data["expenses"]
+    )
+    analise_mensal = _build_analise_mensal(
+        old_data["expenses"], new_data["expenses"], new_data["periodo"]
+    )
 
     json_data = {
         "condominio": condominio,
@@ -905,6 +1229,9 @@ def main():
             "atual": new_resumo,
         },
         "totaisComparativo": totais_comp,
+        "subcategoriasPorConta": subcats_por_conta,
+        "fundoReserva": fundo_reserva,
+        "analiseMensal": analise_mensal,
         "diferencas": diffs,
     }
 
