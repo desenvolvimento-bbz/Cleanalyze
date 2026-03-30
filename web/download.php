@@ -14,6 +14,9 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
+require_once __DIR__ . '/../auth/bootstrap.php';
+auth_require_login();
+
 require_once __DIR__ . '/../config/paths.php';
 $BASE    = APP_BASE;
 $UPLOADS = APP_UPLOADS;

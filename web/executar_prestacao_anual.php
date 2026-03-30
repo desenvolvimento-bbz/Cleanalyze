@@ -35,8 +35,10 @@ function fmt_brl($v) {
 // ===========================================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['export_pdf']) && $_POST['export_pdf'] === '1') {
     $jsonPath = $_POST['json_path'] ?? '';
-    if (!$jsonPath || !file_exists($jsonPath)) {
-        echo "Erro: dados nao encontrados para gerar PDF.";
+    $realJson = $jsonPath ? realpath($jsonPath) : false;
+    $realUploads = realpath($UPLOADS_DIR);
+    if (!$realJson || !$realUploads || stripos($realJson, $realUploads) !== 0) {
+        echo "Erro: caminho invalido.";
         exit;
     }
     $dados = json_decode(file_get_contents($jsonPath), true);
