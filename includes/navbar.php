@@ -42,7 +42,7 @@ if ($_navBaseUrl === '') $_navBaseUrl = '';
           <a class="nav-link<?= $activePage === 'comparar' ? ' active' : '' ?>" href="<?= $_navBaseUrl ?>/comparar.php">Comparar</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link<?= $activePage === 'prestacao' ? ' active' : '' ?>" href="<?= $_navBaseUrl ?>/prestacao.php">Prestação de Contas</a>
+          <a class="nav-link<?= $activePage === 'prestacao' ? ' active' : '' ?>" href="<?= $_navBaseUrl ?>/prestacao_anual.php">Prestacao de Contas IA</a>
         </li>
         <?php if (function_exists('auth_is_admin') && auth_is_admin()): ?>
         <li class="nav-item">

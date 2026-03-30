@@ -146,7 +146,7 @@ $tipoLabel = $tipo === 'inadimplencia' ? 'Inadimplência' : 'Ahreas (Unidades)';
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Resultado da Extração - Cleanalyze</title>
+  <title>Resultado da Extracao - Cleanalyze</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -185,15 +185,15 @@ $tipoLabel = $tipo === 'inadimplencia' ? 'Inadimplência' : 'Ahreas (Unidades)';
             </div>
 
             <div class="d-flex gap-2 mb-4">
-              <a class="btn btn-primary btn-lg" href="<?= h('download.php?f=' . urlencode($saida)) ?>">
+              <a class="btn btn-primary btn-lg" href="<?= h('web/download.php?f=' . urlencode($saida)) ?>">
                 ⬇️ Baixar Planilha
               </a>
               <?php if (is_file($debugTxt)): ?>
-                <a class="btn btn-outline-secondary" href="<?= h('download.php?f=' . urlencode($debugTxt)) ?>">
+                <a class="btn btn-outline-secondary" href="<?= h('web/download.php?f=' . urlencode($debugTxt)) ?>">
                   📄 Baixar .debug.txt
                 </a>
               <?php endif; ?>
-              <a class="btn btn-outline-primary" href="../index.php">
+              <a class="btn btn-outline-primary" href="extrair-form.php">
                 🔄 Nova Extração
               </a>
             </div>
@@ -230,7 +230,7 @@ $tipoLabel = $tipo === 'inadimplencia' ? 'Inadimplência' : 'Ahreas (Unidades)';
             </div>
 
             <div class="d-flex gap-2 mb-4">
-              <a class="btn btn-primary" href="../index.php">
+              <a class="btn btn-primary" href="extrair-form.php">
                 🔄 Tentar Novamente
               </a>
             </div>

@@ -70,12 +70,11 @@ $userEmail = auth_user_email() ?? 'Usuário';
       </a>
     </div>
     <div class="col-md-4">
-      <a href="prestacao.php" class="nav-card card nav-card-prestacao" style="position:relative;">
-        <span class="badge bg-success" style="position:absolute; top:10px; right:10px; font-size:.65rem; font-weight:600;">New!</span>
+      <a href="prestacao_anual.php" class="nav-card card nav-card-prestacao" style="position:relative;">
         <div class="card-body">
           <span class="icon">📊</span>
-          <h5>Prestação de Contas</h5>
-          <p>Compare dois PDFs de Prestação de Contas e veja as diferenças entre meses.</p>
+          <h5>Prestacao de Contas IA</h5>
+          <p>Analise anual de Prestacao de Contas por Inteligencia Artificial — anomalias, padroes e comparativos.</p>
         </div>
       </a>
     </div>

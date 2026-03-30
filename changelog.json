@@ -1,5 +1,18 @@
 [
   {
+    "versao": "1.2.2",
+    "data": "30/03/2026",
+    "titulo": "Analise de Prestacao de Contas por Cleanalyze IA",
+    "itens": [
+      "Atualizacao do modulo de Prestacao de Contas: envie 1 PDF com 12 meses e a IA analisa automaticamente",
+      "Comparativo do mesmo mes do ano anterior e do mes anterior",
+      "Deteccao de contas e subcategorias novas, ausentes e anomalas",
+      "Alerta de Fundo de Reserva com detalhamento de lancamentos",
+      "Visao panoramica com totais de despesas por mes",
+      "Validacao automatica do periodo do relatorio"
+    ]
+  },
+  {
     "versao": "1.2.1",
     "data": "26/03/2026",
     "titulo": "Ajustes e padronizacao visual",

@@ -1,6 +1,11 @@
 <?php
+// Página descontinuada — redirecionar para nova versão
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    header('Location: ../prestacao_anual.php', true, 301);
+    exit;
+}
 /**
- * executar_prestacao_v2.php
+ * executar_prestacao_v2.php (DESCONTINUADO — mantido temporariamente para sessões ativas)
  *
  * Versão v2 do resultado de comparação de Prestação de Contas.
  * Melhorias: cores corrigidas, alerta Fundo de Reserva, dropdown por conta.
@@ -384,9 +389,6 @@ function renderResultadoHTML($dados, $paraPdf = false) {
     .fundo-alert-ok{ background:#e8f5e9; border:2px solid #2e7d32; }
     .fundo-lancamento{ font-size:.82rem; color:#555; padding:2px 0 2px 16px; border-left:2px solid #6a1b9a; margin:3px 0; }
 
-    /* Analise Mensal */
-    .analise-mensal th{ font-size:.8rem; }
-    .analise-mensal td{ font-size:.85rem; }
   </style>
 </head>
 <body>
@@ -692,65 +694,6 @@ function renderResultadoHTML($dados, $paraPdf = false) {
       </div>
     </div>
   </div>
-
-  <!-- ANALISE MENSAL -->
-  <?php $am = $dados['analiseMensal'] ?? []; ?>
-  <?php if (!empty($am) && (!empty($am['ausentesNoMes']) || !empty($am['novasSemHistorico']))): ?>
-  <?php
-    $nomesMes = [1=>'Jan',2=>'Fev',3=>'Mar',4=>'Abr',5=>'Mai',6=>'Jun',7=>'Jul',8=>'Ago',9=>'Set',10=>'Out',11=>'Nov',12=>'Dez'];
-    $mesAtualNome = $nomesMes[$am['mesAtual']] ?? $am['mesAtual'];
-  ?>
-  <div class="card mb-4">
-    <div class="card-header" style="background:#1565c0; color:#fff;">
-      <strong>Analise de Padrao Mensal</strong>
-      <small class="ms-2 opacity-75">— comparando <?= $mesAtualNome ?> atual com historico</small>
-    </div>
-    <div class="card-body">
-      <?php if (!empty($am['novasSemHistorico'])): ?>
-        <h6 style="color:#c62828;">Lancamentos sem historico no periodo anterior</h6>
-        <p class="text-muted small mb-2">Subcategorias que aparecem no mes atual mas nunca existiram no periodo anterior.</p>
-        <div class="table-responsive mb-3">
-          <table class="table table-sm table-bordered">
-            <thead><tr style="background:#fce4ec;"><th>Conta</th><th>Subcategoria</th><th class="text-end">Total Atual</th></tr></thead>
-            <tbody>
-            <?php foreach ($am['novasSemHistorico'] as $n): ?>
-              <tr>
-                <td><?= h($n['conta']) ?></td>
-                <td><strong><?= h($n['subcategoria']) ?></strong></td>
-                <td class="text-end valor-pos"><?= fmt_brl($n['totalAtual']) ?></td>
-              </tr>
-            <?php endforeach; ?>
-            </tbody>
-          </table>
-        </div>
-      <?php endif; ?>
-
-      <?php if (!empty($am['ausentesNoMes'])): ?>
-        <h6 style="color:#856404;">Lancamentos esperados em <?= $mesAtualNome ?> mas ausentes</h6>
-        <p class="text-muted small mb-2">Subcategorias que existiam em <?= $mesAtualNome ?> do periodo anterior mas nao aparecem no mes atual.</p>
-        <div class="table-responsive">
-          <table class="table table-sm table-bordered">
-            <thead><tr style="background:#fffde7;"><th>Conta</th><th>Subcategoria</th><th class="text-end">Total em <?= $mesAtualNome ?> Ant.</th><th>Recorrencia</th><th>Meses</th></tr></thead>
-            <tbody>
-            <?php foreach ($am['ausentesNoMes'] as $a): ?>
-              <tr>
-                <td><?= h($a['conta']) ?></td>
-                <td><strong><?= h($a['subcategoria']) ?></strong></td>
-                <td class="text-end"><?= fmt_brl($a['totalMesmoMesAnterior']) ?></td>
-                <td><?= $a['recorrencia'] ?>/12 meses</td>
-                <td><small class="text-muted"><?php
-                  $ms = array_map(function($m) use ($nomesMes) { return $nomesMes[$m] ?? $m; }, $a['mesesPresente']);
-                  echo implode(', ', $ms);
-                ?></small></td>
-              </tr>
-            <?php endforeach; ?>
-            </tbody>
-          </table>
-        </div>
-      <?php endif; ?>
-    </div>
-  </div>
-  <?php endif; ?>
 
   <!-- DIFERENCAS DETALHADAS (reordenadas: Nova primeiro, Ausente depois) -->
   <div class="card mb-4">

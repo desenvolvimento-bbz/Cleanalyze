@@ -1,6 +1,11 @@
 <?php
+// Página descontinuada — redirecionar para nova versão
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    header('Location: ../prestacao_anual.php', true, 301);
+    exit;
+}
 /**
- * executar_prestacao.php
+ * executar_prestacao.php (DESCONTINUADO — mantido temporariamente para sessões ativas)
  *
  * Recebe dois PDFs de Prestação de Contas, processa via Python CLI,
  * e exibe resultado com cards de diferenças + exportação PDF/XLSX.

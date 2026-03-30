@@ -354,6 +354,29 @@ HTML;
 <body>
 <?php $activePage = 'comparar'; include __DIR__ . '/includes/navbar.php'; ?>
 
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingComparar">
+  <div class="loading-logo">Cleanalyze <span>IA</span></div>
+  <div class="loading-steps">
+    <div class="loading-step" id="cmp-upload">
+      <div class="l-icon">&#8593;</div>
+      <div class="l-text">Enviando planilhas<span class="l-dots"></span></div>
+    </div>
+    <div class="loading-step" id="cmp-read">
+      <div class="l-icon">&#9783;</div>
+      <div class="l-text">Lendo dados das planilhas<span class="l-dots"></span><div class="l-detail" id="cmp-read-d"></div></div>
+    </div>
+    <div class="loading-step" id="cmp-compare">
+      <div class="l-icon">&#8644;</div>
+      <div class="l-text">Comparando celula a celula<span class="l-dots"></span><div class="l-detail" id="cmp-compare-d"></div></div>
+    </div>
+    <div class="loading-step" id="cmp-render">
+      <div class="l-icon">&#9998;</div>
+      <div class="l-text">Montando visualizacao<span class="l-dots"></span><div class="l-detail" id="cmp-render-d"></div></div>
+    </div>
+  </div>
+  <div class="loading-footer">2025 &copy; Desenvolvimento BBZ.</div>
+</div>
 
   <?php $temResultado = !$erro && $htmlA && $htmlB; ?>
   <div class="<?= $temResultado ? 'container-fluid px-4' : 'container' ?> py-4">
@@ -362,7 +385,7 @@ HTML;
           <h4 class="card-title">Comparar Planilhas XLSX</h4>
           <p class="text-secondary">Envie dois arquivos gerados pelo sistema para ver as diferenças lado a lado (A à esquerda, B à direita).</p>
 
-          <form action="comparar.php" method="post" enctype="multipart/form-data" class="row g-3 mb-2">
+          <form action="comparar.php" method="post" enctype="multipart/form-data" class="row g-3 mb-2" id="formComparar">
             <!-- Persistência dos caminhos salvos -->
             <input type="hidden" name="pathA" value="<?= htmlspecialchars((string)$pathA) ?>">
             <input type="hidden" name="pathB" value="<?= htmlspecialchars((string)$pathB) ?>">
@@ -500,7 +523,11 @@ HTML;
       const form = this.closest('form');
       if (!form) return;
       document.getElementById('export_pdf').value = '1';
+      // Submit direto (sem loading) — é um download
+      form._skipLoading = true;
       form.submit();
+      // Reset para proximos submits usarem loading
+      setTimeout(function() { document.getElementById('export_pdf').value = '0'; form._skipLoading = false; }, 500);
     });
 
     // Inicializações
@@ -508,8 +535,91 @@ HTML;
       contarDiferencas();
     });
 
-
     </script>
-  
+
+<?php include __DIR__ . '/includes/loading-overlay.php'; ?>
+<script>
+(function() {
+  var form = document.getElementById('formComparar');
+  if (!form) return;
+
+  // Sobrescrever: só interceptar quando NÃO for export PDF
+  form.addEventListener('submit', function(e) {
+    if (form._skipLoading) return; // Deixar submit normal para PDF export
+    if (document.getElementById('export_pdf').value === '1') return;
+
+    e.preventDefault();
+
+    var btn = form.querySelector('button[type="submit"]');
+    if (btn) btn.disabled = true;
+
+    var overlay = document.getElementById('loadingComparar');
+    overlay.classList.add('active');
+
+    var steps = [
+      { id: 'cmp-upload', delay: 0, doneText: 'Planilhas enviadas' },
+      { id: 'cmp-read', delay: 800, detailId: 'cmp-read-d', detail: 'Parseando celulas e abas...', doneText: 'Dados lidos' },
+      { id: 'cmp-compare', delay: 2500, detailId: 'cmp-compare-d',
+        details: [
+          { at: 0, text: 'Calculando similaridade entre celulas...' },
+          { at: 1500, text: 'Identificando diferencas...' },
+        ],
+        doneText: 'Diferencas mapeadas'
+      },
+      { id: 'cmp-render', delay: 5000, detailId: 'cmp-render-d', detail: 'Gerando tabelas lado a lado...', doneText: 'Pronto!' },
+    ];
+
+    var stepTimers = [];
+
+    function activateStep(stepIndex) {
+      var step = steps[stepIndex];
+      var el = document.getElementById(step.id);
+      for (var i = 0; i < stepIndex; i++) {
+        var prev = steps[i];
+        var prevEl = document.getElementById(prev.id);
+        if (!prevEl.classList.contains('done')) {
+          prevEl.classList.remove('active');
+          prevEl.classList.add('done');
+          prevEl.querySelector('.l-icon').innerHTML = '&#10003;';
+          var dots = prevEl.querySelector('.l-dots');
+          if (dots) dots.style.display = 'none';
+          if (prev.doneText) { var d = prevEl.querySelector('.l-detail'); if (d) d.textContent = prev.doneText; }
+        }
+      }
+      el.classList.add('active');
+      if (step.detail && step.detailId) document.getElementById(step.detailId).textContent = step.detail;
+      if (step.details && step.detailId) {
+        step.details.forEach(function(d) {
+          var t = setTimeout(function() { if (el.classList.contains('active')) document.getElementById(step.detailId).textContent = d.text; }, d.at);
+          stepTimers.push(t);
+        });
+      }
+    }
+
+    steps.forEach(function(step, idx) { var t = setTimeout(function() { activateStep(idx); }, step.delay); stepTimers.push(t); });
+
+    var formData = new FormData(form);
+    fetch(form.action, { method: 'POST', body: formData })
+    .then(function(r) { return r.text(); })
+    .then(function(html) {
+      steps.forEach(function(s, idx) { activateStep(idx); });
+      var last = steps[steps.length - 1];
+      var lastEl = document.getElementById(last.id);
+      lastEl.classList.remove('active'); lastEl.classList.add('done');
+      lastEl.querySelector('.l-icon').innerHTML = '&#10003;';
+      var dots = lastEl.querySelector('.l-dots'); if (dots) dots.style.display = 'none';
+      if (last.doneText && last.detailId) document.getElementById(last.detailId).textContent = last.doneText;
+      setTimeout(function() { document.open(); document.write(html); document.close(); }, 600);
+    })
+    .catch(function(err) {
+      stepTimers.forEach(clearTimeout);
+      overlay.classList.remove('active');
+      if (btn) btn.disabled = false;
+      alert('Erro ao processar: ' + err.message);
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
