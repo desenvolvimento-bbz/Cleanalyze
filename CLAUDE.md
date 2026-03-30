@@ -11,17 +11,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 The app has two layers that communicate via shell execution (PHP calls Python CLI):
 
 **PHP layer** (web interface + auth):
-- `index.php` — Dashboard with extract/compare navigation
+- `index.php` — Dashboard with extract/compare/prestacao navigation
 - `login.php` / `auth/bootstrap.php` — Session auth with JSON-based user store, 15-min idle timeout
-- `extrair.php` — Legacy extraction page; `web/executar_extracao.php` is the main orchestrator
+- `extrair-form.php` — PDF extraction form; `web/executar_extracao.php` is the orchestrator
 - `comparar.php` — XLSX comparison tool with Levenshtein similarity + DOMPDF PDF export
+- `prestacao_anual.php` — Annual Prestação de Contas analysis (upload + loading overlay)
+- `web/executar_prestacao_anual.php` — Annual analysis results with PDF export via DOMPDF
 - `config/paths.php` — Auto-detects Windows (XAMPP) vs Docker paths for Python/Poppler/Tesseract
+- `includes/loading-overlay.php` — Shared CSS/JS for loading overlays (used by extrair, comparar, prestacao)
 
 **Python layer** (extraction engine):
 - `cleanalize_cli.py` — Main CLI orchestrator: PDF → text → plugin → normalize → map → XLSX
 - `cleanalize_core/pdf_engine.py` — Text extraction with fallback chain: pdftotext → pdfplumber → OCR (pdf2image + Tesseract)
 - `cleanalize_core/registry.py` — Plugin registry (register/get/choices)
 - `cleanalize_plugins/` — Extraction plugins implementing `matches(texto)` and `extract_records(texto)`
+- `analise_anual_cli.py` — Annual Prestação de Contas CLI: slices 1 PDF into months, generates comparisons + anomaly detection
+- `compare_prestacao_cli.py` — 1:1 Prestação comparison CLI (deprecated as standalone, functions reused by analise_anual_cli.py)
 
 **Plugin system**: Each plugin in `cleanalize_plugins/` must expose:
 - `NOME` constant (e.g., `"ahreas"`, `"inadimplencia"`)
@@ -75,7 +80,8 @@ pip install pandas openpyxl pdfplumber pdf2image pytesseract  # Python deps
 - **No database**: Auth uses `auth/data/users.json` and `auth/data/invites.json` (inside `auth/data/` which is a Docker volume to persist across deploys)
 - **Dual environment**: `config/paths.php` auto-detects Windows vs Docker; Python CLI works in both
 - **Docker compose files**: `docker-compose.yml` is for Hostinger production. `docker-compose.local.yml` is for local development (port 8080 exposed). Both mount `auth/data/`, `uploads/`, and `logs/` as volumes to persist data across deploys. `Dockerfile` is shared by both — never needs environment-specific changes
-- **Changelog**: `changelog.json` in project root feeds the collapsible "Novidades" card on `index.php`. Keep entries user-facing only — no technical details (no library names, Docker internals, OCR engine names). Focus on what changed for the user (e.g., "Novo modulo de extracao: Inadimplencia", not "Added pdfplumber coordinate extraction"). Update this file whenever a user-visible change is made
+- **Changelog**: `changelog.json` in project root feeds the collapsible "Novidades" card on `index.php`. Keep entries user-facing only — no technical details (no library names, Docker internals, OCR engine names, loading animations, tutorials). Focus on what changed for the user. **Always ask the user for approval before updating** — present version number and content for confirmation
+- **Branding**: Product name is "Cleanalyze IA" (name first, then IA). Institutional colors: primary blue `#0664e4`, purple `#8578ef`, dark `#04193b`. IA disclaimer text: "Analise gerada por Inteligencia Artificial. Os resultados sao indicativos e devem ser validados pelo usuario."
 - **Claude/ folder**: Local-only reference folder for files shared with Claude Code (debug outputs, commit history, etc.). Listed in `.gitignore` — never pushed to GitHub
 - **Regex evolution**: When fixing extraction regex, prefer adding fallback patterns over modifying existing ones, to avoid breaking PDFs that already work. Test with both old and new PDFs after changes
 
@@ -92,3 +98,6 @@ pip install pandas openpyxl pdfplumber pdf2image pytesseract  # Python deps
 - **Shared navbar**: All authenticated pages use `includes/navbar.php` (set `$activePage` before including). Pages in `web/` include it with `__DIR__ . '/../includes/navbar.php'`
 - **comparar.php PDF export**: Exports only columns with differences + up to 3 identifier columns for context. Uses `ini_set('memory_limit', '1G')` during export to handle large spreadsheets
 - Bootstrap JS (`bootstrap.bundle.min.js`) is loaded in `index.php` for the changelog collapse feature
+- **Prestação de Contas Anual** (`analise_anual_cli.py`): Slices expenses by month using individual transaction dates. Validates period: <12 months = error, >13 months = auto-trim to last 13. Compares same-month-year-ago + previous-month. Detects new/absent accounts and subcategories. Fundo de Reserva alert only fires for debits in the LAST month
+- **document.write() pattern**: `prestacao_anual.php` and `extrair-form.php` use `fetch()` + `document.write()` to show loading overlays. This means result page HTML renders with the browser URL of the upload page (root), not `web/`. All links in result pages must work from root context (`web/download.php`, `prestacao_anual.php`, etc.)
+- **Deprecated pages**: `prestacao.php`, `prestacao_v2.php` → 301 redirect to `prestacao_anual.php`. `web/executar_prestacao.php`, `web/executar_prestacao_v2.php` → GET redirect, POST kept temporarily for active sessions
