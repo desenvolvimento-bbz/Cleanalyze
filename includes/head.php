@@ -1,5 +1,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+<?php
+  $_headBase = rtrim(str_replace('\\', '/', dirname(__DIR__)), '/');
+  $_headDocRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? ''), '/');
+  $_headBaseUrl = '/' . ltrim(str_replace($_headDocRoot, '', $_headBase), '/');
+  $_headBaseUrl = rtrim($_headBaseUrl, '/');
+?>
+  <link rel="icon" type="image/png" href="<?= $_headBaseUrl ?>/assets/img/favicon.png">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
   <style>

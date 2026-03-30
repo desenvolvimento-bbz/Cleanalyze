@@ -146,6 +146,7 @@ $tipoLabel = $tipo === 'inadimplencia' ? 'Inadimplência' : 'Ahreas (Unidades)';
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
   <title>Resultado da Extracao - Cleanalyze</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet">
