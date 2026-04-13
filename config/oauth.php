@@ -14,8 +14,10 @@
  * 6. Copie o "Client ID" e cole abaixo
  */
 
-// Google OAuth Client ID (obtido do Google Cloud Console)
-define('GOOGLE_CLIENT_ID', getenv('GOOGLE_CLIENT_ID') ?: '');
+require_once __DIR__ . '/env.php';
+
+// Google OAuth Client ID (obtido do Google Cloud Console, via .env)
+define('GOOGLE_CLIENT_ID', env('GOOGLE_CLIENT_ID', ''));
 
 // Domínios permitidos para login (sem @)
 define('ALLOWED_DOMAINS', ['bbz.com.br']);

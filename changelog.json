@@ -1,5 +1,19 @@
 [
   {
+    "versao": "1.3.0",
+    "data": "13/04/2026",
+    "titulo": "Assistente IA: converse com seus documentos",
+    "itens": [
+      "Novo modulo Assistente IA: envie um PDF ou imagem e faca perguntas sobre o conteudo",
+      "Respostas baseadas no documento com citacao da pagina de origem",
+      "Suporte a PDFs escaneados via reconhecimento de texto (OCR)",
+      "Historico de conversa preservado para cada documento",
+      "Cada usuario tem seus proprios documentos, sem compartilhamento",
+      "Menu superior reorganizado em categorias (Cadastro, Prestacao de Contas, Admin)",
+      "Novo atalho para o Assistente IA na tela inicial"
+    ]
+  },
+  {
     "versao": "1.2.2",
     "data": "30/03/2026",
     "titulo": "Analise de Prestacao de Contas por Cleanalyze IA",

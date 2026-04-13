@@ -32,7 +32,12 @@ $userEmail = auth_user_email() ?? 'Usuário';
     .nav-card-extrair{ border-left:5px solid #4472C4; }
     .nav-card-comparar{ border-left:5px solid #ED7D31; }
     .nav-card-prestacao{ border-left:5px solid #548235; }
+    .nav-card-rag{ border-left:5px solid #0aa2c0; }
     .nav-card-convites{ border-left:5px solid #7B2D8E; }
+    .nav-card .badge-novo{
+      position:absolute; top:12px; right:12px;
+      font-size:.62rem; letter-spacing:.3px;
+    }
 
     .changelog-card{ border-color:var(--cinza); border-radius:10px; }
     .changelog-card .card-header{ background:#fff; border-bottom:1px solid var(--cinza); }
@@ -51,6 +56,16 @@ $userEmail = auth_user_email() ?? 'Usuário';
 
   <!-- Navigation Cards -->
   <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <a href="rag-assistente.php" class="nav-card card nav-card-rag" style="position:relative;">
+        <span class="badge rounded-pill bg-success badge-novo">Novo</span>
+        <div class="card-body">
+          <span class="icon">🤖</span>
+          <h5>Assistente IA</h5>
+          <p>Envie um documento e converse com ele: pergunte, resuma e tire duvidas com citacao de pagina.</p>
+        </div>
+      </a>
+    </div>
     <div class="col-md-4">
       <a href="extrair-form.php" class="nav-card card nav-card-extrair">
         <div class="card-body">
@@ -71,6 +86,7 @@ $userEmail = auth_user_email() ?? 'Usuário';
     </div>
     <div class="col-md-4">
       <a href="prestacao_anual.php" class="nav-card card nav-card-prestacao" style="position:relative;">
+        <span class="badge rounded-pill bg-success badge-novo">Novo</span>
         <div class="card-body">
           <span class="icon">📊</span>
           <h5>Prestacao de Contas IA</h5>

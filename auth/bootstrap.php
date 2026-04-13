@@ -2,6 +2,9 @@
 // auth/bootstrap.php
 // Sessão, timeout, helpers, leitura de users.json/invites.json e checagem de admin.
 
+// Carrega variáveis de ambiente (.env) antes de qualquer uso de env()/getenv()
+require_once dirname(__DIR__) . '/config/env.php';
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

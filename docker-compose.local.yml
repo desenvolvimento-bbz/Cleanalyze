@@ -5,12 +5,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
     environment:
       - PORT=8080
-      - GOOGLE_CLIENT_ID=330639050078-cuj6n6ag45fbpuior5aevo0scslp6n8c.apps.googleusercontent.com
     ports:
       - "8080:8080"
     volumes:
+      - ./.env:/var/www/html/.env:ro
       - ./auth/data:/var/www/html/auth/data
       - ./output:/var/www/html/output
       - ./uploads:/var/www/html/uploads

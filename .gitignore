@@ -1,5 +1,16 @@
-# Pasta de referência local (não vai pro GitHub)
+# Pastas de referência local (não vão pro GitHub)
 Claude/
+claude_context/
+.claude/
+
+# Segredos e configuração local
+.env
+.env.*
+!.env.example
+
+# Dados de autenticação (usuários, convites) — contêm emails e hashes
+auth/data/*.json
+!auth/data/.gitkeep
 
 # Uploads e outputs gerados
 uploads/

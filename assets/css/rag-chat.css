@@ -1,0 +1,146 @@
+/* assets/css/rag-chat.css — estilo do Assistente IA (RAG) */
+
+.rag-chat-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 70vh;
+  max-height: 80vh;
+}
+
+.rag-chat-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  background: #f7f7fb;
+}
+
+.rag-doc-list {
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.rag-doc-item {
+  padding: 10px 12px;
+  border: 1px solid #e5e7ef;
+  border-radius: 8px;
+  background: #fff;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.rag-doc-item:hover {
+  border-color: #04193b;
+  background: #f0f3fa;
+}
+
+.rag-doc-item.active {
+  border-color: #04193b;
+  background: #04193b;
+  color: #fff;
+}
+
+.rag-doc-item.active .rag-doc-meta {
+  color: rgba(255,255,255,.75);
+}
+
+.rag-doc-name {
+  font-weight: 600;
+  font-size: .92rem;
+  word-break: break-word;
+}
+
+.rag-doc-meta {
+  font-size: .75rem;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+.rag-doc-badge {
+  display: inline-block;
+  font-size: .65rem;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+.rag-doc-badge.ready      { background: #d1f7c4; color: #1d6b2b; }
+.rag-doc-badge.processing { background: #fff3cd; color: #7a5d00; }
+.rag-doc-badge.error      { background: #f8d7da; color: #842029; }
+
+.rag-message {
+  display: flex;
+  margin-bottom: 14px;
+}
+
+.rag-message.user {
+  justify-content: flex-end;
+}
+
+.rag-bubble {
+  max-width: 78%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.45;
+  font-size: .95rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+
+.rag-message.user .rag-bubble {
+  background: #04193b;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.rag-message.assistant .rag-bubble {
+  background: #fff;
+  color: #1a1a2c;
+  border: 1px solid #e5e7ef;
+  border-bottom-left-radius: 4px;
+}
+
+.rag-sources {
+  margin-top: 8px;
+  font-size: .75rem;
+  color: #6c757d;
+}
+
+.rag-sources details {
+  background: #f0f3fa;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.rag-sources summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.rag-sources ul {
+  margin: 6px 0 0 0;
+  padding-left: 18px;
+}
+
+.rag-sources li {
+  margin-bottom: 4px;
+}
+
+.rag-typing {
+  display: inline-block;
+  font-style: italic;
+  color: #6c757d;
+}
+
+.rag-typing::after {
+  content: '...';
+  animation: ragDots 1.2s steps(4, end) infinite;
+}
+
+@keyframes ragDots {
+  0%, 20% { content: ''; }
+  40%     { content: '.'; }
+  60%     { content: '..'; }
+  80%,100% { content: '...'; }
+}
