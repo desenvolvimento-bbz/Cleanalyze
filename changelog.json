@@ -1,5 +1,17 @@
 [
   {
+    "versao": "1.3.1",
+    "data": "13/04/2026",
+    "titulo": "Refinamentos do Assistente IA",
+    "itens": [
+      "Nova tela de carregamento durante o envio do documento, com os passos do processamento em destaque",
+      "Acoes rapidas em cada documento da lista: baixar o PDF original, copiar o texto reconhecido e excluir",
+      "O Assistente agora se apresenta como Assistente de IA Cleanalyze",
+      "Mensagens de erro mais claras quando o reconhecimento de texto esta instavel",
+      "Correcao na exclusao de documentos que podia falhar em algumas situacoes"
+    ]
+  },
+  {
     "versao": "1.3.0",
     "data": "13/04/2026",
     "titulo": "Assistente IA: converse com seus documentos",

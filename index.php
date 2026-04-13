@@ -90,7 +90,7 @@ $userEmail = auth_user_email() ?? 'Usuário';
         <div class="card-body">
           <span class="icon">📊</span>
           <h5>Prestacao de Contas IA</h5>
-          <p>Analise anual de Prestacao de Contas por Inteligencia Artificial — anomalias, padroes e comparativos.</p>
+          <p>Analise de Prestacao de Contas por Inteligencia Artificial — anomalias, padroes e comparativos.</p>
         </div>
       </a>
     </div>

@@ -99,7 +99,7 @@ app_log('page.view', ['page' => basename(__FILE__)]);
     </div>
   </div>
   <div class="rag-loading-footer">
-    Analise gerada por Inteligencia Artificial. Os resultados sao indicativos e devem ser validados pelo usuario.
+    Respostas geradas por Inteligencia Artificial com base no documento enviado. As informacoes sao indicativas e devem ser validadas no documento original pelo usuario.
   </div>
 </div>
 
@@ -177,8 +177,9 @@ app_log('page.view', ['page' => basename(__FILE__)]);
   </div>
 </div>
 
-<footer class="text-center text-muted my-4">
-  2025 &copy; Desenvolvimento BBZ.
+<footer class="text-center text-muted my-4" style="font-size:.8rem;">
+  <div>Respostas geradas por Inteligencia Artificial com base no documento enviado. As informacoes sao indicativas e devem ser validadas no documento original pelo usuario.</div>
+  <div class="mt-1">2025 &copy; Desenvolvimento BBZ.</div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
