@@ -9,9 +9,99 @@ app_log('page.view', ['page' => basename(__FILE__)]);
   <title>Assistente IA — Cleanalyze</title>
   <?php include __DIR__ . '/includes/head.php'; ?>
   <link rel="stylesheet" href="assets/css/rag-chat.css">
+  <style>
+    /* Loading overlay (mesmo molde visual de prestacao_anual.php) */
+    .rag-loading-overlay{
+      display:none; position:fixed; inset:0; z-index:9999;
+      background:rgba(4,25,59,.92); color:#fff;
+      flex-direction:column; align-items:center; justify-content:center;
+    }
+    .rag-loading-overlay.active{ display:flex; }
+    .rag-loading-logo{ font-size:1.6rem; font-weight:700; margin-bottom:2rem; opacity:.9; }
+    .rag-loading-logo span{ color:#0664e4; }
+    .rag-loading-steps{ width:100%; max-width:480px; padding:0 20px; }
+    .rag-loading-step{
+      display:flex; align-items:center; gap:12px;
+      padding:10px 0; border-bottom:1px solid rgba(255,255,255,.08);
+      opacity:.25; transition:opacity .4s;
+    }
+    .rag-loading-step.active{ opacity:1; }
+    .rag-loading-step.done{ opacity:.6; }
+    .rag-loading-step .icon{
+      width:28px; height:28px; border-radius:50%; display:flex;
+      align-items:center; justify-content:center; font-size:.8rem;
+      background:rgba(255,255,255,.1); flex-shrink:0;
+    }
+    .rag-loading-step.active .icon{
+      background:#0664e4; animation:ragPulse 1.2s infinite;
+    }
+    .rag-loading-step.done .icon{ background:#2e7d32; }
+    .rag-loading-step .text{ font-size:.9rem; }
+    .rag-loading-step .text .detail{
+      font-size:.75rem; color:rgba(255,255,255,.5); margin-top:2px;
+    }
+    .rag-loading-dots::after{
+      content:''; animation:ragDots 1.5s steps(4,end) infinite;
+    }
+    @keyframes ragDots{
+      0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'}
+    }
+    @keyframes ragPulse{
+      0%,100%{transform:scale(1)} 50%{transform:scale(1.15)}
+    }
+    .rag-loading-footer{
+      position:absolute; bottom:30px; text-align:center;
+      font-size:.75rem; opacity:.4;
+    }
+  </style>
 </head>
 <body>
 <?php $activePage = 'rag'; include __DIR__ . '/includes/navbar.php'; ?>
+
+<!-- Loading overlay do upload (mesmo molde do prestacao_anual.php) -->
+<div class="rag-loading-overlay" id="ragLoadingOverlay">
+  <div class="rag-loading-logo">Cleanalyze <span>IA</span></div>
+  <div class="rag-loading-steps">
+    <div class="rag-loading-step" id="rag-step-upload">
+      <div class="icon">&#8593;</div>
+      <div class="text">
+        Enviando arquivo<span class="rag-loading-dots"></span>
+        <div class="detail" id="rag-detail-upload"></div>
+      </div>
+    </div>
+    <div class="rag-loading-step" id="rag-step-ocr">
+      <div class="icon">&#128270;</div>
+      <div class="text">
+        Reconhecendo texto com OCR<span class="rag-loading-dots"></span>
+        <div class="detail" id="rag-detail-ocr"></div>
+      </div>
+    </div>
+    <div class="rag-loading-step" id="rag-step-chunk">
+      <div class="icon">&#9783;</div>
+      <div class="text">
+        Analisando conteudo do documento<span class="rag-loading-dots"></span>
+        <div class="detail" id="rag-detail-chunk"></div>
+      </div>
+    </div>
+    <div class="rag-loading-step" id="rag-step-embed">
+      <div class="icon">&#9881;</div>
+      <div class="text">
+        Indexando trechos para busca semantica<span class="rag-loading-dots"></span>
+        <div class="detail" id="rag-detail-embed"></div>
+      </div>
+    </div>
+    <div class="rag-loading-step" id="rag-step-done">
+      <div class="icon">&#9998;</div>
+      <div class="text">
+        Preparando Assistente IA<span class="rag-loading-dots"></span>
+        <div class="detail" id="rag-detail-done"></div>
+      </div>
+    </div>
+  </div>
+  <div class="rag-loading-footer">
+    Analise gerada por Inteligencia Artificial. Os resultados sao indicativos e devem ser validados pelo usuario.
+  </div>
+</div>
 
 <div class="container py-4">
   <div class="row g-4">

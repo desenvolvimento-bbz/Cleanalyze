@@ -19,13 +19,76 @@
 }
 
 .rag-doc-item {
+  position: relative;
   padding: 10px 12px;
+  padding-right: 100px;
   border: 1px solid #e5e7ef;
   border-radius: 8px;
   background: #fff;
   margin-bottom: 8px;
   cursor: pointer;
   transition: all .15s ease;
+}
+
+.rag-doc-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity .15s ease;
+}
+
+.rag-doc-item:hover .rag-doc-actions,
+.rag-doc-item.active .rag-doc-actions {
+  opacity: 1;
+}
+
+.rag-doc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #04193b;
+  cursor: pointer;
+  transition: background .12s ease, color .12s ease, border-color .12s ease;
+}
+
+.rag-doc-btn:hover {
+  background: #eef1f8;
+  border-color: rgba(4,25,59,.15);
+}
+
+.rag-doc-btn.js-doc-delete:hover {
+  background: #fdeaea;
+  border-color: rgba(132,34,41,.2);
+  color: #842029;
+}
+
+.rag-doc-btn.is-success {
+  background: #d1f7c4 !important;
+  border-color: #1d6b2b !important;
+  color: #1d6b2b !important;
+}
+
+.rag-doc-item.active .rag-doc-btn {
+  color: #ffffff;
+}
+.rag-doc-item.active .rag-doc-btn:hover {
+  background: rgba(255,255,255,.15);
+  border-color: rgba(255,255,255,.3);
+  color: #ffffff;
+}
+.rag-doc-item.active .rag-doc-btn.js-doc-delete:hover {
+  background: #fdeaea;
+  color: #842029;
+  border-color: #fdeaea;
 }
 
 .rag-doc-item:hover {
