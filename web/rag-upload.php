@@ -76,16 +76,34 @@ $result = rag_run_python('rag_ingest.py', [
 
 $json = rag_decode_cli_json($result['stdout']);
 if ($result['code'] !== 0 || !$json || empty($json['ok'])) {
+    $rawError = $json['error'] ?? ($result['stderr'] ?: 'erro desconhecido');
     app_log('rag.ingest.error', [
         'user' => $email,
         'doc_id' => $docId,
         'code' => $result['code'],
-        'error' => $json['error'] ?? ($result['stderr'] ?: 'erro desconhecido'),
+        'error' => $rawError,
     ]);
+
+    // Traduz erros tecnicos em mensagens amigaveis ao usuario
+    $friendly = 'Nao foi possivel processar o documento. Tente novamente em instantes.';
+    if (stripos($rawError, 'Status 429') !== false || stripos($rawError, 'rate limit') !== false) {
+        $friendly = 'O servico de OCR esta sobrecarregado no momento. Tente novamente em alguns minutos.';
+    } elseif (preg_match('/Status 5\d\d/', $rawError) || stripos($rawError, 'Internal Server Error') !== false) {
+        $friendly = 'O servico de OCR teve uma falha temporaria. Tente novamente em alguns instantes.';
+    } elseif (stripos($rawError, 'ReadTimeout') !== false || stripos($rawError, 'timeout') !== false) {
+        $friendly = 'O OCR demorou demais para responder. Se o documento for muito grande, tente um menor.';
+    } elseif (stripos($rawError, 'FileNotFoundError') !== false) {
+        $friendly = 'Arquivo nao encontrado apos o upload. Tente enviar novamente.';
+    } elseif (stripos($rawError, 'nao parece ser') !== false || stripos($rawError, 'nao suportada') !== false) {
+        $friendly = $rawError; // mensagens de validacao nossas ja sao amigaveis
+    } elseif (stripos($rawError, 'zero paginas') !== false) {
+        $friendly = 'Nao foi possivel extrair texto do documento. Verifique se ele contem texto legivel.';
+    }
+
     rag_json_response([
         'ok' => false,
         'doc_id' => $docId,
-        'error' => $json['error'] ?? 'Falha na ingestao',
+        'error' => $friendly,
     ], 500);
 }
 

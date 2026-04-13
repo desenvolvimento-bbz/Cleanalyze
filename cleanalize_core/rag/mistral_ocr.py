@@ -48,28 +48,68 @@ def _build_client() -> "Mistral":
 
 
 def _retry(callable_, *, what: str):
-    """Retry simples com backoff para operacoes de rede do Mistral."""
+    """Retry com backoff para falhas transitorias do Mistral.
+
+    Retenta em:
+      - httpx.ReadTimeout / ConnectTimeout / RemoteProtocolError (rede)
+      - SDKError com status 429 (rate limit) ou 5xx (erro do servidor Mistral)
+
+    NAO retenta em:
+      - SDKError 4xx (erro do cliente — retry nao vai consertar)
+    """
     import time as _t
 
     try:
         import httpx  # type: ignore
-        transient_exc = (httpx.ReadTimeout, httpx.ConnectTimeout, httpx.RemoteProtocolError)
+        network_exc: tuple = (
+            httpx.ReadTimeout,
+            httpx.ConnectTimeout,
+            httpx.RemoteProtocolError,
+        )
     except ImportError:
-        transient_exc = (Exception,)
+        network_exc = (Exception,)
+
+    try:
+        from mistralai.client.errors import SDKError  # type: ignore
+    except ImportError:
+        try:
+            from mistralai.errors import SDKError  # type: ignore
+        except ImportError:
+            SDKError = None  # type: ignore
+
+    def _is_retryable_sdk_error(exc: Exception) -> bool:
+        if SDKError is None or not isinstance(exc, SDKError):
+            return False
+        resp = getattr(exc, "raw_response", None)
+        status = getattr(resp, "status_code", None)
+        if status is None:
+            return True  # desconhecido -> trata como transitorio
+        return status == 429 or 500 <= int(status) < 600
 
     last_exc = None
     for attempt in range(1, _MAX_ATTEMPTS + 1):
         try:
             return callable_()
-        except transient_exc as e:
+        except network_exc as e:
             last_exc = e
-            if attempt == _MAX_ATTEMPTS:
-                raise RuntimeError(
-                    f"Mistral OCR falhou em {what} apos {_MAX_ATTEMPTS} tentativas: "
-                    f"{type(e).__name__}: {e}"
-                ) from e
-            _t.sleep(2 ** (attempt - 1))  # 1s, 2s
-    raise RuntimeError(f"Mistral OCR: estado inesperado em {what}") from last_exc
+        except Exception as e:
+            if _is_retryable_sdk_error(e):
+                last_exc = e
+            else:
+                raise
+
+        if attempt == _MAX_ATTEMPTS:
+            break
+        _t.sleep(2 ** (attempt - 1))  # 1s, 2s
+
+    status_info = ""
+    resp = getattr(last_exc, "raw_response", None)
+    if resp is not None and getattr(resp, "status_code", None):
+        status_info = f" (HTTP {resp.status_code})"
+    raise RuntimeError(
+        f"Mistral OCR falhou em {what} apos {_MAX_ATTEMPTS} tentativas"
+        f"{status_info}: {type(last_exc).__name__}: {last_exc}"
+    ) from last_exc
 
 
 def ocr_file(file_path: str | Path) -> List[OcrPage]:
