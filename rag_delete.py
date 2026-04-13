@@ -18,25 +18,32 @@ import shutil
 import sys
 import traceback
 
-from cleanalize_core.rag.store import RagStore, user_files_dir
+from cleanalize_core.rag.store import RagStore, global_files_dir, user_files_dir
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Delete de documento do RAG")
-    parser.add_argument("--user", required=True)
+    parser.add_argument("--user", default=None)
     parser.add_argument("--doc-id", required=True)
+    parser.add_argument("--global", dest="global_", action="store_true", help="Deletar do store global (Documentos BBZ)")
     args = parser.parse_args()
 
-    result = {"ok": False, "doc_id": args.doc_id}
+    result = {"ok": False, "doc_id": args.doc_id, "scope": "global" if args.global_ else "user"}
 
     try:
-        with RagStore(args.user) as store:
-            # Retorna None se o doc nao existir — tratamos como idempotente
+        if not args.global_ and not args.user:
+            raise ValueError("--user e obrigatorio quando --global nao e usado")
+
+        store_cm = RagStore.global_store() if args.global_ else RagStore(args.user)
+        with store_cm as store:
             doc = store.get_document(args.doc_id)
             store.delete_document(args.doc_id)
             result["existed"] = doc is not None
 
-        files_dir = user_files_dir(args.user) / args.doc_id
+        if args.global_:
+            files_dir = global_files_dir() / args.doc_id
+        else:
+            files_dir = user_files_dir(args.user) / args.doc_id
         files_removed = False
         if files_dir.exists():
             shutil.rmtree(files_dir, ignore_errors=True)

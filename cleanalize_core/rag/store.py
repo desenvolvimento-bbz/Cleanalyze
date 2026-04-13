@@ -53,6 +53,25 @@ def user_files_dir(email: str, base: Optional[Path] = None) -> Path:
     return user_rag_dir(email, base) / "files"
 
 
+# --- Documentos globais BBZ ---
+
+GLOBAL_SCOPE_DIRNAME = "_global"
+
+
+def global_rag_dir(base: Optional[Path] = None) -> Path:
+    """Diretorio raiz dos documentos globais (Documentos BBZ)."""
+    root = base or (project_root() / "uploads" / "rag")
+    return root / GLOBAL_SCOPE_DIRNAME
+
+
+def global_db_path(base: Optional[Path] = None) -> Path:
+    return global_rag_dir(base) / "index.db"
+
+
+def global_files_dir(base: Optional[Path] = None) -> Path:
+    return global_rag_dir(base) / "files"
+
+
 # ---------- Serializacao de vetores ----------
 
 def _vec_to_blob(vec: Sequence[float]) -> bytes:
@@ -93,13 +112,38 @@ class ChunkHit:
 # ---------- Store principal ----------
 
 class RagStore:
-    def __init__(self, email: str, base: Optional[Path] = None):
-        self.email = email
-        self.db_path = user_db_path(email, base)
-        self.files_dir = user_files_dir(email, base)
+    """Vector store por escopo. Dois escopos suportados:
+      - 'user': um .db por usuario (uploads/rag/<email_safe>/index.db)
+      - 'global': um .db unico compartilhado (uploads/rag/_global/index.db)
+    """
+
+    def __init__(
+        self,
+        email: Optional[str] = None,
+        base: Optional[Path] = None,
+        *,
+        scope: str = "user",
+    ):
+        if scope == "global":
+            self.scope = "global"
+            self.email = None
+            self.db_path = global_db_path(base)
+            self.files_dir = global_files_dir(base)
+        else:
+            if not email:
+                raise ValueError("email e obrigatorio para scope='user'")
+            self.scope = "user"
+            self.email = email
+            self.db_path = user_db_path(email, base)
+            self.files_dir = user_files_dir(email, base)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.files_dir.mkdir(parents=True, exist_ok=True)
         self._conn: Optional[sqlite3.Connection] = None
+
+    @classmethod
+    def global_store(cls, base: Optional[Path] = None) -> "RagStore":
+        """Construtor alternativo para o store de Documentos BBZ (globais)."""
+        return cls(email=None, base=base, scope="global")
 
     # --- conexao ---
 
@@ -154,18 +198,65 @@ class RagStore:
                 text TEXT NOT NULL
             );
             CREATE INDEX IF NOT EXISTS idx_chunks_doc ON chunks(doc_id);
-
-            CREATE TABLE IF NOT EXISTS chat_history (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                doc_id TEXT NOT NULL REFERENCES documents(doc_id) ON DELETE CASCADE,
-                role TEXT NOT NULL,
-                content TEXT NOT NULL,
-                sources_json TEXT,
-                created_at INTEGER NOT NULL
-            );
-            CREATE INDEX IF NOT EXISTS idx_history_doc ON chat_history(doc_id, created_at);
             """
         )
+
+        if self.scope == "user":
+            # chat_history (sem FK para doc_id — um usuario pode ter historico
+            # com docs globais que nao estao neste DB local).
+            c.executescript(
+                """
+                CREATE TABLE IF NOT EXISTS chat_history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    doc_id TEXT NOT NULL,
+                    role TEXT NOT NULL,
+                    content TEXT NOT NULL,
+                    sources_json TEXT,
+                    created_at INTEGER NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS idx_history_doc ON chat_history(doc_id, created_at);
+                """
+            )
+            # Migracao: se o chat_history foi criado antes com FK para documents,
+            # recria sem FK (necessario para suportar historico de docs globais).
+            fks = c.execute("PRAGMA foreign_key_list(chat_history)").fetchall()
+            if fks:
+                c.executescript(
+                    """
+                    PRAGMA foreign_keys = OFF;
+                    BEGIN;
+                    CREATE TABLE chat_history_new (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        doc_id TEXT NOT NULL,
+                        role TEXT NOT NULL,
+                        content TEXT NOT NULL,
+                        sources_json TEXT,
+                        created_at INTEGER NOT NULL
+                    );
+                    INSERT INTO chat_history_new (id, doc_id, role, content, sources_json, created_at)
+                      SELECT id, doc_id, role, content, sources_json, created_at FROM chat_history;
+                    DROP TABLE chat_history;
+                    ALTER TABLE chat_history_new RENAME TO chat_history;
+                    CREATE INDEX IF NOT EXISTS idx_history_doc ON chat_history(doc_id, created_at);
+                    COMMIT;
+                    PRAGMA foreign_keys = ON;
+                    """
+                )
+
+        if self.scope == "global":
+            # Tabela de ACL: quem pode ler este doc global.
+            c.executescript(
+                """
+                CREATE TABLE IF NOT EXISTS document_access (
+                    doc_id TEXT NOT NULL REFERENCES documents(doc_id) ON DELETE CASCADE,
+                    email TEXT NOT NULL,
+                    created_at INTEGER NOT NULL,
+                    PRIMARY KEY (doc_id, email)
+                );
+                CREATE INDEX IF NOT EXISTS idx_access_email ON document_access(email);
+                """
+            )
+
         if _HAS_VEC:
             c.execute(
                 f"CREATE VIRTUAL TABLE IF NOT EXISTS chunks_vec USING vec0("
@@ -221,9 +312,71 @@ class RagStore:
                 placeholders = ",".join("?" * len(ids))
                 c.execute(f"DELETE FROM chunks_vec WHERE rowid IN ({placeholders})", ids)
         c.execute("DELETE FROM chunks WHERE doc_id=?", (doc_id,))
-        c.execute("DELETE FROM chat_history WHERE doc_id=?", (doc_id,))
+        if self.scope == "user":
+            c.execute("DELETE FROM chat_history WHERE doc_id=?", (doc_id,))
+        if self.scope == "global":
+            c.execute("DELETE FROM document_access WHERE doc_id=?", (doc_id,))
         c.execute("DELETE FROM documents WHERE doc_id=?", (doc_id,))
         c.commit()
+
+    # --- ACL (apenas scope='global') ---
+
+    def _require_global(self, op: str) -> None:
+        if self.scope != "global":
+            raise RuntimeError(f"{op} so e permitido no scope='global'")
+
+    def grant_access(self, doc_id: str, email: str) -> None:
+        self._require_global("grant_access")
+        self.conn.execute(
+            "INSERT OR IGNORE INTO document_access (doc_id, email, created_at) "
+            "VALUES (?, ?, ?)",
+            (doc_id, email.strip().lower(), int(time.time())),
+        )
+        self.conn.commit()
+
+    def revoke_access(self, doc_id: str, email: str) -> None:
+        self._require_global("revoke_access")
+        self.conn.execute(
+            "DELETE FROM document_access WHERE doc_id=? AND email=?",
+            (doc_id, email.strip().lower()),
+        )
+        self.conn.commit()
+
+    def has_access(self, doc_id: str, email: str) -> bool:
+        self._require_global("has_access")
+        row = self.conn.execute(
+            "SELECT 1 FROM document_access WHERE doc_id=? AND email=? LIMIT 1",
+            (doc_id, email.strip().lower()),
+        ).fetchone()
+        return row is not None
+
+    def list_access(self, doc_id: str) -> List[str]:
+        self._require_global("list_access")
+        rows = self.conn.execute(
+            "SELECT email FROM document_access WHERE doc_id=? ORDER BY email",
+            (doc_id,),
+        ).fetchall()
+        return [r["email"] for r in rows]
+
+    def list_accessible_docs(self, email: str) -> List[Document]:
+        self._require_global("list_accessible_docs")
+        rows = self.conn.execute(
+            "SELECT d.* FROM documents d "
+            "INNER JOIN document_access a ON a.doc_id = d.doc_id "
+            "WHERE a.email = ? ORDER BY d.created_at DESC",
+            (email.strip().lower(),),
+        ).fetchall()
+        return [_row_to_doc(r) for r in rows]
+
+    def list_all_docs_with_access(self) -> List[dict]:
+        self._require_global("list_all_docs_with_access")
+        docs = self.list_documents()
+        out = []
+        for d in docs:
+            rec = d.to_dict()
+            rec["access"] = self.list_access(d.doc_id)
+            out.append(rec)
+        return out
 
     # --- chunks + vetores ---
 

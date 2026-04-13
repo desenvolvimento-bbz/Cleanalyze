@@ -25,6 +25,19 @@ function rag_require_user(): string {
     return $email;
 }
 
+/** Garante que o usuario autenticado e admin (role=admin). Retorna o email. */
+function rag_require_admin(): string {
+    auth_require_login();
+    $email = auth_user_email();
+    if (!$email) {
+        rag_json_response(['ok' => false, 'error' => 'Usuario nao autenticado'], 401);
+    }
+    if (!function_exists('auth_is_admin') || !auth_is_admin()) {
+        rag_json_response(['ok' => false, 'error' => 'Acesso negado: requer administrador'], 403);
+    }
+    return $email;
+}
+
 /** Sanitiza o email para nome de diretorio (alinha com RagStore.sanitize_email). */
 function rag_sanitize_email(string $email): string {
     $lower = strtolower(trim($email));
@@ -47,6 +60,77 @@ function rag_user_files_dir(string $email): string {
 
 function rag_user_db(string $email): string {
     return rag_user_dir($email) . APP_SEP . 'index.db';
+}
+
+/** --- Documentos BBZ (globais) --- */
+
+function rag_global_dir(): string {
+    return APP_UPLOADS . APP_SEP . 'rag' . APP_SEP . '_global';
+}
+
+function rag_global_files_dir(): string {
+    return rag_global_dir() . APP_SEP . 'files';
+}
+
+function rag_global_db(): string {
+    return rag_global_dir() . APP_SEP . 'index.db';
+}
+
+/**
+ * Lista Documentos BBZ acessiveis para um email. Lida bem com DB inexistente
+ * (retorna array vazio).
+ */
+function rag_list_global_docs_for(string $email): array {
+    $dbPath = rag_global_db();
+    if (!is_file($dbPath)) return [];
+    try {
+        $pdo = new PDO('sqlite:' . $dbPath);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $pdo->prepare(
+            "SELECT d.doc_id, d.filename, d.pages, d.status, d.error_message, d.created_at "
+            . "FROM documents d "
+            . "INNER JOIN document_access a ON a.doc_id = d.doc_id "
+            . "WHERE a.email = :email "
+            . "ORDER BY d.created_at DESC"
+        );
+        $stmt->execute([':email' => strtolower(trim($email))]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    } catch (Throwable $e) {
+        return [];
+    }
+}
+
+/** Busca metadados de um documento global pelo id (sem check de ACL). */
+function rag_get_global_doc(string $docId): ?array {
+    $dbPath = rag_global_db();
+    if (!is_file($dbPath)) return null;
+    try {
+        $pdo = new PDO('sqlite:' . $dbPath);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $pdo->prepare("SELECT * FROM documents WHERE doc_id = :id");
+        $stmt->execute([':id' => $docId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    } catch (Throwable $e) {
+        return null;
+    }
+}
+
+/** Verifica se um email tem acesso a um doc global. */
+function rag_user_has_global_access(string $docId, string $email): bool {
+    $dbPath = rag_global_db();
+    if (!is_file($dbPath)) return false;
+    try {
+        $pdo = new PDO('sqlite:' . $dbPath);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $pdo->prepare(
+            "SELECT 1 FROM document_access WHERE doc_id = :id AND email = :email LIMIT 1"
+        );
+        $stmt->execute([':id' => $docId, ':email' => strtolower(trim($email))]);
+        return (bool) $stmt->fetchColumn();
+    } catch (Throwable $e) {
+        return false;
+    }
 }
 
 /** Gera UUID v4 (para doc_id). */

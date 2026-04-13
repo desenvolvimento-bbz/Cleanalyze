@@ -27,7 +27,7 @@ if ($_navBaseUrl === '') $_navBaseUrl = '';
 // Estado ativo dos dropdowns (pai destacado quando filho corresponde a pagina atual)
 $_cadastroActive  = in_array($activePage, ['extrair', 'comparar'], true);
 $_prestacaoActive = $activePage === 'prestacao';
-$_adminActive     = $activePage === 'convites';
+$_adminActive     = in_array($activePage, ['convites', 'admin-docs-bbz'], true);
 ?>
 <style>
   /* Dropdowns do navbar: bate com a paleta Cleanalyze (--azul #04193b) */
@@ -127,6 +127,13 @@ $_adminActive     = $activePage === 'convites';
             <li>
               <a class="dropdown-item<?= $activePage === 'convites' ? ' active' : '' ?>"
                  href="<?= $_navBaseUrl ?>/auth/invite.php">Usuários</a>
+            </li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center gap-2<?= $activePage === 'admin-docs-bbz' ? ' active' : '' ?>"
+                 href="<?= $_navBaseUrl ?>/rag-admin-docs.php">
+                Documentos BBZ
+                <span class="badge rounded-pill bg-success" style="font-size:.6rem; padding:.25em .5em;">Novo</span>
+              </a>
             </li>
           </ul>
         </li>

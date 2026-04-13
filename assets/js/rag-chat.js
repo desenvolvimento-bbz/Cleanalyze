@@ -6,7 +6,9 @@
   const state = {
     currentDocId: null,
     currentDocName: null,
+    currentIsGlobal: false,
     docs: [],
+    globalDocs: [],
     sending: false,
   };
 
@@ -16,8 +18,10 @@
   const $uploadBtn    = document.getElementById('ragUploadBtn');
   const $uploadStatus = document.getElementById('ragUploadStatus');
   const $loadingOverlay = document.getElementById('ragLoadingOverlay');
-  const $docList      = document.getElementById('ragDocList');
-  const $refreshBtn   = document.getElementById('ragRefreshBtn');
+  const $docList       = document.getElementById('ragDocList');
+  const $globalDocList = document.getElementById('ragGlobalDocList');
+  const $globalCard    = document.getElementById('ragGlobalCard');
+  const $refreshBtn    = document.getElementById('ragRefreshBtn');
   const $chatTitle    = document.getElementById('ragChatTitle');
   const $chatSubtitle = document.getElementById('ragChatSubtitle');
   const $chatBody     = document.getElementById('ragChatBody');
@@ -83,13 +87,111 @@
   // --- Lista de documentos ---
   async function loadDocs() {
     $docList.innerHTML = '<div class="text-secondary small">Carregando...</div>';
+    if ($globalDocList) $globalDocList.innerHTML = '<div class="text-secondary small">Carregando...</div>';
     const data = await api('web/rag-list-docs.php');
     if (!data.ok) {
       $docList.innerHTML = '<div class="text-danger small">Erro: ' + escapeHtml(data.error || '') + '</div>';
       return;
     }
     state.docs = data.documents || [];
+    state.globalDocs = data.global_documents || [];
     renderDocs();
+    renderGlobalDocs();
+  }
+
+  function renderGlobalDocs() {
+    if (!$globalCard || !$globalDocList) return;
+    if (!state.globalDocs.length) {
+      $globalCard.classList.add('d-none');
+      return;
+    }
+    $globalCard.classList.remove('d-none');
+
+    const iconDownload =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true">' +
+        '<path d="M7.5 1a.5.5 0 0 1 .5.5v7.793l2.646-2.647a.5.5 0 1 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7 9.293V1.5a.5.5 0 0 1 .5-.5z"/>' +
+        '<path d="M2 12.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1h-10a.5.5 0 0 1-.5-.5z"/>' +
+      '</svg>';
+    const iconCopy =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true">' +
+        '<path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>' +
+        '<path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>' +
+      '</svg>';
+
+    $globalDocList.innerHTML = state.globalDocs.map((d) => {
+      const active = d.doc_id === state.currentDocId ? ' active' : '';
+      const canAct = d.status === 'ready';
+      return (
+        '<div class="rag-doc-item rag-doc-item-global' + active + '" data-id="' + escapeHtml(d.doc_id) + '">' +
+          '<div class="rag-doc-actions">' +
+            (canAct
+              ? '<button type="button" class="rag-doc-btn js-doc-download" title="Baixar PDF" aria-label="Baixar PDF">' + iconDownload + '</button>'
+              : '') +
+            (canAct
+              ? '<button type="button" class="rag-doc-btn js-doc-copy" title="Copiar texto do OCR" aria-label="Copiar texto do OCR">' + iconCopy + '</button>'
+              : '') +
+          '</div>' +
+          '<div class="rag-doc-name">' + escapeHtml(d.filename) + '</div>' +
+          '<div class="rag-doc-meta">' +
+            '<span class="rag-doc-badge bbz">BBZ</span> ' +
+            (d.pages ? (d.pages + ' pag.') : '') +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+
+    $globalDocList.querySelectorAll('.rag-doc-item-global').forEach((el) => {
+      const id = el.getAttribute('data-id');
+
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('.rag-doc-btn')) return;
+        const doc = state.globalDocs.find((x) => x.doc_id === id);
+        if (!doc) return;
+        if (doc.status !== 'ready') {
+          showUploadStatus('Documento BBZ ainda nao pronto (' + doc.status + ')', 'warn');
+          return;
+        }
+        selectDoc(doc, { isGlobal: true });
+      });
+
+      const dlBtn = el.querySelector('.js-doc-download');
+      if (dlBtn) {
+        dlBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          window.location.href = 'web/rag-download.php?doc_id=' + encodeURIComponent(id);
+        });
+      }
+
+      const copyBtn = el.querySelector('.js-doc-copy');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          const originalHtml = copyBtn.innerHTML;
+          copyBtn.disabled = true;
+          try {
+            const data = await api('web/rag-ocr-text.php?doc_id=' + encodeURIComponent(id));
+            if (!data.ok || typeof data.text !== 'string') {
+              throw new Error(data.error || 'falha ao obter texto');
+            }
+            await copyToClipboard(data.text);
+            copyBtn.innerHTML =
+              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>';
+            copyBtn.classList.add('is-success');
+            showUploadStatus('Texto do OCR copiado (' + formatBytes(data.bytes || 0) + ').', 'ok');
+            setTimeout(() => {
+              copyBtn.innerHTML = originalHtml;
+              copyBtn.classList.remove('is-success');
+              copyBtn.disabled = false;
+            }, 1500);
+          } catch (err) {
+            copyBtn.disabled = false;
+            alert('Nao foi possivel copiar: ' + (err.message || err));
+          }
+        });
+      }
+    });
   }
 
   function renderDocs() {
@@ -242,15 +344,24 @@
   }
 
   // --- Selecao de documento ---
-  async function selectDoc(doc) {
+  async function selectDoc(doc, opts) {
+    const isGlobal = !!(opts && opts.isGlobal);
     state.currentDocId = doc.doc_id;
     state.currentDocName = doc.filename;
-    $chatTitle.textContent = doc.filename;
-    $chatSubtitle.textContent = (doc.pages || 0) + ' pagina(s) · ' + formatDate(doc.created_at);
+    state.currentIsGlobal = isGlobal;
+    $chatTitle.textContent = doc.filename + (isGlobal ? ' · BBZ' : '');
+    const created = doc.created_at ? formatDate(doc.created_at) : '';
+    $chatSubtitle.textContent = (doc.pages || 0) + ' pagina(s)' + (created ? ' · ' + created : '');
     $chatInput.disabled = false;
     $chatSend.disabled = false;
-    $deleteBtn.classList.remove('d-none');
+    // Usuario comum nao pode deletar doc global pelo botao do chat
+    if (isGlobal) {
+      $deleteBtn.classList.add('d-none');
+    } else {
+      $deleteBtn.classList.remove('d-none');
+    }
     renderDocs();
+    renderGlobalDocs();
     await loadHistory(doc.doc_id);
   }
 

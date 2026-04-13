@@ -6,7 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Cleanalyze BBZ** is a hybrid PHP + Python web application for two workflows on Brazilian property management/condominium PDFs:
 1. **Structured extraction**: PDF → plugin → XLSX for import (cadastro, inadimplência, prestação de contas)
-2. **Assistente IA (RAG, v1.3.0+)**: PDF/image → Mistral OCR → embeddings → SQLite+sqlite-vec → chat with gpt-4o-mini grounded in the uploaded document
+2. **Assistente IA (RAG, v1.3.0+)**: PDF/image → Mistral OCR → embeddings → SQLite+sqlite-vec → chat with gpt-4o-mini grounded in the uploaded document. Two document scopes coexist:
+   - **Meus Documentos** (per-user): user uploads privately, only they can chat, download and delete
+   - **Documentos BBZ** (global/shared, v1.3.2+): admin uploads official BBZ manuals, grants access per email, users chat with the same UI but cannot delete
 
 Built for BBZ Administração de Condomínio Ltda.
 
@@ -24,9 +26,12 @@ The app has two layers that communicate via shell execution (PHP calls Python CL
 - `comparar.php` — XLSX comparison tool with Levenshtein similarity + DOMPDF PDF export
 - `prestacao_anual.php` — Prestação de Contas analysis (upload + loading overlay)
 - `web/executar_prestacao_anual.php` — Analysis results with PDF export via DOMPDF
-- `rag-assistente.php` — Assistente IA page: upload + doc list + chat panel. Has its own full-screen loading overlay (same visual molde as `prestacao_anual.php`, CSS prefixed `.rag-loading-*`)
-- `web/rag-upload.php`, `rag-chat-api.php`, `rag-list-docs.php`, `rag-delete-doc.php`, `rag-download.php`, `rag-ocr-text.php` — Assistente IA backend endpoints (detailed in the RAG section below)
-- `web/rag_common.php` — Shared helpers for all `rag-*.php`: `rag_require_user()`, `rag_sanitize_email()`, `rag_uuid()`, `rag_is_uuid()`, `rag_run_python()`, `rag_decode_cli_json()`, `rag_list_documents_php()`, `rag_get_chat_history_php()`
+- `rag-assistente.php` — Assistente IA page: upload + two doc lists (Meus Documentos + Documentos BBZ) + chat panel. Has its own full-screen loading overlay (same visual molde as `prestacao_anual.php`, CSS prefixed `.rag-loading-*`)
+- `rag-admin-docs.php` — Admin-only page for managing Documentos BBZ: upload, list all with ACLs, grant/revoke access per email, delete. Requires `auth_require_admin()` at the top
+- `web/rag-upload.php`, `rag-chat-api.php`, `rag-list-docs.php`, `rag-delete-doc.php`, `rag-download.php`, `rag-ocr-text.php` — Assistente IA user endpoints. All three of `rag-chat-api`, `rag-download` and `rag-ocr-text` resolve `doc_id` first against the user's own docs, then fall back to Documentos BBZ with ACL check
+- `web/rag-global-list.php` — Lists Documentos BBZ accessible to the current user (read-only)
+- `web/rag-admin-global-upload.php`, `rag-admin-global-delete.php`, `rag-admin-global-list-all.php`, `rag-admin-global-access.php` — Admin-only endpoints for Documentos BBZ CRUD + ACL (all gated by `rag_require_admin()`)
+- `web/rag_common.php` — Shared helpers for all `rag-*.php`: `rag_require_user()`, `rag_require_admin()`, `rag_sanitize_email()`, `rag_uuid()`, `rag_is_uuid()`, `rag_run_python()`, `rag_decode_cli_json()`, `rag_list_documents_php()`, `rag_get_chat_history_php()`, plus the `_global` variants: `rag_global_dir()`, `rag_global_files_dir()`, `rag_global_db()`, `rag_list_global_docs_for()`, `rag_get_global_doc()`, `rag_user_has_global_access()`
 - `includes/loading-overlay.php` — Shared CSS/JS for loading overlays (used by extrair, comparar, prestacao). The RAG page has its own inline overlay (prefixed selectors) to avoid CSS collision
 
 **Python layer** (extraction engine):
@@ -42,11 +47,15 @@ The app has two layers that communicate via shell execution (PHP calls Python CL
 - `cleanalize_core/rag/mistral_ocr.py` — Wraps `mistralai.client.Mistral` (v2 SDK). `ocr_file(path)` returns `[OcrPage(page, text)]`. Has `_retry()` helper that retries on `httpx.ReadTimeout`/`ConnectTimeout` **and** `SDKError` with status `429` or `5xx` (NOT 4xx — those are our bug). Client built with `timeout_ms=180_000` (3min) when supported by SDK version
 - `cleanalize_core/rag/chunking.py` — `chunk_pages(pages, chunk_size=800, overlap=100)` using `tiktoken` `cl100k_base` (fallback: char-based ≈ 4 chars/token). Preserves `page` number per chunk
 - `cleanalize_core/rag/embeddings.py` — Wraps `openai.OpenAI` embeddings in batches of 64. `EMBEDDING_DIM = 1536` (text-embedding-3-small)
-- `cleanalize_core/rag/store.py` — SQLite + `sqlite-vec` abstraction. One `.db` per user at `uploads/rag/<sanitized_email>/index.db`. Tables: `documents` (doc_id, filename, pages, status, error_message, created_at), `chunks` (chunk_id, doc_id, page, text), `chunks_vec` (virtual `vec0` table with `FLOAT[1536]`), `chat_history` (id, doc_id, role, content, sources_json, created_at). `delete_document()` also removes matching rows from `chunks_vec` by rowid (virtual tables don't cascade)
+- `cleanalize_core/rag/store.py` — SQLite + `sqlite-vec` abstraction, two scopes:
+  - `RagStore(email, scope='user')` (default) — one `.db` per user at `uploads/rag/<sanitized_email>/index.db`. Tables: `documents`, `chunks`, `chunks_vec`, `chat_history` (no FK, to allow history about global docs)
+  - `RagStore.global_store()` — shared `.db` at `uploads/rag/_global/index.db`. Same schema plus `document_access (doc_id, email, created_at)` with FK to `documents`. ACL methods: `grant_access`, `revoke_access`, `has_access`, `list_access`, `list_accessible_docs`, `list_all_docs_with_access` — all raise if called on a non-global scope via `_require_global()` guard
+  - **Migration on `_init_schema`**: if a user DB still has the old FK on `chat_history.doc_id → documents.doc_id`, rebuilds the table without the FK (needed so a user can keep chat history about a global doc that doesn't exist in their own `documents` table). Runs automatically on first open
 - `cleanalize_core/rag/chat.py` — Builds prompt with top-K retrieved chunks + last 6 history turns + system prompt, calls `gpt-4o-mini` with `temperature=0.2`. `SYSTEM_PROMPT` constrains the model to (a) identify as "Assistente de IA Cleanalyze, criado pela equipe de Desenvolvimento da BBZ", (b) answer only from provided chunks, (c) respond in pt-BR, (d) cite pages that appear verbatim in the chunks
-- `rag_ingest.py` (root CLI) — Orchestrates ingestion: OCR → chunk → embed → insert into SQLite. Uses `store.mark_ready()`/`mark_error()` for status tracking
-- `rag_query.py` (root CLI) — Embeds question → `store.search(doc_id, vec, top_k=5)` → `answer_question()` → persists both user+assistant turns in `chat_history`. Catches `sqlite3.IntegrityError` on chat_history insert to return a friendly "Documento foi removido durante a consulta" when the doc was deleted mid-query
-- `rag_delete.py` (root CLI) — Idempotent delete: removes all tables + `files/<doc_id>/` directory. **Always use this CLI** for deletes — do NOT generate temp scripts in `/tmp/`, because Python prepends the script's directory to `sys.path` (not cwd), breaking `from cleanalize_core...` imports
+- `rag_ingest.py` (root CLI) — Ingests a file into the user or global store. Flag `--global` switches to `RagStore.global_store()` and uses `global_files_dir()` for artifacts; otherwise `--user` is required
+- `rag_query.py` (root CLI) — Opens the user store, tries `get_document(doc_id)` locally, **falls back to `RagStore.global_store()` + `has_access()` check** if the doc isn't in the user's DB. Chat history is **always** written to the user's DB (never to `_global`), even when the conversation is about a global doc — privacy per user. Uses `contextlib.ExitStack` to manage both stores when needed. Catches `sqlite3.IntegrityError` on history insert (doc deleted mid-query) for a friendly error. Returns `is_global` flag in the JSON so the caller can tell scopes apart
+- `rag_delete.py` (root CLI) — Idempotent delete with `--global` flag for Documentos BBZ. On global delete, also wipes `_global/files/<doc_id>/` directory. **Always use this CLI** for deletes — do NOT generate temp scripts in `/tmp/`, because Python prepends the script's directory to `sys.path` (not cwd), breaking `from cleanalize_core...` imports
+- `rag_access.py` (root CLI, admin) — Subcommands `grant`, `revoke`, `check`, `list`, `list-all`, `accessible-for` for managing ACL of Documentos BBZ. All operate on `RagStore.global_store()`. Called by the `web/rag-admin-global-access.php` endpoint
 
 **Plugin system**: Each plugin in `cleanalize_plugins/` must expose:
 - `NOME` constant (e.g., `"ahreas"`, `"inadimplencia"`)
@@ -80,14 +89,29 @@ The app has two layers that communicate via shell execution (PHP calls Python CL
 **Storage layout**:
 ```
 uploads/rag/                      ← Docker volume `cleanalyze_rag`
+├── _global/                      ← Documentos BBZ (shared, admin-managed)
+│   ├── index.db                  ← documents, chunks, chunks_vec, document_access (ACL)
+│   └── files/
+│       └── <doc_id>/
+│           ├── original.pdf
+│           └── ocr.txt
 └── <sanitized_email>/            ← regex [^a-z0-9]+ → _, from email lowercased
-    ├── index.db                  ← SQLite + sqlite-vec
+    ├── index.db                  ← documents, chunks, chunks_vec, chat_history (no FK)
     └── files/
         └── <doc_id>/
             ├── original.pdf
             └── ocr.txt           ← Mistral OCR markdown, used by "copiar texto"
 ```
 Email sanitization is **identical** in Python (`store.sanitize_email()`) and PHP (`rag_sanitize_email()`) — both produce `ti_bbz_com_br` from `ti@bbz.com.br`. Do not diverge.
+
+**Documentos BBZ (global scope) — cross-cutting rules**:
+- Admin is the single manager. There is no "author" or "editor" role — `auth_is_admin()` from `auth/bootstrap.php` is the only gate (via `rag_require_admin()` in `rag_common.php`)
+- ACL is per-email (not per-role). No "all users @bbz.com.br" shortcut in v1.3.2. Emails are stored lowercased and compared case-insensitively (`strtolower` on both sides)
+- **Chat history lives in the user's DB**, never in `_global/index.db`. This is privacy-preserving: user A's conversation with "Manual de Cadastro" is not visible to user B, even if both have access to the same global doc. The `chat_history` table has **no FK on `doc_id`** specifically to allow rows pointing to global doc IDs
+- Users with access can: **chat, download the PDF, copy the OCR text**. They **cannot** delete (delete button is hidden in the global doc card, and `rag-admin-global-delete.php` requires admin)
+- The resolution order in `rag-chat-api.php`, `rag-download.php` and `rag-ocr-text.php` is: (1) user's own documents, (2) global documents with ACL check. Same for `rag_query.py`. If a doc_id exists in both a user's DB and in global (should never happen because UUIDs are v4), the user's local copy wins
+- When a global doc is deleted, orphan rows may remain in user `chat_history` tables (they point to a doc_id that no longer exists). This is intentional and harmless: users can't re-select a doc that isn't in either list, so they'll never see the orphaned history. A future `rag_cleanup_orphans.py` can purge them if disk becomes a concern
+- Admin UI at `rag-admin-docs.php`: upload form (with optional comma-separated "initial access emails" field), table of all globals with inline ACL management (pill per email + `x` to revoke + input to add)
 
 ## Common Commands
 
@@ -188,3 +212,6 @@ Never hardcode secrets. `.env` is in `.gitignore`. `.env.example` is a committed
 - **Assistente IA — retry policy**: `mistral_ocr._retry` retries `httpx.ReadTimeout`/`ConnectTimeout`/`RemoteProtocolError` and `SDKError` with status `429` or `5xx` (3 attempts, 1s→2s backoff). Do NOT retry 4xx — those are client errors (bad file, bad request) that retry won't fix
 - **Assistente IA — file validation**: `rag-upload.php` checks both extension whitelist AND magic bytes (`%PDF`, `\x89PNG\r\n\x1a\n`, `\xFF\xD8\xFF`, `RIFF...WEBP`). This prevents wasted Mistral OCR credits on files that lie about their extension
 - **Assistente IA — doc_id integrity**: Always generate UUID v4 server-side via `rag_uuid()`. Never accept a client-supplied `doc_id`. Validate all incoming `doc_id` params with `rag_is_uuid()` before any DB/file access
+- **Documentos BBZ — schema migration**: The v1.3.2 release drops the FK on `chat_history.doc_id → documents.doc_id` to allow per-user history about global docs. Existing user DBs are auto-migrated on first `_init_schema()` call via `PRAGMA foreign_key_list` check + table rebuild. Do not re-introduce the FK in future schemas
+- **Documentos BBZ — access check duplication**: There is deliberate duplication of access checks in PHP (`rag_user_has_global_access` before running Python) and in Python (`RagStore.has_access` inside `rag_query.py`). PHP check gives a fast 404 + audit log for unauthorized attempts; Python check is defense in depth in case someone calls the CLI directly. Keep both — removing either weakens the guard
+- **Documentos BBZ — admin endpoints**: All `web/rag-admin-global-*.php` endpoints call `rag_require_admin()` at the top. This function returns 403 JSON for non-admins and redirects to login for unauthenticated. Never rely only on UI hiding (the admin dropdown in navbar is hidden for non-admins, but that's UX — enforcement is server-side)

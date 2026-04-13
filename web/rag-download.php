@@ -19,29 +19,36 @@ if (!rag_is_uuid($docId)) {
     rag_json_response(['ok' => false, 'error' => 'doc_id invalido'], 400);
 }
 
-// Confirma que o documento existe e pertence a este usuario
+// Resolve o doc: primeiro nos docs do usuario, depois globais (com check de ACL)
 $docs = rag_list_documents_php($email);
 $found = null;
+$isGlobal = false;
 foreach ($docs as $d) {
     if ($d['doc_id'] === $docId) { $found = $d; break; }
+}
+if (!$found) {
+    $globalDoc = rag_get_global_doc($docId);
+    if ($globalDoc && rag_user_has_global_access($docId, $email)) {
+        $found = $globalDoc;
+        $isGlobal = true;
+    }
 }
 if (!$found) {
     rag_json_response(['ok' => false, 'error' => 'Documento nao encontrado'], 404);
 }
 
-// Caminho esperado do arquivo original (dentro do dir do usuario)
-$userFiles = rag_user_files_dir($email);
-$docDir = $userFiles . APP_SEP . $docId;
+// Caminho do arquivo: em _global/ para globais, em <user>/ para privados
+$baseFiles = $isGlobal ? rag_global_files_dir() : rag_user_files_dir($email);
+$docDir = $baseFiles . APP_SEP . $docId;
 $filePath = $docDir . APP_SEP . 'original.pdf';
 
-// Validacao de path traversal: resolvemos o caminho real e conferimos que
-// ainda esta dentro do diretorio do usuario.
-$realUserFiles = realpath($userFiles);
-$realFilePath  = realpath($filePath);
+// Validacao de path traversal
+$realBase     = realpath($baseFiles);
+$realFilePath = realpath($filePath);
 if (
-    $realUserFiles === false
+    $realBase === false
     || $realFilePath === false
-    || strpos($realFilePath, $realUserFiles . DIRECTORY_SEPARATOR) !== 0
+    || strpos($realFilePath, $realBase . DIRECTORY_SEPARATOR) !== 0
     || !is_file($realFilePath)
 ) {
     rag_json_response(['ok' => false, 'error' => 'Arquivo nao encontrado em disco'], 404);

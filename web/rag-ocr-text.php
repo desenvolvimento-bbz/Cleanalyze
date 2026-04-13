@@ -19,11 +19,19 @@ if (!rag_is_uuid($docId)) {
     rag_json_response(['ok' => false, 'error' => 'doc_id invalido'], 400);
 }
 
-// Ownership check
+// Resolve o doc: primeiro nos docs do usuario, depois globais (com check de ACL)
 $docs = rag_list_documents_php($email);
 $found = null;
+$isGlobal = false;
 foreach ($docs as $d) {
     if ($d['doc_id'] === $docId) { $found = $d; break; }
+}
+if (!$found) {
+    $globalDoc = rag_get_global_doc($docId);
+    if ($globalDoc && rag_user_has_global_access($docId, $email)) {
+        $found = $globalDoc;
+        $isGlobal = true;
+    }
 }
 if (!$found) {
     rag_json_response(['ok' => false, 'error' => 'Documento nao encontrado'], 404);
@@ -36,14 +44,14 @@ if ($found['status'] !== 'ready') {
 }
 
 // Caminho do ocr.txt com validacao de path traversal
-$userFiles = rag_user_files_dir($email);
-$txtPath = $userFiles . APP_SEP . $docId . APP_SEP . 'ocr.txt';
-$realUserFiles = realpath($userFiles);
-$realTxtPath   = realpath($txtPath);
+$baseFiles = $isGlobal ? rag_global_files_dir() : rag_user_files_dir($email);
+$txtPath = $baseFiles . APP_SEP . $docId . APP_SEP . 'ocr.txt';
+$realBase    = realpath($baseFiles);
+$realTxtPath = realpath($txtPath);
 if (
-    $realUserFiles === false
+    $realBase === false
     || $realTxtPath === false
-    || strpos($realTxtPath, $realUserFiles . DIRECTORY_SEPARATOR) !== 0
+    || strpos($realTxtPath, $realBase . DIRECTORY_SEPARATOR) !== 0
     || !is_file($realTxtPath)
 ) {
     rag_json_response(['ok' => false, 'error' => 'Texto OCR nao disponivel para este documento'], 404);

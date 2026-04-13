@@ -130,6 +130,15 @@
 .rag-doc-badge.ready      { background: #d1f7c4; color: #1d6b2b; }
 .rag-doc-badge.processing { background: #fff3cd; color: #7a5d00; }
 .rag-doc-badge.error      { background: #f8d7da; color: #842029; }
+.rag-doc-badge.bbz        { background: #d6e7ff; color: #0b3d91; }
+
+.rag-doc-item-global {
+  border-left: 3px solid #0b3d91;
+}
+.rag-doc-item-global.active {
+  background: #0b3d91;
+  border-left-color: #0b3d91;
+}
 
 .rag-message {
   display: flex;

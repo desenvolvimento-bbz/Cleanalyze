@@ -128,7 +128,7 @@ app_log('page.view', ['page' => basename(__FILE__)]);
         </div>
       </div>
 
-      <div class="card">
+      <div class="card mb-3">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <h5 class="card-title m-0">Meus Documentos</h5>
@@ -137,6 +137,24 @@ app_log('page.view', ['page' => basename(__FILE__)]);
             </button>
           </div>
           <div id="ragDocList" class="rag-doc-list">
+            <div class="text-secondary small">Carregando...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documentos BBZ (globais) — so aparece se houver algum acessivel -->
+      <div class="card d-none" id="ragGlobalCard">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="card-title m-0">
+              Documentos BBZ
+              <span class="badge rounded-pill text-bg-info ms-1" style="font-size:.6rem;">BBZ</span>
+            </h5>
+          </div>
+          <p class="text-secondary small mb-2">
+            Manuais e guias oficiais. Pergunte duvidas sobre processos da BBZ.
+          </p>
+          <div id="ragGlobalDocList" class="rag-doc-list">
             <div class="text-secondary small">Carregando...</div>
           </div>
         </div>

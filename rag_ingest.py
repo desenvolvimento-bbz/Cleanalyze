@@ -22,7 +22,7 @@ from cleanalize_core.config import get_env
 from cleanalize_core.rag.chunking import chunk_pages
 from cleanalize_core.rag.embeddings import embed_texts
 from cleanalize_core.rag.mistral_ocr import ocr_file, pages_to_plain_text
-from cleanalize_core.rag.store import RagStore, user_files_dir
+from cleanalize_core.rag.store import RagStore, global_files_dir, user_files_dir
 
 
 def _int_env(name: str, default: int) -> int:
@@ -36,27 +36,36 @@ def _int_env(name: str, default: int) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Ingest de documento para o RAG")
     parser.add_argument("--pdf", required=True, help="Caminho do PDF/imagem a ingerir")
-    parser.add_argument("--user", required=True, help="Email do usuario dono do documento")
+    parser.add_argument("--user", default=None, help="Email do usuario dono do documento (obrigatorio quando --global nao e usado)")
     parser.add_argument("--doc-id", required=True, help="UUID do documento (gerado pelo PHP)")
     parser.add_argument("--filename", default=None, help="Nome original do arquivo")
+    parser.add_argument("--global", dest="global_", action="store_true", help="Ingerir como Documento BBZ (global, compartilhavel)")
     args = parser.parse_args()
 
     pdf_path = Path(args.pdf)
     filename = args.filename or pdf_path.name
 
-    result = {"ok": False, "doc_id": args.doc_id, "user": args.user}
+    result = {"ok": False, "doc_id": args.doc_id, "scope": "global" if args.global_ else "user"}
+    if not args.global_:
+        result["user"] = args.user
 
     try:
         if not pdf_path.is_file():
             raise FileNotFoundError(f"Arquivo nao encontrado: {pdf_path}")
+        if not args.global_ and not args.user:
+            raise ValueError("--user e obrigatorio quando --global nao e usado")
 
-        with RagStore(args.user) as store:
+        store_cm = RagStore.global_store() if args.global_ else RagStore(args.user)
+        with store_cm as store:
             # 1) Registra o documento como 'processing'
             store.create_document(args.doc_id, filename)
 
             try:
-                # 2) Copia o PDF para o diretorio do usuario (se ainda nao estiver la)
-                dest_dir = user_files_dir(args.user) / args.doc_id
+                # 2) Copia o PDF para o diretorio apropriado
+                if args.global_:
+                    dest_dir = global_files_dir() / args.doc_id
+                else:
+                    dest_dir = user_files_dir(args.user) / args.doc_id
                 dest_dir.mkdir(parents=True, exist_ok=True)
                 dest_pdf = dest_dir / "original.pdf"
                 if pdf_path.resolve() != dest_pdf.resolve():

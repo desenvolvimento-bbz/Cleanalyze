@@ -33,11 +33,17 @@ if (mb_strlen($question) > 2000) {
     rag_json_response(['ok' => false, 'error' => 'Pergunta muito longa (max 2000 caracteres)'], 400);
 }
 
-// Verifica que o documento pertence a este usuario
+// Resolve o doc: primeiro nos docs do usuario, depois nos Documentos BBZ (com check de acesso)
 $docs = rag_list_documents_php($email);
 $found = null;
 foreach ($docs as $d) {
     if ($d['doc_id'] === $docId) { $found = $d; break; }
+}
+if (!$found) {
+    $globalDoc = rag_get_global_doc($docId);
+    if ($globalDoc && rag_user_has_global_access($docId, $email)) {
+        $found = $globalDoc;
+    }
 }
 if (!$found) {
     rag_json_response(['ok' => false, 'error' => 'Documento nao encontrado'], 404);

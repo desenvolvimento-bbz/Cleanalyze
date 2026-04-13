@@ -18,6 +18,7 @@ import json
 import sqlite3
 import sys
 import traceback
+from contextlib import ExitStack
 
 from cleanalize_core.config import get_env
 from cleanalize_core.rag.chat import answer_question
@@ -54,28 +55,45 @@ def main() -> int:
 
         top_k = _int_env("RAG_TOP_K", 5)
 
-        with RagStore(args.user) as store:
-            doc = store.get_document(args.doc_id)
+        with ExitStack() as stack:
+            user_store = stack.enter_context(RagStore(args.user))
+
+            # Tenta primeiro no store do usuario
+            doc = user_store.get_document(args.doc_id)
+            is_global = False
+            search_store = user_store
+
             if doc is None:
-                raise LookupError(f"Documento {args.doc_id} nao encontrado")
+                # Fallback: procura nos Documentos BBZ e checa acesso
+                global_store = stack.enter_context(RagStore.global_store())
+                gdoc = global_store.get_document(args.doc_id)
+                if gdoc is None:
+                    raise LookupError(f"Documento {args.doc_id} nao encontrado")
+                if not global_store.has_access(args.doc_id, args.user):
+                    # Mensagem igual a "nao encontrado" por seguranca
+                    raise LookupError(f"Documento {args.doc_id} nao encontrado")
+                doc = gdoc
+                search_store = global_store
+                is_global = True
+
             if doc.status != "ready":
                 raise RuntimeError(
                     f"Documento ainda nao esta pronto (status={doc.status})"
                 )
 
-            history = store.get_chat_history(args.doc_id, limit=20)
+            # Historico sempre no store do usuario, mesmo que o doc seja global
+            history = user_store.get_chat_history(args.doc_id, limit=20)
 
             query_vec = embed_text(question)
-            hits = store.search(args.doc_id, query_vec, top_k=top_k)
+            hits = search_store.search(args.doc_id, query_vec, top_k=top_k)
 
             chat_result = answer_question(question, hits, history=history)
 
-            # O documento pode ter sido deletado em outra requisicao enquanto
-            # essa query estava em voo. Nesse caso, o INSERT no chat_history
-            # falha com FOREIGN KEY. Capturamos e retornamos erro amigavel.
+            # Se o doc foi deletado em outra requisicao durante a consulta,
+            # o append_chat pode falhar. Captura e retorna erro amigavel.
             try:
-                store.append_chat(args.doc_id, "user", question)
-                store.append_chat(
+                user_store.append_chat(args.doc_id, "user", question)
+                user_store.append_chat(
                     args.doc_id,
                     "assistant",
                     chat_result.answer,
@@ -91,6 +109,7 @@ def main() -> int:
                 answer=chat_result.answer,
                 sources=chat_result.sources,
                 history_len=len(history) + 2,
+                is_global=is_global,
             )
 
     except Exception as e:
