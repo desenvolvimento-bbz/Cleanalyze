@@ -3,15 +3,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file:
-      - .env
     environment:
-      - PORT=8080
+      PORT: 8080
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+      MISTRAL_OCR_MODEL: ${MISTRAL_OCR_MODEL:-mistral-ocr-latest}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      RAG_EMBEDDING_MODEL: ${RAG_EMBEDDING_MODEL:-text-embedding-3-small}
+      RAG_CHAT_MODEL: ${RAG_CHAT_MODEL:-gpt-4o-mini}
+      RAG_CHUNK_SIZE: ${RAG_CHUNK_SIZE:-800}
+      RAG_CHUNK_OVERLAP: ${RAG_CHUNK_OVERLAP:-100}
+      RAG_TOP_K: ${RAG_TOP_K:-5}
     restart: unless-stopped
     ports:
       - "8080:8080"
     volumes:
-      - ./.env:/var/www/html/.env:ro
       - auth-data:/var/www/html/auth/data
       - cleanalyze-uploads:/var/www/html/uploads
       - cleanalyze-rag:/var/www/html/uploads/rag
