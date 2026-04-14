@@ -8,7 +8,16 @@ app_log('page.view', ['page' => basename(__FILE__)]);
 <head>
   <title>Assistente IA — Cleanalyze</title>
   <?php include __DIR__ . '/includes/head.php'; ?>
-  <link rel="stylesheet" href="assets/css/rag-chat.css">
+<?php
+  // Cache-busting: invalida o JS/CSS do Assistente IA sempre que o arquivo muda
+  $_ragCssV = @filemtime(__DIR__ . '/assets/css/rag-chat.css') ?: time();
+  $_ragJsV  = @filemtime(__DIR__ . '/assets/js/rag-chat.js')  ?: time();
+?>
+  <link rel="stylesheet" href="assets/css/rag-chat.css?v=<?= $_ragCssV ?>">
+  <script>
+    // Expoe flag de admin para o JS do Assistente IA
+    window.ragIsAdmin = <?= (function_exists('auth_is_admin') && auth_is_admin()) ? 'true' : 'false' ?>;
+  </script>
   <style>
     /* Loading overlay (mesmo molde visual de prestacao_anual.php) */
     .rag-loading-overlay{
@@ -128,22 +137,9 @@ app_log('page.view', ['page' => basename(__FILE__)]);
         </div>
       </div>
 
-      <div class="card mb-3">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h5 class="card-title m-0">Meus Documentos</h5>
-            <button id="ragRefreshBtn" class="btn btn-sm btn-outline-secondary" title="Atualizar">
-              &#x21bb;
-            </button>
-          </div>
-          <div id="ragDocList" class="rag-doc-list">
-            <div class="text-secondary small">Carregando...</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Documentos BBZ (globais) — so aparece se houver algum acessivel -->
-      <div class="card d-none" id="ragGlobalCard">
+      <!-- Documentos BBZ (globais) em destaque — primeiro item da coluna.
+           Card so aparece quando ha pelo menos um documento acessivel. -->
+      <div class="card mb-3 d-none" id="ragGlobalCard">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <h5 class="card-title m-0">
@@ -155,6 +151,20 @@ app_log('page.view', ['page' => basename(__FILE__)]);
             Manuais e guias oficiais. Pergunte duvidas sobre processos da BBZ.
           </p>
           <div id="ragGlobalDocList" class="rag-doc-list">
+            <div class="text-secondary small">Carregando...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="card-title m-0">Meus Documentos</h5>
+            <button id="ragRefreshBtn" class="btn btn-sm btn-outline-secondary" title="Atualizar">
+              &#x21bb;
+            </button>
+          </div>
+          <div id="ragDocList" class="rag-doc-list">
             <div class="text-secondary small">Carregando...</div>
           </div>
         </div>
@@ -201,6 +211,6 @@ app_log('page.view', ['page' => basename(__FILE__)]);
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="assets/js/rag-chat.js"></script>
+<script src="assets/js/rag-chat.js?v=<?= $_ragJsV ?>"></script>
 </body>
 </html>

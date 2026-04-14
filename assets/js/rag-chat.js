@@ -50,6 +50,13 @@
     return (n / (1024 * 1024)).toFixed(1) + ' MB';
   }
 
+  // Remove a extensao do arquivo para exibicao (mantem o filename real
+  // na state para download/ocr-text). Ex: "manual.pdf" -> "manual"
+  function stripExt(name) {
+    if (!name) return '';
+    return name.replace(/\.(pdf|png|jpe?g|webp)$/i, '');
+  }
+
   async function copyToClipboard(text) {
     // Metodo moderno
     if (navigator.clipboard && window.isSecureContext) {
@@ -118,6 +125,8 @@
         '<path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>' +
       '</svg>';
 
+    const isAdmin = !!window.ragIsAdmin;
+
     $globalDocList.innerHTML = state.globalDocs.map((d) => {
       const active = d.doc_id === state.currentDocId ? ' active' : '';
       const canAct = d.status === 'ready';
@@ -127,11 +136,12 @@
             (canAct
               ? '<button type="button" class="rag-doc-btn js-doc-download" title="Baixar PDF" aria-label="Baixar PDF">' + iconDownload + '</button>'
               : '') +
-            (canAct
+            // "Copiar texto do OCR" e restrito a admin nos Documentos BBZ
+            (canAct && isAdmin
               ? '<button type="button" class="rag-doc-btn js-doc-copy" title="Copiar texto do OCR" aria-label="Copiar texto do OCR">' + iconCopy + '</button>'
               : '') +
           '</div>' +
-          '<div class="rag-doc-name">' + escapeHtml(d.filename) + '</div>' +
+          '<div class="rag-doc-name">' + escapeHtml(stripExt(d.filename)) + '</div>' +
           '<div class="rag-doc-meta">' +
             '<span class="rag-doc-badge bbz">BBZ</span> ' +
             (d.pages ? (d.pages + ' pag.') : '') +
@@ -234,7 +244,7 @@
               : '') +
             '<button type="button" class="rag-doc-btn js-doc-delete" title="Excluir documento" aria-label="Excluir documento">' + iconTrash + '</button>' +
           '</div>' +
-          '<div class="rag-doc-name">' + escapeHtml(d.filename) + '</div>' +
+          '<div class="rag-doc-name">' + escapeHtml(stripExt(d.filename)) + '</div>' +
           '<div class="rag-doc-meta">' +
             '<span class="rag-doc-badge ' + badge + '">' + escapeHtml(d.status) + '</span> ' +
             (d.pages ? (d.pages + ' pag. · ') : '') +
@@ -313,7 +323,7 @@
           e.stopPropagation();
           e.preventDefault();
           const doc = state.docs.find((x) => x.doc_id === id);
-          const name = doc ? doc.filename : 'este documento';
+          const name = doc ? stripExt(doc.filename) : 'este documento';
           if (!confirm('Excluir "' + name + '" e todo o seu historico? Esta acao nao pode ser desfeita.')) {
             return;
           }
@@ -349,7 +359,7 @@
     state.currentDocId = doc.doc_id;
     state.currentDocName = doc.filename;
     state.currentIsGlobal = isGlobal;
-    $chatTitle.textContent = doc.filename + (isGlobal ? ' · BBZ' : '');
+    $chatTitle.textContent = stripExt(doc.filename) + (isGlobal ? ' · BBZ' : '');
     const created = doc.created_at ? formatDate(doc.created_at) : '';
     $chatSubtitle.textContent = (doc.pages || 0) + ' pagina(s)' + (created ? ' · ' + created : '');
     $chatInput.disabled = false;

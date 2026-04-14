@@ -137,23 +137,81 @@ def ocr_file(file_path: str | Path) -> List[OcrPage]:
         what="files.get_signed_url",
     )
 
-    # 3) OCR (com retry)
+    # Descricao de imagens via vision model?
+    describe_images_enabled = _image_descriptions_enabled()
+
+    # 3) OCR (com retry) — pedimos as imagens se vamos descrever
     response = _retry(
         lambda: client.ocr.process(
             model=model,
             document={"type": "document_url", "document_url": signed.url},
-            include_image_base64=False,
+            include_image_base64=describe_images_enabled,
         ),
         what="ocr.process",
     )
 
-    # 4) Normalizacao
+    # 4) Normalizacao — substitui placeholders de imagem por descricoes
     pages: List[OcrPage] = []
     for idx, page in enumerate(getattr(response, "pages", []) or [], start=1):
         markdown = getattr(page, "markdown", None) or ""
+        if describe_images_enabled:
+            markdown = _replace_image_placeholders(markdown, page)
         pages.append(OcrPage(page=idx, text=markdown.strip()))
 
     return pages
+
+
+def _image_descriptions_enabled() -> bool:
+    raw = (get_env("RAG_IMAGE_DESCRIPTIONS", "1") or "1").strip().lower()
+    return raw not in ("0", "false", "no", "off", "")
+
+
+def _replace_image_placeholders(markdown: str, page) -> str:
+    """
+    Substitui placeholders de imagem do markdown do Mistral OCR
+    (ex: `![img-0.jpeg](img-0.jpeg)`) por descricoes textuais geradas
+    por um modelo de visao. Falhas em imagens individuais sao silenciosas
+    para nao quebrar a ingestao.
+    """
+    import re
+    from .image_description import describe_image
+
+    images = getattr(page, "images", None) or []
+    if not images:
+        return markdown
+
+    for img in images:
+        img_id = getattr(img, "id", None)
+        img_b64 = getattr(img, "image_base64", None)
+        if not img_id or not img_b64:
+            continue
+        try:
+            desc = describe_image(img_b64, context=markdown[:500])
+        except Exception:
+            desc = ""
+        if not desc:
+            continue
+
+        replacement = f"[Imagem: {desc}]"
+        # Tenta substituir os formatos comuns de placeholder
+        patterns = [
+            re.escape(f"![{img_id}]({img_id})"),
+            re.escape(f"![{img_id}]"),
+            re.escape(f"![]({img_id})"),
+            rf"!\[[^\]]*\]\({re.escape(img_id)}\)",
+        ]
+        replaced = False
+        for p in patterns:
+            new_md, n = re.subn(p, lambda _m: replacement, markdown, count=1)
+            if n > 0:
+                markdown = new_md
+                replaced = True
+                break
+        if not replaced:
+            # Se nao achou placeholder, acrescenta a descricao ao fim da pagina
+            markdown = markdown.rstrip() + f"\n\n{replacement}"
+
+    return markdown
 
 
 def pages_to_plain_text(pages: List[OcrPage]) -> str:

@@ -56,8 +56,25 @@ if (!$typeOk) {
 
 $docId = rag_uuid();
 $docDir = rag_global_files_dir() . APP_SEP . $docId;
-if (!is_dir($docDir) && !mkdir($docDir, 0775, true)) {
-    rag_json_response(['ok' => false, 'error' => 'Falha ao criar diretorio'], 500);
+if (!is_dir($docDir)) {
+    // Captura o erro real do mkdir para facilitar diagnostico (ex: permissao)
+    $mkdirErr = null;
+    set_error_handler(function ($_errno, $msg) use (&$mkdirErr) { $mkdirErr = $msg; return true; });
+    $ok = mkdir($docDir, 0775, true);
+    restore_error_handler();
+    if (!$ok) {
+        app_log('rag.admin.global_upload.mkdir_fail', [
+            'admin' => $adminEmail,
+            'path' => $docDir,
+            'reason' => $mkdirErr,
+            'parent_exists' => is_dir(rag_global_files_dir()),
+            'parent_writable' => is_writable(rag_global_files_dir()),
+        ]);
+        rag_json_response([
+            'ok' => false,
+            'error' => 'Falha ao criar diretorio para o documento: ' . ($mkdirErr ?: 'erro desconhecido'),
+        ], 500);
+    }
 }
 $destPath = $docDir . APP_SEP . 'original.pdf';
 if (!move_uploaded_file($_FILES['pdf']['tmp_name'], $destPath)) {
