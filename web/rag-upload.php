@@ -13,11 +13,14 @@ ini_set('memory_limit', '512M');
 
 require_once __DIR__ . '/rag_common.php';
 
-$email = rag_require_user();
+$actingEmail = rag_require_user();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     rag_json_response(['ok' => false, 'error' => 'Metodo invalido'], 405);
 }
+
+// Upload e operacao de ESCRITA — bloqueado em view-as.
+$email = rag_effective_user($actingEmail, false, 'upload');
 
 if (!isset($_FILES['pdf']) || $_FILES['pdf']['error'] !== UPLOAD_ERR_OK) {
     rag_json_response(['ok' => false, 'error' => 'Arquivo nao recebido'], 400);

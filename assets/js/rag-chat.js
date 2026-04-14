@@ -10,7 +10,25 @@
     docs: [],
     globalDocs: [],
     sending: false,
+    viewAsUser: null, // email do usuario sendo impersonado (null = modo normal)
   };
+
+  // Restaura view-as de session storage (sobrevive refresh, some ao fechar aba)
+  try {
+    const saved = sessionStorage.getItem('ragViewAsUser');
+    if (saved) state.viewAsUser = saved;
+  } catch (_) { /* ignore */ }
+
+  function isViewingAs() {
+    return !!state.viewAsUser;
+  }
+
+  function withViewAs(url) {
+    // Anexa ?as_user=... em URLs GET quando em modo view-as
+    if (!isViewingAs()) return url;
+    const sep = url.indexOf('?') >= 0 ? '&' : '?';
+    return url + sep + 'as_user=' + encodeURIComponent(state.viewAsUser);
+  }
 
   // --- DOM refs ---
   const $uploadForm   = document.getElementById('ragUploadForm');
@@ -22,6 +40,10 @@
   const $globalDocList = document.getElementById('ragGlobalDocList');
   const $globalCard    = document.getElementById('ragGlobalCard');
   const $refreshBtn    = document.getElementById('ragRefreshBtn');
+  const $viewAsSelect  = document.getElementById('ragViewAsSelect');
+  const $viewAsBanner  = document.getElementById('ragViewAsBanner');
+  const $viewAsBannerEmail = document.getElementById('ragViewAsBannerEmail');
+  const $viewAsHint    = document.getElementById('ragViewAsHint');
   const $chatTitle    = document.getElementById('ragChatTitle');
   const $chatSubtitle = document.getElementById('ragChatSubtitle');
   const $chatBody     = document.getElementById('ragChatBody');
@@ -95,7 +117,7 @@
   async function loadDocs() {
     $docList.innerHTML = '<div class="text-secondary small">Carregando...</div>';
     if ($globalDocList) $globalDocList.innerHTML = '<div class="text-secondary small">Carregando...</div>';
-    const data = await api('web/rag-list-docs.php');
+    const data = await api(withViewAs('web/rag-list-docs.php'));
     if (!data.ok) {
       $docList.innerHTML = '<div class="text-danger small">Erro: ' + escapeHtml(data.error || '') + '</div>';
       return;
@@ -169,7 +191,7 @@
         dlBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           e.preventDefault();
-          window.location.href = 'web/rag-download.php?doc_id=' + encodeURIComponent(id);
+          window.location.href = withViewAs('web/rag-download.php?doc_id=' + encodeURIComponent(id));
         });
       }
 
@@ -181,7 +203,7 @@
           const originalHtml = copyBtn.innerHTML;
           copyBtn.disabled = true;
           try {
-            const data = await api('web/rag-ocr-text.php?doc_id=' + encodeURIComponent(id));
+            const data = await api(withViewAs('web/rag-ocr-text.php?doc_id=' + encodeURIComponent(id)));
             if (!data.ok || typeof data.text !== 'string') {
               throw new Error(data.error || 'falha ao obter texto');
             }
@@ -233,6 +255,7 @@
       const active = d.doc_id === state.currentDocId ? ' active' : '';
       const badge = d.status === 'ready' ? 'ready' : (d.status === 'error' ? 'error' : 'processing');
       const canAct = d.status === 'ready';
+      const viewing = isViewingAs();
       return (
         '<div class="rag-doc-item' + active + '" data-id="' + escapeHtml(d.doc_id) + '">' +
           '<div class="rag-doc-actions">' +
@@ -242,7 +265,9 @@
             (canAct
               ? '<button type="button" class="rag-doc-btn js-doc-copy" title="Copiar texto do OCR" aria-label="Copiar texto do OCR">' + iconCopy + '</button>'
               : '') +
-            '<button type="button" class="rag-doc-btn js-doc-delete" title="Excluir documento" aria-label="Excluir documento">' + iconTrash + '</button>' +
+            (viewing
+              ? ''
+              : '<button type="button" class="rag-doc-btn js-doc-delete" title="Excluir documento" aria-label="Excluir documento">' + iconTrash + '</button>') +
           '</div>' +
           '<div class="rag-doc-name">' + escapeHtml(stripExt(d.filename)) + '</div>' +
           '<div class="rag-doc-meta">' +
@@ -280,7 +305,7 @@
           e.stopPropagation();
           e.preventDefault();
           // Navega direto para o endpoint; o servidor responde com Content-Disposition: attachment
-          window.location.href = 'web/rag-download.php?doc_id=' + encodeURIComponent(id);
+          window.location.href = withViewAs('web/rag-download.php?doc_id=' + encodeURIComponent(id));
         });
       }
 
@@ -293,7 +318,7 @@
           const originalHtml = copyBtn.innerHTML;
           copyBtn.disabled = true;
           try {
-            const data = await api('web/rag-ocr-text.php?doc_id=' + encodeURIComponent(id));
+            const data = await api(withViewAs('web/rag-ocr-text.php?doc_id=' + encodeURIComponent(id)));
             if (!data.ok || typeof data.text !== 'string') {
               throw new Error(data.error || 'falha ao obter texto');
             }
@@ -322,6 +347,10 @@
         delBtn.addEventListener('click', async (e) => {
           e.stopPropagation();
           e.preventDefault();
+          if (isViewingAs()) {
+            alert('Exclusao desabilitada em modo "visualizar como".');
+            return;
+          }
           const doc = state.docs.find((x) => x.doc_id === id);
           const name = doc ? stripExt(doc.filename) : 'este documento';
           if (!confirm('Excluir "' + name + '" e todo o seu historico? Esta acao nao pode ser desfeita.')) {
@@ -362,10 +391,13 @@
     $chatTitle.textContent = stripExt(doc.filename) + (isGlobal ? ' · BBZ' : '');
     const created = doc.created_at ? formatDate(doc.created_at) : '';
     $chatSubtitle.textContent = (doc.pages || 0) + ' pagina(s)' + (created ? ' · ' + created : '');
-    $chatInput.disabled = false;
-    $chatSend.disabled = false;
-    // Usuario comum nao pode deletar doc global pelo botao do chat
-    if (isGlobal) {
+    // Em modo view-as: chat e delete sao sempre desabilitados
+    const viewing = isViewingAs();
+    $chatInput.disabled = viewing;
+    $chatSend.disabled = viewing;
+    // Usuario comum nao pode deletar doc global pelo botao do chat,
+    // nem ninguem pode deletar em modo view-as
+    if (isGlobal || viewing) {
       $deleteBtn.classList.add('d-none');
     } else {
       $deleteBtn.classList.remove('d-none');
@@ -377,7 +409,7 @@
 
   async function loadHistory(docId) {
     $chatBody.innerHTML = '<div class="text-secondary small text-center my-3">Carregando historico...</div>';
-    const data = await api('web/rag-list-docs.php?doc_id=' + encodeURIComponent(docId) + '&with_history=1');
+    const data = await api(withViewAs('web/rag-list-docs.php?doc_id=' + encodeURIComponent(docId) + '&with_history=1'));
     if (!data.ok) {
       $chatBody.innerHTML = '<div class="text-danger small text-center my-3">Erro: ' + escapeHtml(data.error || '') + '</div>';
       return;
@@ -529,6 +561,10 @@
   // --- Upload ---
   $uploadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (isViewingAs()) {
+      showUploadStatus('Upload desabilitado em modo "visualizar como".', 'warn');
+      return;
+    }
     if (!$pdfInput.files || !$pdfInput.files[0]) return;
     const file = $pdfInput.files[0];
     const fd = new FormData();
@@ -565,6 +601,10 @@
   $chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (state.sending) return;
+    if (isViewingAs()) {
+      alert('Chat desabilitado em modo "visualizar como". Apenas leitura.');
+      return;
+    }
     const q = ($chatInput.value || '').trim();
     if (!q || !state.currentDocId) return;
     state.sending = true;
@@ -592,6 +632,10 @@
   // --- Delete ---
   $deleteBtn.addEventListener('click', async () => {
     if (!state.currentDocId) return;
+    if (isViewingAs()) {
+      alert('Exclusao desabilitada em modo "visualizar como".');
+      return;
+    }
     if (!confirm('Excluir este documento e todo o seu historico?')) return;
     const data = await api('web/rag-delete-doc.php', {
       method: 'POST',
@@ -615,6 +659,79 @@
 
   $refreshBtn.addEventListener('click', loadDocs);
 
+  // --- View-as (admin) ---
+  async function initViewAs() {
+    if (!$viewAsSelect) return; // usuario comum nao tem a barra
+
+    // Popula o dropdown com a lista de usuarios
+    try {
+      const data = await api('web/rag-admin-list-users.php');
+      if (!data.ok) throw new Error(data.error || 'falha');
+      // Remove opcoes existentes exceto a primeira
+      while ($viewAsSelect.options.length > 1) $viewAsSelect.remove(1);
+      (data.users || []).forEach((u) => {
+        if (u.is_self) return; // o proprio admin ja e "Seu modo"
+        const opt = document.createElement('option');
+        opt.value = u.email;
+        opt.textContent = u.email + (u.role === 'admin' ? ' (admin)' : '');
+        $viewAsSelect.appendChild(opt);
+      });
+      // Reaplica selecao salva em sessionStorage
+      if (state.viewAsUser) {
+        $viewAsSelect.value = state.viewAsUser;
+      }
+    } catch (err) {
+      if ($viewAsHint) $viewAsHint.textContent = 'falha ao carregar usuarios';
+    }
+
+    $viewAsSelect.addEventListener('change', async () => {
+      const target = $viewAsSelect.value || null;
+      state.viewAsUser = target;
+      try {
+        if (target) sessionStorage.setItem('ragViewAsUser', target);
+        else sessionStorage.removeItem('ragViewAsUser');
+      } catch (_) { /* ignore */ }
+
+      // Limpa contexto de chat corrente
+      state.currentDocId = null;
+      state.currentDocName = null;
+      state.currentIsGlobal = false;
+      $chatTitle.textContent = 'Selecione um documento';
+      $chatSubtitle.textContent = 'Escolha um documento na lista ao lado para comecar.';
+      $chatBody.innerHTML = '<div class="text-center text-secondary my-5">Nenhuma conversa ativa.</div>';
+      $chatInput.disabled = true;
+      $chatSend.disabled = true;
+      $deleteBtn.classList.add('d-none');
+
+      applyViewAsVisuals();
+      await loadDocs();
+    });
+
+    applyViewAsVisuals();
+  }
+
+  function applyViewAsVisuals() {
+    const on = isViewingAs();
+    document.body.classList.toggle('rag-view-as-active', on);
+    if ($viewAsBanner) {
+      if (on) {
+        $viewAsBanner.classList.remove('d-none');
+        if ($viewAsBannerEmail) $viewAsBannerEmail.textContent = state.viewAsUser;
+      } else {
+        $viewAsBanner.classList.add('d-none');
+      }
+    }
+    // Desabilita inputs sensiveis quando em view-as
+    if ($pdfInput)  $pdfInput.disabled  = on;
+    if ($uploadBtn) $uploadBtn.disabled = on;
+    if (on) {
+      $chatInput.disabled = true;
+      $chatSend.disabled = true;
+    }
+    // Delete button ja e gated por doc selecionado — some junto no selectDoc
+  }
+
   // --- Init ---
+  initViewAs();
   loadDocs();
 })();

@@ -11,7 +11,7 @@ set_time_limit(300);
 
 require_once __DIR__ . '/rag_common.php';
 
-$email = rag_require_user();
+$actingEmail = rag_require_user();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     rag_json_response(['ok' => false, 'error' => 'Metodo invalido'], 405);
@@ -19,6 +19,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $raw = file_get_contents('php://input');
 $body = json_decode($raw, true) ?: $_POST;
+
+// Chat e operacao de ESCRITA (gera custo de tokens e polui historico).
+// Nao e permitido em modo view-as — rag_effective_user() retorna 403.
+$email = rag_effective_user($actingEmail, false, 'chat', $body);
 
 $docId = trim((string) ($body['doc_id'] ?? ''));
 $question = trim((string) ($body['question'] ?? ''));

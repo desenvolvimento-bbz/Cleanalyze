@@ -12,7 +12,8 @@ ini_set('display_errors', 0);
 
 require_once __DIR__ . '/rag_common.php';
 
-$email = rag_require_user();
+$actingEmail = rag_require_user();
+$email = rag_effective_user($actingEmail, true, 'download');
 
 $docId = trim((string) ($_GET['doc_id'] ?? ''));
 if (!rag_is_uuid($docId)) {

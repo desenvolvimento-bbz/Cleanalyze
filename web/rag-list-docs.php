@@ -10,7 +10,9 @@ ini_set('display_errors', 0);
 
 require_once __DIR__ . '/rag_common.php';
 
-$email = rag_require_user();
+$actingEmail = rag_require_user();
+$email = rag_effective_user($actingEmail, true, 'list_docs');
+$isViewAs = ($email !== $actingEmail);
 
 $docs = rag_list_documents_php($email);
 $globals = rag_list_global_docs_for($email);
@@ -19,6 +21,7 @@ $response = [
     'ok' => true,
     'documents' => $docs,
     'global_documents' => $globals,
+    'view_as' => $isViewAs ? $email : null,
 ];
 
 $docId = $_GET['doc_id'] ?? null;
@@ -34,6 +37,8 @@ if ($docId && rag_is_uuid($docId) && !empty($_GET['with_history'])) {
         }
     }
     if ($belongs) {
+        // $email aqui ja esta resolvido para o target do view-as (se aplicavel),
+        // entao o historico retornado e o daquele usuario
         $response['history'] = rag_get_chat_history_php($email, $docId);
     }
 }

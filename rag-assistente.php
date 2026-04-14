@@ -113,6 +113,29 @@ app_log('page.view', ['page' => basename(__FILE__)]);
 </div>
 
 <div class="container py-4">
+  <?php if (function_exists('auth_is_admin') && auth_is_admin()): ?>
+  <!-- Barra administrativa: View-as outro usuario (read-only) -->
+  <div class="rag-admin-bar mb-3" id="ragAdminBar">
+    <div class="d-flex align-items-center flex-wrap gap-2">
+      <span class="rag-admin-bar-label">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true" style="vertical-align:-2px; margin-right:4px;">
+          <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
+          <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM1 8a7 7 0 0 1 11.601-5.333A8 8 0 0 0 8 8a8 8 0 0 0 4.601 7.333A7 7 0 0 1 1 8z"/>
+        </svg>
+        Modo administrador
+      </span>
+      <label class="small text-secondary mb-0" for="ragViewAsSelect">Visualizar como:</label>
+      <select id="ragViewAsSelect" class="form-select form-select-sm" style="max-width:280px;">
+        <option value="">Seu modo (admin)</option>
+      </select>
+      <span id="ragViewAsHint" class="small text-secondary"></span>
+    </div>
+  </div>
+  <div class="alert alert-warning py-2 px-3 mb-3 d-none" id="ragViewAsBanner" role="alert">
+    <strong>Visualizando como <span id="ragViewAsBannerEmail"></span></strong> — modo somente leitura. Upload, chat e exclusao estao desabilitados.
+  </div>
+  <?php endif; ?>
+
   <div class="row g-4">
     <!-- Coluna esquerda: lista de documentos + upload -->
     <div class="col-lg-4">

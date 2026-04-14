@@ -38,6 +38,82 @@ function rag_require_admin(): string {
     return $email;
 }
 
+/**
+ * Extrai o parametro `as_user` da request (GET, POST form ou JSON body).
+ * Retorna string vazia se nao presente.
+ */
+function rag_extract_as_user(array $jsonBody = []): string {
+    $candidates = [
+        $_GET['as_user'] ?? null,
+        $_POST['as_user'] ?? null,
+        $jsonBody['as_user'] ?? null,
+    ];
+    foreach ($candidates as $v) {
+        if (is_string($v) && trim($v) !== '') {
+            return strtolower(trim($v));
+        }
+    }
+    return '';
+}
+
+/**
+ * Resolve o "usuario efetivo" da request levando em conta view-as.
+ *
+ * Regras:
+ *  - Se nao ha `as_user` na request, retorna o email do proprio admin (comportamento normal)
+ *  - Se ha `as_user` mas o chamador nao e admin, retorna 403 (tentativa de spoof)
+ *  - Se ha `as_user` e o chamador e admin, valida que o email alvo existe em users.json,
+ *    loga a acao como `rag.admin.view_as.<label>` e retorna o email alvo
+ *
+ * $readOnly e obrigatorio: apenas endpoints read-only podem aceitar as_user. Se um
+ * endpoint destrutivo (upload/chat/delete) receber as_user, retorna 403.
+ */
+function rag_effective_user(string $actingEmail, bool $readOnly, string $auditLabel, array $jsonBody = []): string {
+    $asUser = rag_extract_as_user($jsonBody);
+    if ($asUser === '') {
+        return $actingEmail;
+    }
+
+    // Rejeita em endpoints destrutivos — admin so pode OLHAR, nunca escrever como outro
+    if (!$readOnly) {
+        rag_json_response([
+            'ok' => false,
+            'error' => 'Operacoes de escrita nao sao permitidas em modo view-as',
+        ], 403);
+    }
+
+    // So admin pode usar as_user
+    if (!function_exists('auth_is_admin') || !auth_is_admin()) {
+        rag_json_response([
+            'ok' => false,
+            'error' => 'Acesso negado: view-as requer administrador',
+        ], 403);
+    }
+
+    // Alvo precisa existir em users.json
+    $users = function_exists('users_load') ? users_load() : [];
+    $foundKey = null;
+    foreach (array_keys($users) as $k) {
+        if (strtolower($k) === $asUser) {
+            $foundKey = $k;
+            break;
+        }
+    }
+    if ($foundKey === null) {
+        rag_json_response([
+            'ok' => false,
+            'error' => 'Usuario alvo nao encontrado',
+        ], 404);
+    }
+
+    app_log('rag.admin.view_as.' . $auditLabel, [
+        'admin' => $actingEmail,
+        'target' => $foundKey,
+    ]);
+
+    return $foundKey;
+}
+
 /** Sanitiza o email para nome de diretorio (alinha com RagStore.sanitize_email). */
 function rag_sanitize_email(string $email): string {
     $lower = strtolower(trim($email));

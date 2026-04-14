@@ -140,6 +140,37 @@
   border-left-color: #0b3d91;
 }
 
+/* Barra administrativa de View-as */
+.rag-admin-bar {
+  padding: 10px 14px;
+  background: #fff8e1;
+  border: 1px solid #f5d78e;
+  border-radius: 8px;
+  color: #5b4400;
+}
+.rag-admin-bar-label {
+  font-weight: 600;
+  font-size: .85rem;
+  color: #5b4400;
+  padding-right: 8px;
+  border-right: 1px solid #f5d78e;
+  margin-right: 4px;
+}
+.rag-admin-bar .form-select-sm {
+  max-width: 280px;
+}
+
+/* Modo view-as ativo: banner e estados desabilitados */
+body.rag-view-as-active .rag-admin-bar {
+  background: #fde7c4;
+  border-color: #e8a94e;
+}
+body.rag-view-as-active #ragUploadForm,
+body.rag-view-as-active #ragChatForm {
+  opacity: .55;
+  pointer-events: none;
+}
+
 .rag-message {
   display: flex;
   margin-bottom: 14px;

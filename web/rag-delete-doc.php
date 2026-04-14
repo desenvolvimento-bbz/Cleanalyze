@@ -10,7 +10,7 @@ ini_set('display_errors', 0);
 
 require_once __DIR__ . '/rag_common.php';
 
-$email = rag_require_user();
+$actingEmail = rag_require_user();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     rag_json_response(['ok' => false, 'error' => 'Metodo invalido'], 405);
@@ -18,6 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $raw = file_get_contents('php://input');
 $body = json_decode($raw, true) ?: $_POST;
+
+// Delete e operacao destrutiva — bloqueado em view-as.
+$email = rag_effective_user($actingEmail, false, 'delete', $body);
 $docId = trim((string) ($body['doc_id'] ?? ''));
 if (!rag_is_uuid($docId)) {
     rag_json_response(['ok' => false, 'error' => 'doc_id invalido'], 400);
