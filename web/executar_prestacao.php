@@ -1,6 +1,11 @@
 <?php
+// Página descontinuada — redirecionar para nova versão
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    header('Location: ../prestacao_anual.php', true, 301);
+    exit;
+}
 /**
- * executar_prestacao.php
+ * executar_prestacao.php (DESCONTINUADO — mantido temporariamente para sessões ativas)
  *
  * Recebe dois PDFs de Prestação de Contas, processa via Python CLI,
  * e exibe resultado com cards de diferenças + exportação PDF/XLSX.
@@ -34,8 +39,10 @@ function fmt_brl($v) {
 // ===========================================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['export_pdf']) && $_POST['export_pdf'] === '1') {
     $jsonPath = $_POST['json_path'] ?? '';
-    if (!$jsonPath || !file_exists($jsonPath)) {
-        echo "Erro: dados não encontrados para gerar PDF.";
+    $realJson = $jsonPath ? realpath($jsonPath) : false;
+    $realUploads = realpath($UPLOADS_DIR);
+    if (!$realJson || !$realUploads || stripos($realJson, $realUploads) !== 0) {
+        echo "Erro: caminho invalido.";
         exit;
     }
     $dados = json_decode(file_get_contents($jsonPath), true);
@@ -172,6 +179,13 @@ function renderResultadoHTML($dados, $paraPdf = false) {
         .valor-positivo{ color:#c62828; }
         .valor-negativo{ color:#2e7d32; }
         .page-break{ page-break-before:always; }
+        .periodo-bar{ display:flex; margin-bottom:14px; border:1px solid #ccc; border-radius:6px; overflow:hidden; }
+        .periodo-bar .periodo-col{ flex:1; text-align:center; padding:6px 10px; }
+        .periodo-bar .periodo-ant{ background:#2E75B6; color:#fff; }
+        .periodo-bar .periodo-atu{ background:#548235; color:#fff; }
+        .periodo-bar .periodo-vs{ display:flex; align-items:center; padding:0 10px; font-weight:700; background:#efeff4; color:#04193b; }
+        .periodo-bar .periodo-label{ font-size:8px; opacity:.8; }
+        .periodo-bar .periodo-date{ font-size:11px; font-weight:700; }
     </style>';
 
     $condominio = htmlspecialchars($dados['condominio'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -191,6 +205,13 @@ function renderResultadoHTML($dados, $paraPdf = false) {
     $html .= "<div class='stat-box'><div class='num'>" . ($dados['lanctosAnterior'] ?? 0) . "</div><div class='lbl'>Lançamentos<br>Mês Anterior</div></div>";
     $html .= "<div class='stat-box'><div class='num'>" . ($dados['lanctosAtual'] ?? 0) . "</div><div class='lbl'>Lançamentos<br>Mês Atual</div></div>";
     $html .= "<div class='stat-box'><div class='num' style='color:#c00;'>" . count($dados['diferencas'] ?? []) . "</div><div class='lbl'>Diferenças<br>Encontradas</div></div>";
+    $html .= "</div>";
+
+    // Barra de Períodos
+    $html .= "<div class='periodo-bar'>";
+    $html .= "<div class='periodo-col periodo-ant'><div class='periodo-label'>Mês Anterior</div><div class='periodo-date'>{$perAnt}</div></div>";
+    $html .= "<div class='periodo-vs'>vs</div>";
+    $html .= "<div class='periodo-col periodo-atu'><div class='periodo-label'>Mês Atual</div><div class='periodo-date'>{$perAtu}</div></div>";
     $html .= "</div>";
 
     // Totais por Conta
@@ -325,14 +346,7 @@ function renderResultadoHTML($dados, $paraPdf = false) {
   </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand" href="../index.php">Cleanalyze</a>
-    <div class="navbar-nav ms-auto">
-      <a class="nav-link" href="../prestacao.php">Prestação de Contas</a>
-    </div>
-  </div>
-</nav>
+<?php $activePage = 'prestacao'; include __DIR__ . '/../includes/navbar.php'; ?>
 
 <div class="container py-4">
 
@@ -354,13 +368,13 @@ function renderResultadoHTML($dados, $paraPdf = false) {
     <div class="col-md-3">
       <div class="card stat-card">
         <div class="number"><?= h($dados['lanctosAnterior'] ?? 0) ?></div>
-        <div class="label">Lançamentos<br>Mês Anterior</div>
+        <div class="label">Lançamentos<br><strong><?= h($dados['periodoAnterior'] ?? 'Mês Anterior') ?></strong></div>
       </div>
     </div>
     <div class="col-md-3">
       <div class="card stat-card">
         <div class="number"><?= h($dados['lanctosAtual'] ?? 0) ?></div>
-        <div class="label">Lançamentos<br>Mês Atual</div>
+        <div class="label">Lançamentos<br><strong><?= h($dados['periodoAtual'] ?? 'Mês Atual') ?></strong></div>
       </div>
     </div>
     <div class="col-md-3">
@@ -388,6 +402,19 @@ function renderResultadoHTML($dados, $paraPdf = false) {
       <button type="submit" class="btn btn-outline-secondary">📄 Baixar Relatório PDF</button>
     </form>
     <a href="../prestacao.php" class="btn btn-outline-secondary">Nova Comparação</a>
+  </div>
+
+  <!-- Barra de Períodos -->
+  <div class="d-flex mb-4 rounded overflow-hidden" style="border:1px solid var(--cinza);">
+    <div class="flex-fill text-center py-2" style="background:#2E75B6; color:#fff;">
+      <small class="d-block" style="opacity:.8;">Mês Anterior</small>
+      <strong style="font-size:1.05rem;"><?= h($dados['periodoAnterior'] ?? '') ?></strong>
+    </div>
+    <div class="d-flex align-items-center px-3" style="background:var(--cinzaClaro); color:var(--azul); font-weight:700;">vs</div>
+    <div class="flex-fill text-center py-2" style="background:#548235; color:#fff;">
+      <small class="d-block" style="opacity:.8;">Mês Atual</small>
+      <strong style="font-size:1.05rem;"><?= h($dados['periodoAtual'] ?? '') ?></strong>
+    </div>
   </div>
 
   <!-- TOTAIS POR CONTA -->
@@ -500,7 +527,8 @@ function renderResultadoHTML($dados, $paraPdf = false) {
   <a href="../prestacao.php" class="btn btn-primary mb-4">Voltar</a>
 <?php endif; ?>
 
-  <!-- Detalhes técnicos -->
+  <?php if (auth_is_admin()): ?>
+  <!-- Detalhes técnicos (somente admin) -->
   <div class="accordion mb-4" id="accDetails">
     <div class="accordion-item">
       <h2 class="accordion-header">
@@ -519,6 +547,7 @@ function renderResultadoHTML($dados, $paraPdf = false) {
       </div>
     </div>
   </div>
+  <?php endif; ?>
 </div>
 
 <footer class="text-center text-muted my-4">2025 &copy; Desenvolvimento BBZ.</footer>

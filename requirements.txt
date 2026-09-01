@@ -1,0 +1,15 @@
+# Dependências Python do Cleanalyze
+# Instaladas no Dockerfile via pip3.
+
+# --- Extração de PDF existente ---
+pdfplumber
+pdf2image
+pytesseract
+
+# --- RAG (OCR + embeddings + chat) ---
+mistralai>=1.2.0
+openai>=1.50.0
+tiktoken>=0.8.0
+sqlite-vec>=0.1.6
+python-dotenv>=1.0.1
+httpx>=0.27.0

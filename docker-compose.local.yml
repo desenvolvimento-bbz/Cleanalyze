@@ -2,14 +2,23 @@ services:
   cleanalyze:
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     environment:
-      - PORT=8080
-      - GOOGLE_CLIENT_ID=330639050078-cuj6n6ag45fbpuior5aevo0scslp6n8c.apps.googleusercontent.com
+      PORT: 8080
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+      MISTRAL_OCR_MODEL: ${MISTRAL_OCR_MODEL:-mistral-ocr-latest}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      RAG_EMBEDDING_MODEL: ${RAG_EMBEDDING_MODEL:-text-embedding-3-small}
+      RAG_CHAT_MODEL: ${RAG_CHAT_MODEL:-gpt-4o-mini}
+      RAG_CHUNK_SIZE: ${RAG_CHUNK_SIZE:-800}
+      RAG_CHUNK_OVERLAP: ${RAG_CHUNK_OVERLAP:-100}
+      RAG_TOP_K: ${RAG_TOP_K:-5}
     ports:
       - "8080:8080"
     volumes:
-      # Código-fonte ao vivo: qualquer .php/.py editado no host vale no próximo request
+      # Codigo-fonte ao vivo: qualquer .php/.py editado no host vale no proximo request.
+      # Este bind da raiz ja cobre ./auth/data, ./output e ./uploads.
       - .:/var/www/html
       # Preserva o vendor/ instalado pelo Composer na imagem (o bind acima o cobriria)
       - /var/www/html/vendor

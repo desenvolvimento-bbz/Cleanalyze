@@ -19,10 +19,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcurl4-openssl-dev \
   && rm -rf /var/lib/apt/lists/*
 
-# Biblioteca Python para extração de PDF (pdfplumber)
-RUN pip3 install --no-cache-dir --break-system-packages pdfplumber pdf2image pytesseract
+# Dependências Python (extração existente + RAG)
+COPY requirements.txt /tmp/requirements.txt
+RUN pip3 install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 
-# Extensões do PHP: gd + zip
+# Extensões do PHP: gd + zip + sqlite3 (sqlite3 + pdo_sqlite geralmente já vêm,
+# mas garantimos que estejam habilitados para o RAG)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
  && docker-php-ext-install -j"$(nproc)" gd zip curl
 
@@ -35,6 +37,7 @@ RUN { \
       echo 'max_file_uploads=50'; \
       echo 'max_execution_time=300'; \
       echo 'max_input_time=300'; \
+      echo 'date.timezone=America/Sao_Paulo'; \
     } > /usr/local/etc/php/conf.d/zz-uploads.ini
 
 # (Opcional) evita warning de ServerName no Apache
@@ -59,7 +62,7 @@ COPY . .
 COPY --from=vendor /app/vendor ./vendor
 
 # Dirs graváveis
-RUN mkdir -p uploads output logs \
+RUN mkdir -p uploads uploads/rag output logs auth/data \
  && chown -R www-data:www-data /var/www/html
 
 # Exponha 8080 (o Apache será reconfigurado para ouvir nessa porta)

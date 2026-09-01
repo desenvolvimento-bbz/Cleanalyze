@@ -2,27 +2,84 @@
   {
     "versao": "1.4.0",
     "data": "01/09/2026",
-    "titulo": "Identidade visual BBZ",
+    "titulo": "Modelos da Lello e identidade visual BBZ",
     "itens": [
-      "Aplicacao agora segue a identidade visual oficial da BBZ",
-      "Logo BBZ na barra de navegacao e na tela de login",
-      "Cores e tipografia padronizadas em todas as telas",
+      "Novo modelo de extracao: Relacao de Enderecamento (Lello)",
+      "Novo modelo de extracao: Cotas Atrasadas / Inadimplencia (Lello)",
+      "Unidades com mais de um proprietario saem em uma unica linha, com nome, CPF, e-mail e telefones separados por barra",
+      "Dados exportados em maiusculas e sem acentos, com o tipo de logradouro abreviado",
+      "Aplicacao agora segue a identidade visual oficial da BBZ, com o logo na barra de navegacao e na tela de login",
       "Modelos de extracao reorganizados no menu por sistema (Ahreas e Lello)"
     ]
   },
   {
-    "versao": "1.3.0",
-    "data": "01/09/2026",
-    "titulo": "Extracao de relatorios da Lello",
+    "versao": "1.3.3",
+    "data": "14/04/2026",
+    "titulo": "Assistente IA mais assertivo e com leitura de imagens",
     "itens": [
-      "Novo modelo de extracao: Relacao de Enderecamento (Lello)",
-      "Gera a planilha de importacao de unidades a partir do PDF da Lello",
-      "Unidades com mais de um proprietario saem em uma unica linha, com nome, CPF, e-mail e telefones separados por barra",
-      "Endereco de cobranca separado em logradouro, numero e complemento",
-      "Dados exportados em maiusculas e sem acentos",
-      "Tipo de logradouro abreviado no mesmo padrao da Ahreas (Avenida vira AV, Alameda vira AL)",
-      "Novo modelo de extracao: Cotas Atrasadas / Inadimplencia (Lello)",
-      "Gera uma linha por conta contabil de cada cobranca, com o percentual de multa preenchido"
+      "Respostas mais diretas e assertivas — o Assistente afirma com base no documento ou informa claramente quando nao encontra a resposta, sem mais 'parece' ou 'talvez'",
+      "Leitura do conteudo de prints e imagens dos documentos: o Assistente agora entende o que aparece nas telas e figuras dos manuais e pode responder perguntas sobre passos visuais",
+      "Copia do texto reconhecido dos Documentos BBZ restrita a administradores"
+    ]
+  },
+  {
+    "versao": "1.3.2",
+    "data": "13/04/2026",
+    "titulo": "Documentos BBZ no Assistente IA",
+    "itens": [
+      "Nova secao Documentos BBZ no Assistente IA: consulte manuais e guias oficiais pelo chat",
+      "Tire duvidas sobre processos da BBZ perguntando direto para o Assistente",
+      "Cada Documento BBZ e liberado individualmente para os usuarios escolhidos",
+      "Area administrativa para publicar, liberar acesso e remover Documentos BBZ"
+    ]
+  },
+  {
+    "versao": "1.3.1",
+    "data": "13/04/2026",
+    "titulo": "Refinamentos do Assistente IA",
+    "itens": [
+      "Acoes rapidas em cada documento da lista: baixar o PDF original, copiar o texto reconhecido e excluir",
+      "Mensagens de erro mais claras quando o reconhecimento de texto esta instavel",
+      "Correcao na exclusao de documentos que podia falhar em algumas situacoes"
+    ]
+  },
+  {
+    "versao": "1.3.0",
+    "data": "13/04/2026",
+    "titulo": "Assistente IA: converse com seus documentos",
+    "itens": [
+      "Novo modulo Assistente IA: envie um PDF ou imagem e faca perguntas sobre o conteudo",
+      "Respostas baseadas no documento com citacao da pagina de origem",
+      "Suporte a PDFs escaneados via reconhecimento de texto (OCR)",
+      "Historico de conversa preservado para cada documento",
+      "Cada usuario tem seus proprios documentos, sem compartilhamento",
+      "Menu superior reorganizado em categorias (Cadastro, Prestacao de Contas, Admin)",
+      "Novo atalho para o Assistente IA na tela inicial"
+    ]
+  },
+  {
+    "versao": "1.2.2",
+    "data": "30/03/2026",
+    "titulo": "Analise de Prestacao de Contas por Cleanalyze IA",
+    "itens": [
+      "Atualizacao do modulo de Prestacao de Contas: envie 1 PDF com 12 meses e a IA analisa automaticamente",
+      "Comparativo do mesmo mes do ano anterior e do mes anterior",
+      "Deteccao de contas e subcategorias novas, ausentes e anomalas",
+      "Alerta de Fundo de Reserva com detalhamento de lancamentos",
+      "Visao panoramica com totais de despesas por mes",
+      "Validacao automatica do periodo do relatorio"
+    ]
+  },
+  {
+    "versao": "1.2.1",
+    "data": "26/03/2026",
+    "titulo": "Ajustes e padronizacao visual",
+    "itens": [
+      "Correcao na identificacao do nome do condominio no comparativo de Prestacao de Contas",
+      "Periodos comparados agora ficam em destaque antes das tabelas",
+      "Padronizacao do menu superior em todas as paginas",
+      "Comparacao de planilhas agora aproveita toda a largura da tela ao exibir resultados",
+      "PDF de comparacao exporta apenas colunas e linhas com diferenca, facilitando a leitura"
     ]
   },
   {

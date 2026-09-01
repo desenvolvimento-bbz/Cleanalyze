@@ -78,6 +78,8 @@ function h($v) { return htmlspecialchars((string)$v, ENT_QUOTES|ENT_SUBSTITUTE, 
     .pass-form{ display:none; margin-top:6px; }
     .pass-form.show{ display:flex; }
     .user-row td{ vertical-align:middle; }
+    .status-online{ color:#198754; font-weight:600; font-size:.8rem; }
+    .status-offline{ color:#888; font-size:.8rem; }
   </style>
 </head>
 <body>
@@ -107,6 +109,7 @@ function h($v) { return htmlspecialchars((string)$v, ENT_QUOTES|ENT_SUBSTITUTE, 
                   <th>Papel</th>
                   <th>Origem</th>
                   <th>Criado em</th>
+                  <th>Último acesso</th>
                   <th>Senha</th>
                   <th style="width:200px;">Ações</th>
                 </tr>
@@ -117,6 +120,8 @@ function h($v) { return htmlspecialchars((string)$v, ENT_QUOTES|ENT_SUBSTITUTE, 
                   $hasPassword = !empty($data['hash']);
                   $via = ($data['created_via'] ?? '') === 'google_oauth' ? 'google' : ($hasPassword ? 'password' : 'unknown');
                   $createdAt = $data['created_at'] ?? null;
+                  $lastAccess = $data['last_access'] ?? null;
+                  $isOnline = $lastAccess && (time() - $lastAccess) < 300; // 5 minutos
                   $isCurrentUser = ($email === $currentEmail);
                   $rowId = 'row-' . md5($email);
               ?>
@@ -145,8 +150,18 @@ function h($v) { return htmlspecialchars((string)$v, ENT_QUOTES|ENT_SUBSTITUTE, 
                   </td>
                   <td>
                     <?php if ($createdAt):
-                        echo h(is_numeric($createdAt) ? date('d/m/Y H:i', $createdAt) : substr($createdAt, 0, 16));
+                        $ts = is_numeric($createdAt) ? (int)$createdAt : strtotime($createdAt);
+                        echo h($ts ? date('d/m/Y H:i', $ts) : '—');
                     else: ?>
+                      <span class="text-muted">—</span>
+                    <?php endif; ?>
+                  </td>
+                  <td>
+                    <?php if ($isOnline): ?>
+                      <span class="status-online" title="Ativo nos últimos 15 minutos">Online</span>
+                    <?php elseif ($lastAccess): ?>
+                      <span class="status-offline"><?= h(date('d/m/Y H:i', $lastAccess)) ?></span>
+                    <?php else: ?>
                       <span class="text-muted">—</span>
                     <?php endif; ?>
                   </td>
