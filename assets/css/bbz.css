@@ -1,0 +1,159 @@
+/* ===========================================================================
+   Identidade visual BBZ — Cleanalyze
+   Paleta e tipografia oficiais do manual de marca da BBZ.
+
+   Regras que este arquivo aplica:
+   - Azul Escuro (#04193b) para fundos escuros e texto principal.
+   - Azul (#0664e4) para ação primária, links e foco.
+   - Nenhuma cor fora da paleta oficial.
+   - Manrope: peso leve em títulos grandes, bold em números de destaque.
+   - Cantos arredondados generosos e traços finos.
+
+   Carregado por includes/head.php — não duplicar a paleta nas páginas.
+   =========================================================================== */
+
+:root {
+  /* Paleta principal */
+  --bbz-azul-escuro: #04193b;
+  --bbz-azul: #0664e4;
+
+  /* Paleta secundária */
+  --bbz-azul-medio: #60a5fa;
+  --bbz-azul-claro: #b0d4ff;
+
+  /* Paleta de apoio */
+  --bbz-roxo: #8578ef;
+  --bbz-cinza-escuro: #8c8c9c;
+  --bbz-cinza-medio: #b8b8c4;
+  --bbz-cinza-claro: #efeff4;
+
+  /* Aliases mantidos para as páginas que já usavam estes nomes */
+  --azul: var(--bbz-azul-escuro);
+  --cinza: var(--bbz-cinza-medio);
+  --cinzaClaro: var(--bbz-cinza-claro);
+
+  --bbz-raio: 18px;
+  --bbz-raio-sm: 12px;
+}
+
+/* ------------------------------- Base ----------------------------------- */
+
+body {
+  background: var(--bbz-cinza-claro);
+  color: var(--bbz-azul-escuro);
+  font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* Títulos grandes em peso leve — contraste com números/dados em bold é
+   marca registrada do estilo BBZ. */
+h1, h2 { font-weight: 300; letter-spacing: -0.01em; }
+h3, h4 { font-weight: 400; }
+h5, h6 { font-weight: 600; }
+
+a { color: var(--bbz-azul); text-decoration: none; }
+a:hover { color: var(--bbz-azul-escuro); text-decoration: underline; }
+
+/* ------------------------------ Navbar ---------------------------------- */
+
+.navbar { background: var(--bbz-azul-escuro); padding-block: .65rem; }
+.navbar .navbar-brand,
+.navbar a { color: #fff !important; }
+
+.navbar .navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Área de respiro ao redor da marca, como pede o manual. */
+.navbar .bbz-marca { height: 30px; width: auto; display: block; }
+
+.navbar .nav-link { color: rgba(255, 255, 255, .82) !important; font-weight: 400; }
+.navbar .nav-link:hover { color: #fff !important; text-decoration: none; }
+.navbar .nav-link.active {
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: inset 0 -2px 0 var(--bbz-azul);
+}
+.navbar-toggler {
+  border-color: rgba(255, 255, 255, .3);
+}
+
+/* ------------------------------- Cards ---------------------------------- */
+
+.card {
+  border: 1px solid var(--bbz-cinza-medio);
+  border-radius: var(--bbz-raio);
+}
+.card-header {
+  background: #fff;
+  border-bottom: 1px solid var(--bbz-cinza-medio);
+  border-top-left-radius: var(--bbz-raio);
+  border-top-right-radius: var(--bbz-raio);
+  font-weight: 600;
+}
+
+/* ------------------------------ Botões ---------------------------------- */
+
+/* Ação primária é sempre o Azul, não o Azul Escuro. */
+.btn { border-radius: var(--bbz-raio-sm); font-weight: 600; }
+
+.btn-primary {
+  background: var(--bbz-azul);
+  border-color: var(--bbz-azul);
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background: #0553bd;
+  border-color: #0553bd;
+}
+.btn-primary:focus-visible { box-shadow: 0 0 0 .2rem rgba(6, 100, 228, .35); }
+
+.btn-outline-primary { color: var(--bbz-azul); border-color: var(--bbz-azul); }
+.btn-outline-primary:hover { background: var(--bbz-azul); border-color: var(--bbz-azul); }
+
+.btn-outline-secondary { color: var(--bbz-azul-escuro); border-color: var(--bbz-cinza-medio); }
+.btn-outline-secondary:hover {
+  background: var(--bbz-azul-escuro);
+  border-color: var(--bbz-azul-escuro);
+  color: #fff;
+}
+
+/* ----------------------------- Formulários ------------------------------ */
+
+.form-control, .form-select {
+  border-radius: var(--bbz-raio-sm);
+  border-color: var(--bbz-cinza-medio);
+  color: var(--bbz-azul-escuro);
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--bbz-azul);
+  box-shadow: 0 0 0 .2rem rgba(6, 100, 228, .18);
+}
+.form-label { font-weight: 600; }
+.form-text { color: var(--bbz-cinza-escuro); }
+
+/* ------------------------------ Tabelas --------------------------------- */
+
+/* Traços finos, sem grade pesada. */
+.table { --bs-table-border-color: var(--bbz-cinza-medio); color: var(--bbz-azul-escuro); }
+.table thead th {
+  background: var(--bbz-cinza-claro);
+  color: var(--bbz-azul-escuro);
+  font-weight: 600;
+  border-bottom: 1px solid var(--bbz-cinza-medio);
+}
+
+/* ------------------------------ Apoio ----------------------------------- */
+
+.text-secondary, .text-muted { color: var(--bbz-cinza-escuro) !important; }
+
+/* Número de destaque (KPI): bold e bem maior que o texto ao redor. */
+.bbz-kpi { font-weight: 700; font-size: 2rem; color: var(--bbz-azul); line-height: 1.1; }
+
+.badge.bg-primary { background: var(--bbz-azul) !important; }
+
+footer { color: var(--bbz-cinza-escuro); }

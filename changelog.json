@@ -1,5 +1,31 @@
 [
   {
+    "versao": "1.4.0",
+    "data": "01/09/2026",
+    "titulo": "Identidade visual BBZ",
+    "itens": [
+      "Aplicacao agora segue a identidade visual oficial da BBZ",
+      "Logo BBZ na barra de navegacao e na tela de login",
+      "Cores e tipografia padronizadas em todas as telas",
+      "Modelos de extracao reorganizados no menu por sistema (Ahreas e Lello)"
+    ]
+  },
+  {
+    "versao": "1.3.0",
+    "data": "01/09/2026",
+    "titulo": "Extracao de relatorios da Lello",
+    "itens": [
+      "Novo modelo de extracao: Relacao de Enderecamento (Lello)",
+      "Gera a planilha de importacao de unidades a partir do PDF da Lello",
+      "Unidades com mais de um proprietario saem em uma unica linha, com nome, CPF, e-mail e telefones separados por barra",
+      "Endereco de cobranca separado em logradouro, numero e complemento",
+      "Dados exportados em maiusculas e sem acentos",
+      "Tipo de logradouro abreviado no mesmo padrao da Ahreas (Avenida vira AV, Alameda vira AL)",
+      "Novo modelo de extracao: Cotas Atrasadas / Inadimplencia (Lello)",
+      "Gera uma linha por conta contabil de cada cobranca, com o percentual de multa preenchido"
+    ]
+  },
+  {
     "versao": "1.2.0",
     "data": "25/03/2026",
     "titulo": "Novo modulo e melhorias visuais",

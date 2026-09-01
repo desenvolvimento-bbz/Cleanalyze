@@ -22,18 +22,17 @@ $UPLOADS_DIR  = APP_UPLOADS;
   <meta charset="UTF-8">
   <title>Diagnóstico - Cleanalyze</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+  <link href="../assets/css/bbz.css" rel="stylesheet">
   <style>
     :root{ --azul:#04193b; --cinza:#b8b8c4; --cinzaClaro:#efeff4; }
     body{ background:var(--cinzaClaro); color:var(--azul); font-family: 'Manrope', sans-serif; }
     .navbar{ background:var(--azul); }
     .navbar .navbar-brand, .navbar a{ color:#fff !important; }
-    .btn-primary{ background:var(--azul); border-color:var(--azul); }
-    .btn-primary:hover{ background:#062a5c; border-color:#062a5c; }
     .card{ border-color:var(--cinza); }
     .ok { color: #198754; font-weight: 600; }
     .erro { color: #dc3545; font-weight: 600; }
-    pre { background: #f8f9fa; padding: 12px; border-radius: 6px; font-size: 0.85rem; overflow-x: auto; }
+    pre { background: var(--bbz-cinza-claro); padding: 12px; border-radius: 6px; font-size: 0.85rem; overflow-x: auto; }
   </style>
 </head>
 <body>

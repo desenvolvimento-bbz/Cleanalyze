@@ -11,12 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Bootstrap (mesma linha visual do Cleanalyze) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+  <link href="../assets/css/bbz.css" rel="stylesheet">
   <style>
-    body { background:#f7f7fb; }
+    body { background:var(--bbz-cinza-claro); }
     h1,h3 { color:#04193b; }
-    .btn-primary{ background:#04193b; border-color:#04193b; }
     .btn-outline-secondary{ color:#04193b; border-color:#b8b8c4; }
-    .card{ border-color:#eaeaf2; }
   </style>
 </head>
 <body>

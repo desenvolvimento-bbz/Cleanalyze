@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   cleanalyze:
     build:
@@ -11,5 +9,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./output:/var/www/html/output
-      - ./uploads:/var/www/html/uploads
+      # Código-fonte ao vivo: qualquer .php/.py editado no host vale no próximo request
+      - .:/var/www/html
+      # Preserva o vendor/ instalado pelo Composer na imagem (o bind acima o cobriria)
+      - /var/www/html/vendor

@@ -310,3 +310,42 @@ class PdfEngine:
         text = re.sub(r'(\d),\s+(\d)', r'\1,\2', text)
 
         return text
+
+    # ----------------- pdfplumber (grade de layout / colunas) -----------------
+
+    def to_text_layout(self, pdf_path: str) -> str:
+        """
+        Extrai texto preservando as COLUNAS do PDF, em grade monoespaçada.
+
+        Diferente de to_text_pdfplumber(), que colapsa o vão entre colunas em
+        um único espaço, aqui o espaçamento horizontal acompanha a posição x
+        real de cada palavra. Isso é necessário em relatórios em forma de
+        formulário — como a "Relação Endereçamento" da Lello — nos quais
+        rótulo e valor só se distinguem pela coluna em que estão.
+
+        pdftotext -layout não resolve esses PDFs: a ordem de desenho não é a
+        ordem de leitura e os pares rótulo/valor saem embaralhados.
+        """
+        try:
+            import pdfplumber
+        except ImportError as e:
+            self._log(f"[ERROR] pdfplumber não disponível: {e}")
+            self._log("[INFO] Instale com: pip install pdfplumber")
+            return ""
+
+        self._log("[INFO] Extraindo texto com pdfplumber (grade de layout)...")
+        try:
+            paginas = []
+            with pdfplumber.open(pdf_path) as pdf:
+                total = len(pdf.pages)
+                self._log(f"[DEBUG] PDF tem {total} páginas")
+                ini = (int(self.first_page) - 1) if self.first_page else 0
+                fim = int(self.last_page) if self.last_page else total
+                for page in pdf.pages[ini:fim]:
+                    paginas.append(page.extract_text(layout=True) or "")
+            result = "\n".join(paginas)
+            self._log(f"[DEBUG] pdfplumber(layout) extraiu {len(result)} caracteres")
+            return result
+        except Exception as e:
+            self._log(f"[ERROR] Falha na extração com pdfplumber (layout): {e}")
+            return ""

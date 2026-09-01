@@ -1,23 +1,21 @@
-version: "3.9"
-
 services:
- cleanalyze:
- build:
- context: .
- dockerfile: dockerfile
- environment:
- - PORT=8080
- - GOOGLE_CLIENT_ID=330639050078-cuj6n6ag45fbpuior5aevo0scslp6n8c.apps.googleusercontent.com
- restart: unless-stopped
- networks:
- - proxy_default
- labels:
- - "traefik.enable=true"
- - "traefik.http.routers.cleanalyze.rule=Host(`cleanalyze.desenvolvimentobbz.cloud`)"
- - "traefik.http.routers.cleanalyze.entrypoints=websecure"
- - "traefik.http.routers.cleanalyze.tls.certresolver=le"
- - "traefik.http.services.cleanalyze.loadbalancer.server.port=8080"
+  cleanalyze:
+    build:
+      context: .
+      dockerfile: dockerfile
+    environment:
+      - PORT=8080
+      - GOOGLE_CLIENT_ID=330639050078-cuj6n6ag45fbpuior5aevo0scslp6n8c.apps.googleusercontent.com
+    restart: unless-stopped
+    networks:
+      - proxy_default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cleanalyze.rule=Host(`cleanalyze.desenvolvimentobbz.cloud`)"
+      - "traefik.http.routers.cleanalyze.entrypoints=websecure"
+      - "traefik.http.routers.cleanalyze.tls.certresolver=le"
+      - "traefik.http.services.cleanalyze.loadbalancer.server.port=8080"
 
 networks:
- proxy_default:
- external: true
+  proxy_default:
+    external: true

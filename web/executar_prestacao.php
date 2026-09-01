@@ -148,12 +148,12 @@ function renderResultadoHTML($dados, $paraPdf = false) {
         .header-bar h2{ margin:0; font-size:16px; }
         .header-bar p{ margin:2px 0 0; font-size:11px; opacity:.85; }
         .stat-row{ display:flex; gap:12px; margin-bottom:16px; }
-        .stat-box{ flex:1; text-align:center; border:1px solid #ccc; border-radius:6px; padding:10px; }
+        .stat-box{ flex:1; text-align:center; border:1px solid #b8b8c4; border-radius:6px; padding:10px; }
         .stat-box .num{ font-size:22px; font-weight:700; }
-        .stat-box .lbl{ font-size:10px; color:#666; }
+        .stat-box .lbl{ font-size:10px; color:#8c8c9c; }
         table{ width:100%; border-collapse:collapse; margin-bottom:14px; font-size:10px; }
         th{ background:#04193b; color:#fff; padding:5px 8px; text-align:left; }
-        td{ padding:4px 8px; border-bottom:1px solid #ddd; }
+        td{ padding:4px 8px; border-bottom:1px solid #b8b8c4; }
         .badge-nova{ background:#fff2cc; color:#856404; padding:2px 8px; border-radius:4px; font-weight:600; font-size:9px; }
         .badge-ausente{ background:#fce4ec; color:#c62828; padding:2px 8px; border-radius:4px; font-weight:600; font-size:9px; }
         .badge-sub-nova{ background:#e2efda; color:#2e7d32; padding:2px 8px; border-radius:4px; font-weight:600; font-size:9px; }
@@ -254,7 +254,7 @@ function renderResultadoHTML($dados, $paraPdf = false) {
     if ($paraPdf) $html .= "<div class='page-break'></div>";
     $html .= "<div class='section-title'>Resumo Financeiro Contábil</div>";
     $html .= "<table><tr><th>Categoria</th><th style='text-align:right'>Saldo Ant.</th><th style='text-align:right'>Créditos</th><th style='text-align:right'>Débitos</th><th style='text-align:right'>Saldo Atual</th><th></th><th style='text-align:right'>Saldo Ant.</th><th style='text-align:right'>Créditos</th><th style='text-align:right'>Débitos</th><th style='text-align:right'>Saldo Atual</th></tr>";
-    $html .= "<tr><th colspan='5' style='text-align:center; background:#2E75B6;'>Mês Anterior</th><th style='background:#fff'></th><th colspan='4' style='text-align:center; background:#548235;'>Mês Atual</th></tr>";
+    $html .= "<tr><th colspan='5' style='text-align:center; background:#04193b;'>Mês Anterior</th><th style='background:#fff'></th><th colspan='4' style='text-align:center; background:#0664e4;'>Mês Atual</th></tr>";
 
     $resAnt = $dados['resumo']['anterior'] ?? [];
     $resAtu = $dados['resumo']['atual'] ?? [];
@@ -292,17 +292,17 @@ function renderResultadoHTML($dados, $paraPdf = false) {
   <meta charset="UTF-8">
   <title>Resultado — Prestação de Contas</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+  <link href="../assets/css/bbz.css" rel="stylesheet">
   <style>
     :root{ --azul:#04193b; --cinza:#b8b8c4; --cinzaClaro:#efeff4; }
     body{ background:var(--cinzaClaro); color:var(--azul); font-family:'Manrope',sans-serif; }
     .navbar{ background:var(--azul); }
     .navbar .navbar-brand, .navbar a{ color:#fff !important; }
-    .btn-primary{ background:var(--azul); border-color:var(--azul); }
     .card{ border-color:var(--cinza); }
     .stat-card{ text-align:center; padding:1.5rem; }
     .stat-card .number{ font-size:2.2rem; font-weight:700; }
-    .stat-card .label{ font-size:.85rem; color:#666; }
+    .stat-card .label{ font-size:.85rem; color:#8c8c9c; }
     .badge-nova{ background:#fff2cc; color:#856404; padding:3px 10px; border-radius:4px; font-weight:600; font-size:.75rem; }
     .badge-ausente{ background:#fce4ec; color:#c62828; padding:3px 10px; border-radius:4px; font-weight:600; font-size:.75rem; }
     .badge-sub-nova{ background:#e2efda; color:#2e7d32; padding:3px 10px; border-radius:4px; font-weight:600; font-size:.75rem; }
@@ -312,7 +312,7 @@ function renderResultadoHTML($dados, $paraPdf = false) {
     .diff-card-ausente{ border-left:5px solid #ef5350; }
     .diff-card-sub-nova{ border-left:5px solid #66bb6a; }
     .diff-card-sub-removida{ border-left:5px solid #ff9800; }
-    .lancamento-item{ font-size:.8rem; color:#666; padding:2px 0 2px 16px; border-left:2px solid #ddd; margin:2px 0; }
+    .lancamento-item{ font-size:.8rem; color:#8c8c9c; padding:2px 0 2px 16px; border-left:2px solid #ddd; margin:2px 0; }
     .totais-table th{ background:var(--azul); color:#fff; font-size:.8rem; }
     .totais-table td{ font-size:.85rem; vertical-align:middle; }
     .totais-table .row-nova td{ background:#fffde7; }
@@ -371,7 +371,7 @@ function renderResultadoHTML($dados, $paraPdf = false) {
     </div>
     <div class="col-md-3">
       <div class="card stat-card">
-        <div class="number" style="color:#2e7d32;"><?= count($dados['totaisComparativo'] ?? []) ?></div>
+        <div class="number" style="color:#0664e4;"><?= count($dados['totaisComparativo'] ?? []) ?></div>
         <div class="label">Contas<br>Comparadas</div>
       </div>
     </div>

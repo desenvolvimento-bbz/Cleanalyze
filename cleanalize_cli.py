@@ -36,6 +36,10 @@ from cleanalize_plugins.inadimplencia import Extractor as Inad, NOME as NOME_INA
 register(NOME_INAD, Inad)
 from cleanalize_plugins.ahreas import Extractor as Ahreas, NOME as NOME_AHREAS
 register(NOME_AHREAS, Ahreas)
+from cleanalize_plugins.lello import Extractor as Lello, NOME as NOME_LELLO
+register(NOME_LELLO, Lello)
+from cleanalize_plugins.lello_inadimplencia import Extractor as LelloInad, NOME as NOME_LELLO_INAD
+register(NOME_LELLO_INAD, LelloInad)
 
 # -------------------- Normalização/Mapeamento --------------------
 
@@ -171,7 +175,7 @@ def main():
     ap = argparse.ArgumentParser(description="Cleanalize CLI (OCR opcional, DPI e intervalo de páginas)")
     ap.add_argument("--pdftotext", help="Caminho do pdftotext.exe (Poppler)")
     ap.add_argument("--pdf", required=True, help="PDF de entrada")
-    ap.add_argument("--tipo", choices=choices(), help="Tipo (inadimplencia, ahreas)")
+    ap.add_argument("--tipo", choices=choices(), help="Tipo (inadimplencia, ahreas, lello, lello_inadimplencia)")
     ap.add_argument("--config", required=True, help="JSON de mapeamento")
     ap.add_argument("--modelo", help="Planilha modelo (XLSX)")
     ap.add_argument("--saida", default="saida.xlsx", help="Arquivo XLSX de saída")
@@ -185,6 +189,9 @@ def main():
     ap.add_argument("--dpi", type=int, default=200, help="DPI das imagens para OCR (padrão 200)")
     ap.add_argument("--first-page", type=int, help="Primeira página para OCR (1 = primeira)")
     ap.add_argument("--last-page", type=int, help="Última página para OCR")
+    ap.add_argument("--use-layout", action="store_true",
+                    help="Usar pdfplumber em grade de layout (preserva colunas). "
+                         "Automatico para lello.")
     ap.add_argument("--use-pdfplumber", action="store_true",
                     help="Usar pdfplumber (extração por coordenadas) em vez de pdftotext. "
                          "Automático para inadimplência.")
@@ -209,7 +216,20 @@ def main():
         use_pdfplumber = True
         print("[INFO] Tipo inadimplência detectado: usando pdfplumber (extração por coordenadas)")
 
-    if use_pdfplumber:
+    # Lello: relatorio em forma de formulario, so legivel com as colunas preservadas
+    use_layout = args.use_layout
+    if args.tipo in ("lello", "lello_inadimplencia"):
+        use_layout = True
+        print(f"[INFO] Tipo {args.tipo} detectado: usando pdfplumber (grade de layout, preserva colunas)")
+
+    if use_layout:
+        texto = engine.to_text_layout(args.pdf)
+        extractor_method = "pdfplumber (layout)"
+        if (not texto or not texto.strip()) and args.ocr:
+            print("[INFO] pdfplumber (layout) retornou vazio, ativando OCR como fallback...")
+            texto = engine.to_text(args.pdf)
+            extractor_method = "pdfplumber (layout) -> OCR fallback"
+    elif use_pdfplumber:
         texto = engine.to_text_pdfplumber(args.pdf)
         extractor_method = "pdfplumber"
         # OCR só como fallback: se pdfplumber retornou texto > 0, NÃO roda OCR
