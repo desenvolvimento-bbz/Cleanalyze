@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   cleanalyze:
     build:
@@ -19,6 +17,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./auth/data:/var/www/html/auth/data
-      - ./output:/var/www/html/output
-      - ./uploads:/var/www/html/uploads
+      # Codigo-fonte ao vivo: qualquer .php/.py editado no host vale no proximo request.
+      # Este bind da raiz ja cobre ./auth/data, ./output e ./uploads.
+      - .:/var/www/html
+      # Preserva o vendor/ instalado pelo Composer na imagem (o bind acima o cobriria)
+      - /var/www/html/vendor

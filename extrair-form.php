@@ -54,8 +54,11 @@ app_log('page.view', ['page'=>basename(__FILE__)]);
             </div>
             <div class="col-md-4">
               <select name="tipo" id="tipoExtrair" class="form-select" required>
+                <option value="">-- Selecione --</option>
+                <option value="inadimplencia">Ahreas (Inadimplência)</option>
                 <option value="ahreas">Ahreas (Unidades)</option>
-                <option value="inadimplencia">Inadimplencia</option>
+                <option value="lello_inadimplencia">Lello (Inadimplência)</option>
+                <option value="lello">Lello (Unidades)</option>
               </select>
             </div>
             <div class="col-md-6">

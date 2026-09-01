@@ -62,7 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$err) {
 <title>Convite — Cleanalyze</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+  <link href="../assets/css/bbz.css" rel="stylesheet">
 <style>
 :root{ --azul:#04193b; --cinzaClaro:#efeff4; }
 body{ background:var(--cinzaClaro); color:var(--azul); font-family:'Manrope',sans-serif; }

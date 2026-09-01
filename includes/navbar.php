@@ -30,11 +30,12 @@ $_prestacaoActive = $activePage === 'prestacao';
 $_adminActive     = in_array($activePage, ['convites', 'admin-docs-bbz'], true);
 ?>
 <style>
-  /* Dropdowns do navbar: bate com a paleta Cleanalyze (--azul #04193b) */
+  /* Dropdowns do navbar. Cores da marca (assets/css/bbz.css), com fallback
+     caso alguma pagina ainda nao carregue o CSS central. */
   .navbar .dropdown-menu {
     border: 1px solid rgba(4,25,59,.15);
-    box-shadow: 0 6px 20px rgba(0,0,0,.08);
-    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(4,25,59,.10);
+    border-radius: var(--bbz-raio-sm, 12px);
     padding: 6px;
     min-width: 220px;
     background-color: #fff;
@@ -46,7 +47,7 @@ $_adminActive     = in_array($activePage, ['convites', 'admin-docs-bbz'], true);
   .navbar .dropdown-menu .dropdown-item,
   .navbar .dropdown-menu .dropdown-item:link,
   .navbar .dropdown-menu .dropdown-item:visited {
-    color: #04193b !important;
+    color: var(--bbz-azul-escuro, #04193b) !important;
     background-color: transparent;
     border-radius: 6px;
     padding: 8px 12px;
@@ -54,18 +55,21 @@ $_adminActive     = in_array($activePage, ['convites', 'admin-docs-bbz'], true);
   }
   .navbar .dropdown-menu .dropdown-item:hover,
   .navbar .dropdown-menu .dropdown-item:focus {
-    color: #04193b !important;
-    background-color: #eef1f8 !important;
+    color: var(--bbz-azul-escuro, #04193b) !important;
+    background-color: var(--bbz-cinza-claro, #efeff4) !important;
   }
   .navbar .dropdown-menu .dropdown-item.active,
   .navbar .dropdown-menu .dropdown-item:active {
     color: #ffffff !important;
-    background-color: #04193b !important;
+    background-color: var(--bbz-azul, #0664e4) !important;
   }
 </style>
-<nav class="navbar navbar-expand-lg" style="font-family:'Manrope',sans-serif;">
+<nav class="navbar navbar-expand-lg">
   <div class="container">
-    <a class="navbar-brand" href="<?= $_navBaseUrl ?>/index.php" style="font-weight:700; font-size:1.3rem;">Cleanalyze<?php if ($_navVersion): ?><span style="font-size:.6rem; font-weight:400; color:rgba(255,255,255,.45); margin-left:6px; vertical-align:middle;">v<?= htmlspecialchars($_navVersion) ?></span><?php endif; ?></a>
+    <a class="navbar-brand" href="<?= $_navBaseUrl ?>/index.php">
+      <img src="<?= $_navBaseUrl ?>/assets/img/bbz-logo-negativa.png" alt="BBZ" class="bbz-marca">
+      <span style="font-size:1.25rem;">Cleanalyze</span><?php if ($_navVersion): ?><span style="font-size:.6rem; font-weight:400; color:rgba(255,255,255,.45); margin-left:6px; vertical-align:middle;">v<?= htmlspecialchars($_navVersion) ?></span><?php endif; ?>
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>

@@ -278,13 +278,13 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST') && isset($_POST['export_pdf']) && $_
   @page { margin: 10mm 8mm; }
   body { font-family: DejaVu Sans, sans-serif; font-size: 8px; color: #04193b; margin: 0; }
   h2 { font-size: 13px; margin: 0 0 4px; }
-  .info { font-size: 8px; color: #555; margin-bottom: 4px; }
-  .cols-info { font-size: 7px; color: #888; margin-bottom: 8px; }
+  .info { font-size: 8px; color: #8c8c9c; margin-bottom: 4px; }
+  .cols-info { font-size: 7px; color: #8c8c9c; margin-bottom: 8px; }
   h3 { font-size: 10px; margin: 10px 0 4px; padding: 3px 8px; background: #04193b; color: #fff; }
   table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
   th { background: #b8b8c4; padding: 3px 5px; text-align: left; font-size: 7.5px; }
-  td { padding: 2px 5px; border-bottom: 1px solid #ddd; }
-  .diff { background: #f8d7da; font-weight: 600; }
+  td { padding: 2px 5px; border-bottom: 1px solid #b8b8c4; }
+  .diff { background: #b0d4ff; font-weight: 600; }
   .page-break { page-break-before: always; }
 </style>
 </head><body>
@@ -343,7 +343,7 @@ HTML;
     table thead th.sticky-top{
       position: sticky; top: 0; z-index: 2; background:var(--cinza) !important; color:var(--azul);
     }
-    .diff-cell{ background:#f8d7da !important; } /* highlight diferença */
+    .diff-cell{ background:#b0d4ff !important; } /* highlight diferença */
         /* força esconder a linha, independente do CSS do Bootstrap */
 
     @media (max-width: 992px){

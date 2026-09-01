@@ -71,10 +71,10 @@ function h($v) { return htmlspecialchars((string)$v, ENT_QUOTES|ENT_SUBSTITUTE, 
   <title>Usuários — Cleanalyze</title>
   <?php include __DIR__ . '/../includes/head.php'; ?>
   <style>
-    .role-badge-admin{ background:#7B2D8E; color:#fff; padding:3px 10px; border-radius:4px; font-size:.8rem; font-weight:600; }
-    .role-badge-user{ background:#4472C4; color:#fff; padding:3px 10px; border-radius:4px; font-size:.8rem; font-weight:600; }
-    .via-google{ color:#34A853; font-size:.8rem; }
-    .via-password{ color:#888; font-size:.8rem; }
+    .role-badge-admin{ background:var(--bbz-roxo); color:#fff; padding:3px 10px; border-radius:4px; font-size:.8rem; font-weight:600; }
+    .role-badge-user{ background:var(--bbz-azul); color:#fff; padding:3px 10px; border-radius:4px; font-size:.8rem; font-weight:600; }
+    .via-google{ color:var(--bbz-azul); font-size:.8rem; }
+    .via-password{ color:var(--bbz-cinza-escuro); font-size:.8rem; }
     .pass-form{ display:none; margin-top:6px; }
     .pass-form.show{ display:flex; }
     .user-row td{ vertical-align:middle; }

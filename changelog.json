@@ -1,5 +1,18 @@
 [
   {
+    "versao": "1.4.0",
+    "data": "01/09/2026",
+    "titulo": "Modelos da Lello e identidade visual BBZ",
+    "itens": [
+      "Novo modelo de extracao: Relacao de Enderecamento (Lello)",
+      "Novo modelo de extracao: Cotas Atrasadas / Inadimplencia (Lello)",
+      "Unidades com mais de um proprietario saem em uma unica linha, com nome, CPF, e-mail e telefones separados por barra",
+      "Dados exportados em maiusculas e sem acentos, com o tipo de logradouro abreviado",
+      "Aplicacao agora segue a identidade visual oficial da BBZ, com o logo na barra de navegacao e na tela de login",
+      "Modelos de extracao reorganizados no menu por sistema (Ahreas e Lello)"
+    ]
+  },
+  {
     "versao": "1.3.3",
     "data": "14/04/2026",
     "titulo": "Assistente IA mais assertivo e com leitura de imagens",
