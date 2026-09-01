@@ -17,7 +17,7 @@ app_log('page.view', ['page'=>basename(__FILE__)]);
     .upload-zone:hover{ border-color:var(--azul); }
     .upload-zone input[type="file"]{ display:none; }
     .upload-zone label{ cursor:pointer; display:block; }
-    .file-name{ font-size:.85rem; color:#666; margin-top:.5rem; }
+    .file-name{ font-size:.85rem; color:var(--bbz-cinza-escuro); margin-top:.5rem; }
   </style>
 </head>
 <body>
@@ -108,12 +108,12 @@ app_log('page.view', ['page'=>basename(__FILE__)]);
 document.getElementById('pdf_anterior').addEventListener('change', function() {
   const name = this.files[0] ? this.files[0].name : '';
   document.getElementById('name-anterior').textContent = name;
-  if (name) document.getElementById('zone-anterior').style.borderColor = '#548235';
+  if (name) document.getElementById('zone-anterior').style.borderColor = '#0664e4';
 });
 document.getElementById('pdf_atual').addEventListener('change', function() {
   const name = this.files[0] ? this.files[0].name : '';
   document.getElementById('name-atual').textContent = name;
-  if (name) document.getElementById('zone-atual').style.borderColor = '#548235';
+  if (name) document.getElementById('zone-atual').style.borderColor = '#0664e4';
 });
 
 // Loading state on submit

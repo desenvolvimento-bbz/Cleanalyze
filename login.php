@@ -51,29 +51,30 @@ $bye      = isset($_GET['bye']);
 <title>Login — Cleanalyze</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="<?= htmlspecialchars($baseUrl) ?>/assets/css/bbz.css" rel="stylesheet">
+<link rel="icon" href="<?= htmlspecialchars($baseUrl) ?>/assets/img/bbz-logo-positiva.png">
 <?php if ($googleEnabled): ?>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <?php endif; ?>
 <style>
-:root{ --azul:#04193b; --cinzaClaro:#efeff4; }
-body{ background:var(--cinzaClaro); color:var(--azul); font-family:'Manrope',sans-serif; }
-.login-card{ max-width:440px; margin:8vh auto; border:none; border-radius:12px; }
+.login-card{ max-width:440px; margin:8vh auto; border:none; border-radius:var(--bbz-raio); }
 .login-card .card-body{ padding:2.5rem; }
-.brand-title{ font-size:1.8rem; font-weight:700; color:var(--azul); text-align:center; margin-bottom:.3rem; }
-.brand-sub{ text-align:center; color:#888; font-size:.85rem; margin-bottom:2rem; }
+.brand-logo{ display:block; width:56px; height:auto; margin:0 auto 1rem; }
+.brand-title{ font-size:1.8rem; font-weight:600; color:var(--bbz-azul-escuro); text-align:center; margin-bottom:.3rem; }
+.brand-sub{ text-align:center; color:var(--bbz-cinza-escuro); font-size:.85rem; margin-bottom:2rem; }
 .divider{ display:flex; align-items:center; margin:1.5rem 0; }
-.divider::before, .divider::after{ content:''; flex:1; border-bottom:1px solid #ddd; }
-.divider span{ padding:0 12px; color:#999; font-size:.8rem; }
-.btn-primary{ background:var(--azul); border-color:var(--azul); }
-.btn-primary:hover{ background:#0a3d7a; border-color:#0a3d7a; }
+.divider::before, .divider::after{ content:''; flex:1; border-bottom:1px solid var(--bbz-cinza-medio); }
+.divider span{ padding:0 12px; color:var(--bbz-cinza-escuro); font-size:.8rem; }
 .google-btn{
   display:flex; align-items:center; justify-content:center; gap:10px;
-  width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;
-  background:#fff; cursor:pointer; font-size:.95rem; font-weight:500;
-  transition:box-shadow .15s, border-color .15s; color:#333;
+  width:100%; padding:10px; border:1px solid var(--bbz-cinza-medio); border-radius:var(--bbz-raio-sm);
+  background:#fff; cursor:pointer; font-size:.95rem; font-weight:600;
+  transition:box-shadow .15s, border-color .15s; color:var(--bbz-azul-escuro);
 }
-.google-btn:hover{ box-shadow:0 2px 8px rgba(0,0,0,.1); border-color:#bbb; }
+.google-btn:hover{ box-shadow:0 2px 8px rgba(4,25,59,.12); border-color:var(--bbz-cinza-escuro); }
 .google-btn svg{ flex-shrink:0; }
 #google-error{ display:none; }
 </style>
@@ -81,6 +82,7 @@ body{ background:var(--cinzaClaro); color:var(--azul); font-family:'Manrope',san
 <body>
 <div class="card login-card shadow-sm">
   <div class="card-body">
+    <img src="<?= htmlspecialchars($baseUrl) ?>/assets/img/bbz-logo-positiva.png" alt="BBZ" class="brand-logo">
     <div class="brand-title">Cleanalyze</div>
     <div class="brand-sub">Acesse sua conta</div>
 

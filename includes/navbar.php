@@ -16,9 +16,12 @@ $_navBaseUrl = rtrim($_navBaseUrl, '/');
 // Se estiver na raiz (Docker), $_navBaseUrl será vazio -> usar "/"
 if ($_navBaseUrl === '') $_navBaseUrl = '';
 ?>
-<nav class="navbar navbar-expand-lg" style="font-family:'Manrope',sans-serif;">
+<nav class="navbar navbar-expand-lg">
   <div class="container">
-    <a class="navbar-brand" href="<?= $_navBaseUrl ?>/index.php" style="font-weight:700; font-size:1.3rem;">Cleanalyze</a>
+    <a class="navbar-brand" href="<?= $_navBaseUrl ?>/index.php">
+      <img src="<?= $_navBaseUrl ?>/assets/img/bbz-logo-negativa.png" alt="BBZ" class="bbz-marca">
+      <span style="font-size:1.25rem;">Cleanalyze</span>
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>

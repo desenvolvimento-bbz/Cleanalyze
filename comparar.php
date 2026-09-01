@@ -225,7 +225,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST') && isset($_POST['export_pdf']) && $_
   table { border-collapse: collapse; }
   th, td { border: 1px solid #b8b8c4; padding: 4px 6px; white-space: nowrap; }
   thead th { background: #b8b8c4; }
-  .diff-cell { background: #f8d7da; }
+  .diff-cell { background: #b0d4ff; }
 </style>
 </head>
 <body>
@@ -285,7 +285,7 @@ HTML;
     table thead th.sticky-top{
       position: sticky; top: 0; z-index: 2; background:var(--cinza) !important; color:var(--azul);
     }
-    .diff-cell{ background:#f8d7da !important; } /* highlight diferença */
+    .diff-cell{ background:#b0d4ff !important; } /* highlight diferença */
         /* força esconder a linha, independente do CSS do Bootstrap */
 
     @media (max-width: 992px){

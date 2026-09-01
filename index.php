@@ -11,14 +11,14 @@ $userEmail = auth_user_email() ?? 'Usuário';
   <?php include __DIR__ . '/includes/head.php'; ?>
   <style>
     .welcome-section{
-      background: linear-gradient(135deg, #04193b 0%, #0a3d7a 100%);
-      color:#fff; border-radius:12px; padding:2rem 2.5rem; margin-bottom:2rem;
+      background: linear-gradient(135deg, var(--bbz-azul-escuro) 0%, var(--bbz-azul) 100%);
+      color:#fff; border-radius:var(--bbz-raio); padding:2rem 2.5rem; margin-bottom:2rem;
     }
-    .welcome-section h2{ font-weight:700; margin:0; }
+    .welcome-section h2{ font-weight:300; margin:0; }
     .welcome-section p{ opacity:.8; margin:.5rem 0 0; }
 
     .nav-card{
-      border:none; border-radius:12px; transition:transform .15s, box-shadow .15s;
+      border:none; border-radius:var(--bbz-raio); transition:transform .15s, box-shadow .15s;
       cursor:pointer; text-decoration:none; color:var(--azul); height:100%;
     }
     .nav-card:hover{
@@ -28,13 +28,15 @@ $userEmail = auth_user_email() ?? 'Usuário';
     .nav-card .card-body{ padding:1.8rem; }
     .nav-card .icon{ font-size:2.5rem; margin-bottom:.8rem; display:block; }
     .nav-card h5{ font-weight:700; margin-bottom:.4rem; }
-    .nav-card p{ color:#666; font-size:.85rem; margin:0; }
-    .nav-card-extrair{ border-left:5px solid #4472C4; }
-    .nav-card-comparar{ border-left:5px solid #ED7D31; }
-    .nav-card-prestacao{ border-left:5px solid #548235; }
-    .nav-card-convites{ border-left:5px solid #7B2D8E; }
+    .nav-card p{ color:var(--bbz-cinza-escuro); font-size:.85rem; margin:0; }
+        /* Sequencia da paleta BBZ: azul (principal) -> azul medio -> roxo (destaque).
+       Convites e area administrativa, entao fica no cinza de apoio. */
+    .nav-card-extrair{ border-left:5px solid var(--bbz-azul); }
+    .nav-card-comparar{ border-left:5px solid var(--bbz-azul-medio); }
+    .nav-card-prestacao{ border-left:5px solid var(--bbz-roxo); }
+    .nav-card-convites{ border-left:5px solid var(--bbz-cinza-escuro); }
 
-    .changelog-card{ border-color:var(--cinza); border-radius:10px; }
+    .changelog-card{ border-color:var(--bbz-cinza-medio); border-radius:var(--bbz-raio); }
     .changelog-card .card-header{ background:#fff; border-bottom:1px solid var(--cinza); }
   </style>
 </head>

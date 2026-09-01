@@ -30,7 +30,7 @@ $UPLOADS_DIR  = APP_UPLOADS;
 @mkdir($UPLOADS_DIR, 0777, true);
 
 // ---------- ENTRADAS DO FORM ----------
-$tipo  = isset($_POST['tipo']) ? trim($_POST['tipo']) : '';              // 'ahreas' | 'inadimplencia'
+$tipo  = isset($_POST['tipo']) ? trim($_POST['tipo']) : '';              // 'ahreas' | 'inadimplencia' | 'lello' | 'lello_inadimplencia'
 $bloco = isset($_POST['bloco']) ? trim($_POST['bloco']) : '';            // opcional
 $pdfFromForm = isset($_FILES['pdf']) ? $_FILES['pdf'] : null;            // upload padrão
 $pdfPathPost  = isset($_POST['pdf_path']) ? trim($_POST['pdf_path']) : '';// caminho já salvo (opcional)
@@ -66,8 +66,8 @@ if ($pdfFromForm && $pdfFromForm['error'] === UPLOAD_ERR_OK) {
   $erros[] = "Nenhum PDF recebido.";
 }
 
-if ($tipo !== 'ahreas' && $tipo !== 'inadimplencia') {
-  $erros[] = "Tipo inválido. Use 'ahreas' ou 'inadimplencia'.";
+if (!in_array($tipo, ['ahreas', 'inadimplencia', 'lello', 'lello_inadimplencia'], true)) {
+  $erros[] = "Tipo inválido. Use 'ahreas', 'inadimplencia', 'lello' ou 'lello_inadimplencia'.";
 }
 
 if ($erros) {
@@ -84,6 +84,14 @@ if ($tipo === 'inadimplencia') {
   $config = $BASE . $S . 'config' . $S . 'inadimplencia.json';
   $modelo = $BASE . $S . 'modelo_planilha_inadimplencia.xlsx';
   $prefixoSaida = 'Inadimplencia';
+} elseif ($tipo === 'lello_inadimplencia') {
+  $config = $BASE . $S . 'config' . $S . 'lello_inadimplencia.json';
+  $modelo = $BASE . $S . 'modelo_planilha_inadimplencia.xlsx';
+  $prefixoSaida = 'Inadimplencia_Lello';
+} elseif ($tipo === 'lello') {
+  $config = $BASE . $S . 'config' . $S . 'lello.json';
+  $modelo = $BASE . $S . 'modelo_planilha_importacao.xlsx';
+  $prefixoSaida = 'Unidades_Lello';
 } else { // 'ahreas'
   $config = $BASE . $S . 'config' . $S . 'ahreas.json';
   $modelo = $BASE . $S . 'modelo_planilha_importacao.xlsx';
@@ -140,7 +148,13 @@ function h($s){return htmlspecialchars($s, ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');}
 $debugTxt = $finalPdfPath . '.debug.txt';
 
 // Tipo formatado para exibição
-$tipoLabel = $tipo === 'inadimplencia' ? 'Inadimplência' : 'Ahreas (Unidades)';
+$LABELS_TIPO = [
+  'inadimplencia' => 'Ahreas (Inadimplência)',
+  'lello'         => 'Lello (Unidades)',
+  'lello_inadimplencia' => 'Lello (Inadimplência)',
+  'ahreas'        => 'Ahreas (Unidades)',
+];
+$tipoLabel = $LABELS_TIPO[$tipo] ?? $tipo;
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -148,16 +162,15 @@ $tipoLabel = $tipo === 'inadimplencia' ? 'Inadimplência' : 'Ahreas (Unidades)';
   <meta charset="UTF-8">
   <title>Resultado da Extração - Cleanalyze</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+  <link href="../assets/css/bbz.css" rel="stylesheet">
   <style>
     :root{ --azul:#04193b; --cinza:#b8b8c4; --cinzaClaro:#efeff4; }
     body{ background:var(--cinzaClaro); color:var(--azul); font-family: 'Manrope', sans-serif; }
     .navbar{ background:var(--azul); }
     .navbar .navbar-brand, .navbar a{ color:#fff !important; }
-    .btn-primary{ background:var(--azul); border-color:var(--azul); }
-    .btn-primary:hover{ background:#062a5c; border-color:#062a5c; }
     .card{ border-color:var(--cinza); }
-    pre{ white-space: pre-wrap; word-break: break-word; background: #f8f9fa; padding: 12px; border-radius: 6px; font-size: 0.85rem; }
+    pre{ white-space: pre-wrap; word-break: break-word; background: var(--bbz-cinza-claro); padding: 12px; border-radius: 6px; font-size: 0.85rem; }
     .result-icon{ font-size: 3rem; }
   </style>
 </head>

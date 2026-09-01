@@ -1,0 +1,28 @@
+{
+  "nome_modelo": "Lello — Inadimplência",
+  "_observacoes": [
+    "Relatório 'Cotas Atrasadas' da Lello.",
+    "Uma linha por conta contábil: o rateio das contas soma o Valor Original da cobrança.",
+    "Cód. Condomínio vem da 'Referência' do relatório, não do nome do arquivo.",
+    "Percentual Multa é calculado por cobrança (valor da multa sobre o valor original).",
+    "O relatório não traz bloco nem conta bancária, e a coluna Correção/Juros não tem destino no modelo."
+  ],
+  "mapeamento": {
+    "Condominio": "Cód. Condomínio",
+    "Bloco": "Cód. Bloco",
+    "Unidade": "Cód. Unidade",
+    "Vencimento": "Vencimento",
+    "ContaBancaria": "Cód. Conta Bancária",
+    "Conta": "Cód. Conta Contábil",
+    "Historico": "Descrição",
+    "Complemento": "Complemento",
+    "Valor": "Valor",
+    "PercentualMulta": "Percentual Multa",
+    "Recibo": "Nro. Bancário"
+  },
+  "normalizacao": {
+    "Valor": { "tipo": "decimal_br" },
+    "PercentualMulta": { "tipo": "decimal_br" },
+    "Vencimento": { "tipo": "data_br_formatada" }
+  }
+}
