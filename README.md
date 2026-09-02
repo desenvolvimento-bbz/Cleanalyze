@@ -8,18 +8,17 @@ Detalhes de arquitetura e convenções de código estão no [CLAUDE.md](CLAUDE.m
 
 ---
 
-## ⚠️ Branch de trabalho
-
-O desenvolvimento **não acontece no `main`**.
+## Branch de trabalho
 
 | Branch | Papel |
 |---|---|
-| **`codexprimeiro-teste`** | Branch ativa. É o que roda em produção. Todo trabalho novo sai daqui |
-| `main` | Congelada na v1.2.0. Mantida apenas como histórico |
+| **`main`** | Branch ativa. É o que roda em produção. Todo trabalho novo sai daqui |
+| `codexprimeiro-teste` | Linha antiga de desenvolvimento, mesclada no `main` em 01/09/2026. Ficou defasada |
 
-O `main` está dezenas de commits atrás e **não deve ser publicado em produção** — subir a
-partir dele regride o Assistente IA, a Prestação de Contas v2 e, principalmente, remove os
-volumes Docker que persistem usuários e arquivos enviados.
+Até setembro de 2026 era o contrário: o `main` estava congelado na v1.2.0 e o
+desenvolvimento vivia na `codexprimeiro-teste`. As duas linhas foram unificadas, e hoje o
+`main` contém tudo — Assistente IA, Prestação de Contas v2, os modelos de extração e a
+identidade visual.
 
 Antes de commitar, confirme em que branch você está:
 
